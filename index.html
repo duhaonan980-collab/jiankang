@@ -20,7 +20,7 @@
   --tab-bg:rgba(249,249,249,0.8);--tab-border:rgba(0,0,0,0.08);
   --radius:20px;--shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
-  --tab-h:calc(49px + var(--safe-bottom));
+  --tab-h:calc(46px + var(--safe-bottom));
 }
 @media(prefers-color-scheme:dark){
   :root:not([data-theme="light"]){--bg:#000000;--card-bg:rgba(28,28,30,0.72);--card-border:rgba(255,255,255,0.08);
@@ -112,19 +112,27 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .stat-val{font-size:20px;font-weight:800}.stat-label{font-size:12px;color:var(--text2);margin-top:2px}
 .settings-section{margin:12px 16px;background:var(--card-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:0.5px solid var(--card-border);border-radius:var(--radius);overflow:hidden}
 .settings-section-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin:16px 16px 6px}
+.info-link{float:right;font-size:13px;color:var(--blue);font-weight:500;text-transform:none;letter-spacing:0;cursor:pointer}
+.info-link:active{opacity:.6}
+.info-modal-body{padding:0 4px}
+.info-modal-item{padding:12px 0;border-bottom:1px solid var(--card-border)}
+.info-modal-item:last-child{border-bottom:none}
+.info-modal-item-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+.info-modal-item-desc{font-size:13px;color:var(--text2);line-height:1.5}
 .settings-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--card-border)}
 .settings-item:last-child{border-bottom:none}.settings-label{font-size:16px}
 .settings-input{width:80px;text-align:right;background:transparent;border:none;font-size:16px;font-weight:500;color:var(--text);font-family:inherit;outline:none}
 .seg-control{display:flex;background:rgba(118,118,128,0.12);border-radius:9px;padding:2px;margin:8px 0}
 .seg-item{flex:1;text-align:center;padding:6px 4px;font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;transition:all .2s;color:var(--text)}
 .seg-item.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+#mealControl .seg-item.active{background:var(--blue);color:#fff;box-shadow:none}
 .recommend-box{margin:12px 16px;padding:14px 16px;background:rgba(0,122,255,0.08);border-radius:14px;display:flex;align-items:center;justify-content:space-between}
 .recommend-label{font-size:14px;color:var(--text2)}.recommend-val{font-size:22px;font-weight:800;color:var(--blue)}
 .api-key-input{width:100%;background:rgba(118,118,128,0.08);border:none;border-radius:10px;padding:10px 14px;font-size:15px;font-family:inherit;outline:none;color:var(--text);margin-top:4px}
 .api-help{font-size:13px;color:var(--blue);text-decoration:none;margin-top:8px;display:inline-block}
 .about-text{text-align:center;padding:24px;font-size:13px;color:var(--text3)}
 .about-text .ver{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:4px}
-.tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);padding-bottom:var(--safe-bottom);background:var(--tab-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:0.5px solid var(--tab-border);display:flex;z-index:100}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);padding-bottom:calc(var(--safe-bottom) * 0.4);background:var(--tab-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:0.5px solid var(--tab-border);display:flex;z-index:100}
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--text3);transition:color .2s}
 .tab-item.active{color:var(--blue)}.tab-icon{font-size:24px;line-height:1}.tab-label{font-size:10px;font-weight:600}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
@@ -309,6 +317,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
         </div>
       </div>
       <div class="nutri-rec" id="nutriRec"></div>
+      <div class="disclaimer" style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:10px;padding:8px 10px;background:rgba(118,118,128,0.06);border-radius:10px">本结果基于公开的营养学公式和一般健康成年人膳食建议计算，仅供日常饮食规划参考，不构成医疗诊断或个体化营养治疗建议。孕妇、哺乳期女性、未成年人、老年人及患有慢性疾病或特殊健康状况的人群，请咨询医生或注册营养师后使用。</div>
     </div>
     <div class="card">
       <div class="card-title">今日饮食</div>
@@ -351,9 +360,9 @@ input,textarea{user-select:text;-webkit-user-select:text}
       <div class="settings-item"><span class="settings-label">性别</span><div class="seg-control" style="width:140px;margin:0"><div class="seg-item active" data-gender="male" onclick="setGender('male')">男</div><div class="seg-item" data-gender="female" onclick="setGender('female')">女</div></div></div>
     </div>
     <button class="update-btn" onclick="updateWeightRecord()"><span style="font-size:20px">⚖️</span> 更新体重记录</button>
-    <div class="settings-section-title">运动量</div>
-    <div class="settings-section"><div class="seg-control" style="margin:8px" id="activityControl"><div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div><div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div><div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div><div class="seg-item" data-act="high" onclick="setActivity('high')">高</div></div></div>
-    <div class="settings-section-title">目标</div>
+    <div class="settings-section-title">运动量<span class="info-link" onclick="showActivityInfo()">说明</span></div>
+    <div class="settings-section"><div class="seg-control" style="margin:8px" id="activityControl"><div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div><div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div><div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div><div class="seg-item" data-act="high" onclick="setActivity('high')">高</div><div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div></div></div>
+    <div class="settings-section-title">目标<span class="info-link" onclick="showGoalInfo()">说明</span></div>
     <div class="settings-section"><div class="seg-control" style="margin:8px" id="goalControl"><div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div><div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div><div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div></div></div>
     <div class="recommend-box"><span class="recommend-label">每日推荐热量</span><span class="recommend-val" id="recommendCal">--</span></div>
     <div class="settings-section-title">外观</div>
@@ -385,7 +394,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.3.0</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
+    <div class="about-text"><div class="ver">热量营养检测 v3.4.4</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
   </div>
 
   <div class="tab-bar">
@@ -410,6 +419,8 @@ input,textarea{user-select:text;-webkit-user-select:text}
 
   <div class="modal-overlay" id="weightMonthModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">选择月份</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeWeightPickerYear(-1)">‹</button><div class="cal-title" id="weightPickerYearLabel">2026年</div><button class="date-nav-btn" onclick="changeWeightPickerYear(1)">›</button></div><div class="weight-month-grid" id="weightPickerGrid"></div><button class="modal-btn danger" onclick="hideModal('weightMonthModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div>
 
+  <div class="modal-overlay" id="infoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title" id="infoModalTitle">说明</div><div class="info-modal-body" id="infoModalBody"></div><button class="modal-btn danger" onclick="hideModal('infoModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:16px">关闭</button></div></div>
+
   <div class="loading-overlay" id="loadingOverlay"><img class="loading-img" id="loadingImg" style="display:none" alt=""><div class="spinner"></div><div class="loading-text" id="loadingText">AI识别中...</div></div>
   <div class="toast" id="toast"></div>
 
@@ -423,7 +434,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
       <div class="pattern-grid" id="lockPatternGrid"></div>
     </div>
     <div class="lock-footer" id="lockScreenFooter">
-      <button class="lock-footer-btn" id="lockScreenBtn" onclick="onLockFooterBtn()">使用面容解锁</button>
+      <button class="lock-footer-btn" id="lockScreenBtn" onclick="onLockFooterBtn()">忘记图案？清除应用锁</button>
     </div>
   </div>
   <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none" onchange="handleCameraPhoto(event)">
@@ -438,7 +449,7 @@ let state = {
   pendingFood:null, pendingMeal:null, currentCat:'all',
   tempPhoto:null, aiResults:[], theme:'auto',
   weightChartYear:new Date().getFullYear(), weightChartMonth:new Date().getMonth(),
-  appLock:{enabled:false,method:'pattern',pattern:[],credentialId:null}
+  appLock:{enabled:false,method:'pattern',pattern:[]}
 };
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
 let photoDB=null;
@@ -464,7 +475,7 @@ function clearAllPhotoData(){if(!photoDB)return;return new Promise((resolve)=>{c
 
 /* ========== STORAGE ========== */
 function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,baiduApiKey:state.baiduApiKey,baiduSecretKey:state.baiduSecretKey,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock}))}catch(e){showToast('存储失败')}}
-function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.baiduApiKey=d.baiduApiKey||'';state.baiduSecretKey=d.baiduSecretKey||'';state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[],credentialId:null}}}catch(e){console.error(e)}}
+function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.baiduApiKey=d.baiduApiKey||'';state.baiduSecretKey=d.baiduSecretKey||'';state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]}}}catch(e){console.error(e)}}
 
 /* ========== DATE ========== */
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -472,12 +483,62 @@ function formatDateLabel(k){const t=getDateKey(new Date());if(k===t)return '今�
 function getTodayFoods(){return state.foodLogs[state.selectedDate]||[]}
 
 /* ========== CALC ========== */
+/* ========== NUTRITION ALGORITHM v2 (Mifflin-St Jeor + CalcWeight + 保护机制) ========== */
 function calcBMI(h,w){if(!h||!w)return 0;return w/((h/100)**2)}
-function getBMIInfo(b){if(!b)return{label:'未设置',status:'请输入身高体重',color:'var(--text3)',desc:''};if(b<16)return{label:'瘦',status:'严重偏瘦',color:'var(--cyan)',desc:'建议增加营养摄入'};if(b<18.5)return{label:'偏瘦',status:'体重偏低',color:'var(--yellow)',desc:'适当增加热量摄入'};if(b<24)return{label:'正常',status:'体重正常',color:'var(--green)',desc:'保持良好的饮食习惯'};if(b<28)return{label:'偏胖',status:'体重偏高',color:'var(--orange)',desc:'建议控制饮食加强运动'};return{label:'胖',status:'肥胖',color:'var(--red)',desc:'建议咨询专业人士'}}
+function getBMIInfo(b){
+  if(!b)return{label:'未设置',status:'请输入身高体重',color:'var(--text3)',desc:''};
+  if(b<18.5)return{label:'偏瘦',status:'体重偏低',color:'var(--cyan)',desc:'当前体型偏瘦，系统已自动增加营养冗余，不建议继续减脂，推荐选择维持或增肌目标。'};
+  if(b<24)return{label:'正常',status:'体重正常',color:'var(--green)',desc:'当前体型处于正常范围，可根据个人目标选择减脂、维持或增肌，坚持均衡饮食和规律运动。'};
+  if(b<28)return{label:'超重',status:'体重偏高',color:'var(--orange)',desc:'当前体重略高于理想范围，适度减脂有助于改善健康状况，建议控制精制糖和高油食品摄入。'};
+  return{label:'肥胖',status:'肥胖',color:'var(--red)',desc:'当前处于肥胖范围，建议优先选择减脂模式。系统已自动启用计算体重修正机制，避免营养推荐失衡，提高减脂过程的科学性与安全性。'};
+}
+/* ① 基础代谢 BMR — Mifflin-St Jeor */
 function calcBMR(p){if(!p.height||!p.weight||!p.age)return 0;const b=10*p.weight+6.25*p.height-5*p.age;return p.gender==='male'?b+5:b-161}
-function calcTDEE(p){const b=calcBMR(p);if(!b)return 0;const f={low:1.2,normal:1.375,medium:1.55,high:1.725};return Math.round(b*(f[p.activity]||1.2))}
-function calcTargetCalories(){const t=calcTDEE(state.profile);if(!t)return 0;if(state.profile.goal==='lose')return t-500;if(state.profile.goal==='gain')return t+300;return t}
-function calcNutritionTargets(){const t=calcTargetCalories();if(!t)return{p:0,c:0,f:0};const w=state.profile.weight||60;return{p:Math.round(w*1.5),c:Math.round(t*0.5/4),f:Math.round(t*0.25/9)}}
+/* ② 每日总消耗 TDEE */
+function calcTDEE(p){const b=calcBMR(p);if(!b)return 0;const f={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};return b*(f[p.activity]||1.2)}
+/* ③ 每日推荐热量 E — 含基础代谢保护 */
+function calcTargetCalories(){
+  const tdee=calcTDEE(state.profile);if(!tdee)return 0;
+  const bmr=calcBMR(state.profile);
+  let e;
+  if(state.profile.goal==='lose'){e=tdee*0.85;if(e<bmr)e=bmr}
+  else if(state.profile.goal==='gain'){e=tdee*1.15}
+  else{e=tdee}
+  return Math.round(e);
+}
+/* ⑤ CalcWeight — 计算体重基数（肥胖用户使用调整体重） */
+function calcCalcWeight(p){
+  const bmi=calcBMI(p.height,p.weight);if(!bmi)return p.weight||60;
+  if(bmi<18.5)return(p.weight||60)*1.1;
+  if(bmi<28)return p.weight||60;
+  var ideal=(p.height-100)*0.9;
+  return ideal+0.25*((p.weight||60)-ideal);
+}
+/* ⑥⑦⑧⑨ 完整营养素计算 */
+function calcNutritionTargets(){
+  var e=calcTargetCalories();
+  if(!e)return{p:0,c:0,f:0,fiber:25,va:800,vc:100,calories:0};
+  var p=state.profile,cw=calcCalcWeight(p),goal=p.goal||'maintain',isMale=p.gender==='male';
+  /* ⑥ 蛋白质 */
+  var protein=(goal==='lose'||goal==='gain')?cw*2.0:cw*1.6;
+  var proteinKcal=protein*4;
+  /* ⑦ 脂肪 — 三层最低保护 */
+  var fat=Math.max(cw*0.9,isMale?50:40,cw*0.6);
+  var fatKcal=fat*9;
+  /* ⑧ 碳水 — 剩余热量法 + 最低碳水保护 + 热量闭合 */
+  var remainingKcal=e-proteinKcal-fatKcal;
+  var carb=remainingKcal/4;
+  var carbMin=isMale?120:100;
+  if(carb<carbMin){
+    carb=carbMin;
+    var deficit=carbMin*4-remainingKcal;
+    if(deficit>0){protein-=deficit/2/4;fat-=deficit/2/9}
+  }
+  /* ⑨ 微量营养素 */
+  var fiber=Math.max(25,14*e/1000);
+  /* ⑩ 统一取整输出 */
+  return{p:Math.round(protein),c:Math.round(carb),f:Math.round(fat),fiber:Math.round(fiber),va:isMale?800:700,vc:100,calories:e};
+}
 
 /* ========== BAIDU AI ========== */
 let baiduToken=null,baiduTokenExpiry=0;
@@ -588,7 +649,11 @@ function openAmountModal(food,isAI){
   document.getElementById('amountAi').style.display=isAI?'block':'none';
   var tipEl=document.getElementById('amountTip');
   if(tipEl)tipEl.textContent=getFoodWeightTip(food.name);
-  document.getElementById('amountInput').value=100;setAmount(100,null);
+  document.getElementById('amountInput').value=100;
+  document.querySelectorAll('.amount-quick-btn').forEach(function(b){b.classList.remove('active')});
+  var btn100=document.querySelector('.amount-quick-btn:nth-child(2)');
+  if(btn100)btn100.classList.add('active');
+  updateAmountResult();
   const hr=new Date().getHours();let meal='snack';
   if(hr>=5&&hr<10)meal='breakfast';else if(hr>=10&&hr<14)meal='lunch';else if(hr>=16&&hr<21)meal='dinner';
   setMeal(meal);showModal('amountModal')
@@ -724,7 +789,7 @@ function renderNutrition(){
   document.getElementById('proteinBar').style.width=Math.min(tp/Math.max(t.p,1)*100,100)+'%';
   document.getElementById('carbsBar').style.width=Math.min(tc/Math.max(t.c,1)*100,100)+'%';
   document.getElementById('fatBar').style.width=Math.min(tf/Math.max(t.f,1)*100,100)+'%';
-  var fiberT=25,vaT=800,vcT=100;
+  var fiberT=t.fiber||25,vaT=t.va||800,vcT=t.vc||100;
   document.getElementById('fiberVal').textContent=tfi.toFixed(1)+' / '+fiberT+'g';
   document.getElementById('vitAVal').textContent=Math.round(tva)+' / '+vaT+'μg';
   document.getElementById('vitCVal').textContent=tvc.toFixed(0)+' / '+vcT+'mg';
@@ -782,7 +847,7 @@ function renderSettings(){
   var lockToggle=document.getElementById('appLockToggle');
   if(lockToggle)lockToggle.checked=state.appLock.enabled;
   var lockDesc=document.getElementById('appLockDesc');
-  if(lockDesc){if(state.appLock.enabled){lockDesc.textContent='已启用'+(state.appLock.method==='faceid'?'面容ID':'图案')+'解锁，每次打开应用需验证身份'}else{lockDesc.textContent='开启后每次打开应用需要验证身份，保护你的隐私数据'}}
+  if(lockDesc){if(state.appLock.enabled){lockDesc.textContent='已启用图案解锁，每次打开应用需绘制图案验证身份'}else{lockDesc.textContent='开启后每次打开应用需要绘制图案验证身份，保护你的隐私数据'}}
 }
 function renderWeeklyChart(){
   const target=calcTargetCalories();const today=new Date();const trend=[];
@@ -811,12 +876,34 @@ function setGender(g){state.profile.gender=g;saveState();renderSettings();render
 function setActivity(a){state.profile.activity=a;saveState();renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart()}
 function setGoal(g){state.profile.goal=g;saveState();renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart()}
 function setTheme(t){state.theme=t;saveState();if(t==='auto'){document.documentElement.removeAttribute('data-theme')}else{document.documentElement.setAttribute('data-theme',t)};document.querySelector('meta[name="theme-color"]').content=t==='dark'?'#000000':'#F2F2F7';renderSettings()}
+function showActivityInfo(){
+  document.getElementById('infoModalTitle').textContent='运动量说明';
+  var items=[
+    {t:'偏低',d:'久坐、几乎不运动，每周运动 0～1 次。办公室、学生党、长期久坐人群'},
+    {t:'正常',d:'每周轻度运动 1～3 次。散步、快走、骑行、轻量健身等'},
+    {t:'稍高',d:'每周中等强度运动 3～5 次。慢跑、游泳、健身房力量训练等'},
+    {t:'高',d:'每周高强度运动 6～7 次。高强度健身、球类运动、长跑等'},
+    {t:'极高',d:'每天高强度训练或重体力劳动。建筑工人、搬运工、职业运动员等'}
+  ];
+  document.getElementById('infoModalBody').innerHTML=items.map(function(i){return '<div class="info-modal-item"><div class="info-modal-item-title">'+i.t+'</div><div class="info-modal-item-desc">'+i.d+'</div></div>'}).join('');
+  showModal('infoModal');
+}
+function showGoalInfo(){
+  document.getElementById('infoModalTitle').textContent='目标说明';
+  var items=[
+    {t:'减脂',d:'减少体脂，约15%热量缺口'},
+    {t:'维持',d:'保持当前体重，热量收支平衡'},
+    {t:'增肌',d:'增加肌肉，约15%热量盈余'}
+  ];
+  document.getElementById('infoModalBody').innerHTML=items.map(function(i){return '<div class="info-modal-item"><div class="info-modal-item-title">'+i.t+'</div><div class="info-modal-item-desc">'+i.d+'</div></div>'}).join('');
+  showModal('infoModal');
+}
 function saveBaiduKeys(){state.baiduApiKey=document.getElementById('baiduApiKeyInput').value.trim();state.baiduSecretKey=document.getElementById('baiduSecretKeyInput').value.trim();baiduToken=null;localStorage.removeItem('baidu_token');saveState();showToast('已保存')}
 
 /* ========== DATA MANAGEMENT ========== */
 function exportData(){const json=JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,baiduApiKey:state.baiduApiKey,baiduSecretKey:state.baiduSecretKey},null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='热量营养检测_数据_'+getDateKey(new Date())+'.json';a.click();URL.revokeObjectURL(url);showToast('数据已导出')}
 function importData(){const input=document.createElement('input');input.type='file';input.accept='.json';input.onchange=function(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=function(ev){try{const d=JSON.parse(ev.target.result);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};if(d.baiduApiKey)state.baiduApiKey=d.baiduApiKey;if(d.baiduSecretKey)state.baiduSecretKey=d.baiduSecretKey;saveState();renderAll();showToast('数据已导入')}catch(err){showToast('导入失败: 文件格式错误')}};reader.readAsText(f)};input.click()}
-async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');localStorage.removeItem('baidu_token');await clearAllPhotoData();state={profile:{height:0,weight:0,age:25,gender:'male',activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},baiduApiKey:'',baiduSecretKey:'',selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,currentCat:'all',tempPhoto:null,aiResults:[],theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),appLock:{enabled:false,method:'pattern',pattern:[],credentialId:null}};document.documentElement.removeAttribute('data-theme');renderAll();showToast('所有数据已清除')}
+async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');localStorage.removeItem('baidu_token');await clearAllPhotoData();state={profile:{height:0,weight:0,age:25,gender:'male',activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},baiduApiKey:'',baiduSecretKey:'',selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,currentCat:'all',tempPhoto:null,aiResults:[],theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),appLock:{enabled:false,method:'pattern',pattern:[]}};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
 async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？食物记录不会被删除。'))return;await clearAllPhotoData();Object.values(state.foodLogs).forEach(foods=>foods.forEach(f=>f.hasPhoto=false));saveState();renderAll();if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({type:'CLEAR_PHOTO_CACHE'})}showToast('照片缓存已清除')}
 
 /* ========== WEIGHT TRACKING ========== */
@@ -1061,55 +1148,19 @@ function updateOnlineStatus(){const b=document.getElementById('offlineBadge');if
 
 /* ========== APP LOCK ========== */
 var patternLock={mode:'idle',firstPattern:null,dots:[],drawing:false,containerEl:null,svgEl:null,gridEl:null,dotPositions:[]};
-function isFaceIDAvailable(){
-  return window.PublicKeyCredential&&PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable?
-    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable():Promise.resolve(false);
-}
 function onAppLockToggle(){
   var toggle=document.getElementById('appLockToggle');
   if(toggle.checked){
-    isFaceIDAvailable().then(function(available){
-      if(available){
-        enableFaceIDLock();
-      }else{
-        enablePatternLock();
-      }
-    });
+    enablePatternLock();
   }else{
     disableAppLock();
   }
 }
 function disableAppLock(){
-  state.appLock={enabled:false,method:'pattern',pattern:[],credentialId:null};
+  state.appLock={enabled:false,method:'pattern',pattern:[]};
   saveState();
   renderSettings();
   showToast('应用锁已关闭');
-}
-function enableFaceIDLock(){
-  var challenge=new Uint8Array(32);
-  crypto.getRandomValues(challenge);
-  var userId=new Uint8Array(16);
-  crypto.getRandomValues(userId);
-  navigator.credentials.create({
-    publicKey:{
-      challenge:challenge,
-      rp:{name:'热量营养检测'},
-      user:{id:userId,name:'user',displayName:'用户'},
-      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
-      timeout:60000
-    }
-  }).then(function(cred){
-    var credId=btoa(String.fromCharCode.apply(null,new Uint8Array(cred.rawId)));
-    state.appLock={enabled:true,method:'faceid',pattern:[],credentialId:credId};
-    saveState();renderSettings();
-    showToast('面容ID解锁已启用');
-  }).catch(function(e){
-    console.warn('[AppLock] FaceID注册失败',e);
-    var toggle=document.getElementById('appLockToggle');
-    if(toggle)toggle.checked=false;
-    showToast('面容ID启用失败，请尝试图案锁');
-  });
 }
 function enablePatternLock(){
   patternLock.mode='setup1';
@@ -1122,14 +1173,12 @@ function showPatternLockScreen(mode,title,subtitle,error){
   document.getElementById('lockScreenError').textContent=error||'';
   var footer=document.getElementById('lockScreenFooter');
   var btn=document.getElementById('lockScreenBtn');
-  if(mode==='unlock'&&state.appLock.method==='faceid'){
-    footer.style.display='block';
-    btn.textContent='使用面容解锁';
-    btn.onclick=function(){tryFaceIDUnlock();};
-  }else if(mode==='unlock'&&state.appLock.method==='pattern'){
+  if(mode==='unlock'){
     footer.style.display='block';
     btn.textContent='忘记图案？清除应用锁';
-    btn.onclick=function(){resetAppLock();};
+  }else if(mode==='setup'){
+    footer.style.display='block';
+    btn.textContent='取消';
   }else{
     footer.style.display='none';
   }
@@ -1143,7 +1192,7 @@ function hidePatternLockScreen(){
 }
 function resetAppLock(){
   if(!confirm('确定要清除应用锁吗？这将关闭应用锁功能。'))return;
-  state.appLock={enabled:false,method:'pattern',pattern:[],credentialId:null};
+  state.appLock={enabled:false,method:'pattern',pattern:[]};
   saveState();
   hidePatternLockScreen();
   renderSettings();
@@ -1271,7 +1320,7 @@ function onPatternComplete(dots){
       setTimeout(function(){clearPatternDots();document.getElementById('lockPatternSvg').innerHTML='';},500);
     }else{
       if(JSON.stringify(patternLock.firstPattern)===JSON.stringify(dots)){
-        state.appLock={enabled:true,method:'pattern',pattern:dots.slice(),credentialId:null};
+        state.appLock={enabled:true,method:'pattern',pattern:dots.slice()};
         saveState();
         hidePatternLockScreen();
         renderSettings();
@@ -1294,40 +1343,19 @@ function onPatternComplete(dots){
     }
   }
 }
-function tryFaceIDUnlock(){
-  if(!state.appLock.credentialId){showToast('面容ID未配置');return}
-  var credId=state.appLock.credentialId;
-  var rawId=new Uint8Array(atob(credId).split('').map(function(c){return c.charCodeAt(0)}));
-  var challenge=new Uint8Array(32);
-  crypto.getRandomValues(challenge);
-  navigator.credentials.get({
-    publicKey:{
-      challenge:challenge,
-      allowCredentials:[{type:'public-key',id:rawId}],
-      userVerification:'required',
-      timeout:60000
-    }
-  }).then(function(){
-    hidePatternLockScreen();
-    showToast('解锁成功');
-  }).catch(function(e){
-    console.warn('[AppLock] FaceID解锁失败',e);
-    document.getElementById('lockScreenError').textContent='面容验证失败，请重试';
-  });
-}
 function checkAppLockOnLaunch(){
   if(state.appLock&&state.appLock.enabled){
-    if(state.appLock.method==='faceid'){
-      showPatternLockScreen('unlock','应用已锁定','点击下方按钮使用面容解锁','');
-      setTimeout(function(){tryFaceIDUnlock();},300);
-    }else{
-      showPatternLockScreen('unlock','请绘制图案解锁','连接你的解锁图案','');
-    }
+    showPatternLockScreen('unlock','请绘制图案解锁','连接你的解锁图案','');
   }
 }
 function onLockFooterBtn(){
-  if(state.appLock.method==='faceid'){tryFaceIDUnlock()}
-  else{resetAppLock()}
+  if(patternLock.mode==='setup'){
+    hidePatternLockScreen();
+    var toggle=document.getElementById('appLockToggle');
+    if(toggle)toggle.checked=false;
+  }else{
+    resetAppLock();
+  }
 }
 
 /* ========== INIT ========== */
