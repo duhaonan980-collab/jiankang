@@ -1,10 +1,10 @@
 /* ============================================
    热量营养检测 - Service Worker
-   版本: v2.1.0
+   版本: v3.3.0
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v15';
+const CACHE_VERSION = 'v19';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 
@@ -68,6 +68,9 @@ self.addEventListener('fetch', (event) => {
 
   // 跳过 CORS 代理请求
   if (url.hostname.includes('corsproxy')) return;
+
+  // 跳过 OpenFoodFacts API 请求
+  if (url.hostname.includes('openfoodfacts')) return;
 
   // 处理应用核心文件请求（Cache First，后台更新）
   if (
