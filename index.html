@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="热量营养检测">
 <meta name="theme-color" content="#F2F2F7">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon.png?v=353">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=353">
 <title>热量营养检测</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
@@ -270,6 +270,25 @@ input,textarea{user-select:text;-webkit-user-select:text}
 </style>
 </head>
 <body>
+<script>
+// PWA 自检：检测到新版 Service Worker 自动刷新
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js?v=353').then(reg=>{
+    reg.addEventListener('updatefound',()=>{
+      const newWorker=reg.installing;
+      newWorker.addEventListener('statechange',()=>{
+        if(newWorker.state==='installed' && navigator.serviceWorker.controller){
+          // 新SW已就绪，强制激活并刷新
+          newWorker.postMessage({type:'SKIP_WAITING'});
+          setTimeout(()=>location.reload(),300);
+        }
+      });
+    });
+    // 如果已有等待中的SW，立即激活
+    if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});location.reload();}
+  });
+}
+</script>
 <div id="app">
   <!-- ===== MAIN PAGE ===== -->
   <div id="main-page" class="page active">
@@ -395,7 +414,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.5.3</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
+    <div class="about-text"><div class="ver">热量营养检测 v3.5.4</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
   </div>
 
   <div class="tab-bar">
