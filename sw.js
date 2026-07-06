@@ -1,10 +1,10 @@
 /* ============================================
    热量营养检测 - Service Worker
-   版本: v3.5.1
+   版本: v3.5.3
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v28';
+const CACHE_VERSION = 'v30';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 
@@ -12,7 +12,9 @@ const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 const APP_SHELL_FILES = [
   './',
   './index.html',
-  './sw.js'
+  './sw.js',
+  './favicon.png',
+  './apple-touch-icon.png'
 ];
 
 // ==================== INSTALL ====================
