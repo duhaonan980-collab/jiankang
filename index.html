@@ -21,7 +21,7 @@
   --tab-bg:rgba(249,249,249,0.8);--tab-border:rgba(0,0,0,0.08);
   --radius:20px;--shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
-  --tab-h:48px;
+  --tab-h:60px;
 }
 @media(prefers-color-scheme:dark){
   :root:not([data-theme="light"]){--bg:#000000;--card-bg:rgba(28,28,30,0.72);--card-border:rgba(255,255,255,0.08);
@@ -37,12 +37,13 @@
   --text:#1C1C1E;--text2:#8E8E93;--text3:#C7C7CC;
   --tab-bg:rgba(249,249,249,0.8);--tab-border:rgba(0,0,0,0.08);
   --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);}
-html,body{height:100%;overflow:hidden}
-body{font-family:-apple-system,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.4;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+html{height:100%}
+body{min-height:100vh;margin:0;background:var(--bg);overflow-x:hidden;font-family:-apple-system,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;color:var(--text);font-size:16px;line-height:1.4;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
 input,textarea{user-select:text;-webkit-user-select:text}
 ::-webkit-scrollbar{width:0;display:none}
-#app{height:100%;position:relative;overflow:hidden;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--tab-h) + var(--safe-bottom) + 8px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:0}
+#app{min-height:100vh;display:flex;flex-direction:column;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.page-area{flex:1;position:relative;overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--tab-h) + var(--safe-bottom) + 12px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:0}
 .page.active{opacity:1;pointer-events:auto;z-index:1}
 .page-header{padding:calc(var(--safe-top) + 12px) 20px 8px;display:flex;align-items:flex-end;justify-content:space-between}
 .page-title{font-size:34px;font-weight:800;letter-spacing:-0.5px}
@@ -133,9 +134,9 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .api-help{font-size:13px;color:var(--blue);text-decoration:none;margin-top:8px;display:inline-block}
 .about-text{text-align:center;padding:24px;font-size:13px;color:var(--text3)}
 .about-text .ver{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:4px}
-.tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);padding-bottom:var(--safe-bottom);background:var(--tab-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:0.5px solid var(--tab-border);display:flex;z-index:100;align-items:center;box-sizing:content-box}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--text3);transition:color .2s;padding-top:2px;height:100%}
-.tab-item.active{color:var(--blue)}.tab-icon{font-size:22px;line-height:1}.tab-label{font-size:10px;font-weight:600}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);padding-bottom:var(--safe-bottom);background:var(--tab-bg);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:0.5px solid var(--tab-border);border-radius:20px 20px 0 0;box-shadow:0 -2px 20px rgba(0,0,0,0.05);display:flex;z-index:100;align-items:center;box-sizing:content-box}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:#8E8E93;transition:color .2s;height:100%}
+.tab-item.active{color:var(--blue)}.tab-icon{font-size:24px;line-height:1}.tab-label{font-size:11px;font-weight:500}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.show{opacity:1;pointer-events:auto}
 .modal-sheet{width:100%;max-width:500px;background:var(--bg);border-radius:24px 24px 0 0;padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));padding-bottom:calc(24px + var(--safe-bottom));max-height:calc(85vh - var(--safe-top));overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(0.32,0.72,0,1)}
@@ -288,6 +289,7 @@ if('serviceWorker' in navigator){
 
 </script>
 <div id="app">
+  <main class="page-area">
   <!-- ===== MAIN PAGE ===== -->
   <div id="main-page" class="page active">
     <div class="page-header">
@@ -412,14 +414,9 @@ if('serviceWorker' in navigator){
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.6.2</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
+    <div class="about-text"><div class="ver">热量营养检测 v3.7.0</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
   </div>
-
-  <div class="tab-bar">
-    <div class="tab-item active" data-page="main" onclick="switchPage('main')"><span class="tab-icon">🏠</span><span class="tab-label">首页</span></div>
-    <div class="tab-item" data-page="history" onclick="switchPage('history')"><span class="tab-icon">📋</span><span class="tab-label">历史</span></div>
-    <div class="tab-item" data-page="settings" onclick="switchPage('settings')"><span class="tab-icon">⚙️</span><span class="tab-label">设置</span></div>
-  </div>
+  </main>
 
   <div class="modal-overlay" id="amountModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">确认食物信息</div><div class="food-preview"><span class="food-preview-icon" id="amountIcon">🍽️</span><div class="food-preview-name" id="amountName">食物名称</div><div class="food-preview-ai" id="amountAi" style="display:none">✓ AI识别</div></div><div class="amount-input-wrap"><input class="amount-input" type="number" id="amountInput" value="100" inputmode="decimal" oninput="updateAmountResult()"><span class="amount-unit">克</span></div><div class="amount-quick"><button class="amount-quick-btn" onclick="setAmount(50,this)">50g</button><button class="amount-quick-btn active" onclick="setAmount(100,this)">100g</button><button class="amount-quick-btn" onclick="setAmount(150,this)">150g</button><button class="amount-quick-btn" onclick="setAmount(200,this)">200g</button><button class="amount-quick-btn" onclick="setAmount(300,this)">300g</button></div><div class="amount-tip" id="amountTip">💡 估不准重量？</div><div class="amount-result">热量约 <strong id="amountCalories">0</strong> kcal</div><div class="meal-select"><div class="seg-control" id="mealControl"><div class="seg-item" data-meal="breakfast" onclick="setMeal('breakfast')">早餐</div><div class="seg-item" data-meal="lunch" onclick="setMeal('lunch')">午餐</div><div class="seg-item" data-meal="dinner" onclick="setMeal('dinner')">晚餐</div><div class="seg-item" data-meal="snack" onclick="setMeal('snack')">加餐</div></div></div><button class="modal-btn primary" onclick="confirmAddFood()">添加到今日记录</button><button class="modal-btn danger" onclick="closeAmountModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div>
 
@@ -465,6 +462,11 @@ if('serviceWorker' in navigator){
   <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none" onchange="handleCameraPhoto(event)">
   <input type="file" accept="image/*" capture="environment" id="barcodeInput" style="display:none" onchange="handleBarcodePhoto(event)">
 </div>
+<nav class="tab-bar">
+  <div class="tab-item active" data-page="main" onclick="switchPage('main')"><span class="tab-icon">🏠</span><span class="tab-label">首页</span></div>
+  <div class="tab-item" data-page="history" onclick="switchPage('history')"><span class="tab-icon">📋</span><span class="tab-label">历史</span></div>
+  <div class="tab-item" data-page="settings" onclick="switchPage('settings')"><span class="tab-icon">⚙️</span><span class="tab-label">设置</span></div>
+</nav>
 <script>
 /* ========== STATE ========== */
 let state = {
