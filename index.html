@@ -21,7 +21,7 @@
   --tab-bg:rgba(249,249,249,0.8);--tab-border:rgba(0,0,0,0.08);
   --radius:20px;--shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
-  --tab-h:55px;
+  --tab-h:48px;
 }
 @media(prefers-color-scheme:dark){
   :root:not([data-theme="light"]){--bg:#000000;--card-bg:rgba(28,28,30,0.72);--card-border:rgba(255,255,255,0.08);
@@ -135,7 +135,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .about-text .ver{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:4px}
 .tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);padding-bottom:var(--safe-bottom);background:var(--tab-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:0.5px solid var(--tab-border);display:flex;z-index:100;align-items:center;box-sizing:content-box}
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--text3);transition:color .2s;padding-top:2px;height:100%}
-.tab-item.active{color:var(--blue)}.tab-icon{font-size:24px;line-height:1}.tab-label{font-size:10px;font-weight:600}
+.tab-item.active{color:var(--blue)}.tab-icon{font-size:22px;line-height:1}.tab-label{font-size:10px;font-weight:600}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.show{opacity:1;pointer-events:auto}
 .modal-sheet{width:100%;max-width:500px;background:var(--bg);border-radius:24px 24px 0 0;padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));padding-bottom:calc(24px + var(--safe-bottom));max-height:calc(85vh - var(--safe-top));overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(0.32,0.72,0,1)}
@@ -411,7 +411,7 @@ if('serviceWorker' in navigator){
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.5.8</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
+    <div class="about-text"><div class="ver">热量营养检测 v3.5.9</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
   </div>
 
   <div class="tab-bar">
