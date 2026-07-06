@@ -37,11 +37,11 @@
   --text:#1C1C1E;--text2:#8E8E93;--text3:#C7C7CC;
   --tab-bg:rgba(249,249,249,0.8);--tab-border:rgba(0,0,0,0.08);
   --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);}
-html,body{height:100%;height:var(--app-height,100dvh);overflow:hidden}
+html,body{height:100%;overflow:hidden}
 body{font-family:-apple-system,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.4;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
 input,textarea{user-select:text;-webkit-user-select:text}
 ::-webkit-scrollbar{width:0;display:none}
-#app{height:100%;height:var(--app-height,100dvh);position:relative;overflow:hidden;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+#app{height:100%;position:relative;overflow:hidden;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--tab-h) + var(--safe-bottom) + 8px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:0}
 .page.active{opacity:1;pointer-events:auto;z-index:1}
 .page-header{padding:calc(var(--safe-top) + 12px) 20px 8px;display:flex;align-items:flex-end;justify-content:space-between}
@@ -285,16 +285,7 @@ if('serviceWorker' in navigator){
     if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}
   });
 }
-// 修复 PWA 主屏幕模式下的视口高度（消除 Safari 地址栏占位残留）
-(function fixViewportHeight(){
-  function setH(){document.documentElement.style.setProperty('--app-height',window.innerHeight+'px');}
-  // 延迟执行：用 rAF + setTimeout 等 PWA 布局完全稳定再取高度
-  function delayedSetH(){setTimeout(function(){requestAnimationFrame(function(){requestAnimationFrame(setH);});},80);}
-  delayedSetH();
-  window.addEventListener('resize',setH);
-  window.addEventListener('orientationchange',function(){setTimeout(setH,250);});
-  window.addEventListener('pageshow',delayedSetH);
-})();
+
 </script>
 <div id="app">
   <!-- ===== MAIN PAGE ===== -->
@@ -421,7 +412,7 @@ if('serviceWorker' in navigator){
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.6.1</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
+    <div class="about-text"><div class="ver">热量营养检测 v3.6.2</div><div>营养追踪 · 体重管理 · 零食扫码 · 全面屏适配</div></div>
   </div>
 
   <div class="tab-bar">
