@@ -872,6 +872,7 @@ function renderBMI(){
   }
 }
 function applyUIConstraints(info){
+  // 1. 把 'buddha' 加进目标数组里，让系统去扫描它
   const goals=['buddha','lose','maintain','gain'];
   
   goals.forEach(g=>{
@@ -880,6 +881,7 @@ function applyUIConstraints(info){
     btn.classList.remove('disabled','recommended');
     btn.disabled=false;
     
+    // 2. 佛系和减脂共享同样的锁定规则（如果减脂被锁，佛系也同步变灰）
     let isLocked = info && info.lockedGoals && info.lockedGoals.includes(g);
     if (g === 'buddha' && info && info.lockedGoals && info.lockedGoals.includes('lose')) {
       isLocked = true;
@@ -887,8 +889,8 @@ function applyUIConstraints(info){
     
     if(isLocked){btn.disabled=true;btn.classList.add('disabled')}
     if(info&&info.recGoal===g){btn.classList.add('recommended')}
-  }); // 👈 检查这里：forEach 的闭合
-} // 👈 检查这里：整个函数的闭合右大括号，千万不能漏！
+  });
+}
   // Auto-switch if current goal is locked
   if(info&&info.lockedGoals&&info.lockedGoals.includes(state.profile.goal)){
     state.profile.goal=info.recGoal;saveState();
