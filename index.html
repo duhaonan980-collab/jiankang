@@ -890,7 +890,6 @@ function applyUIConstraints(info){
     if(isLocked){btn.disabled=true;btn.classList.add('disabled')}
     if(info&&info.recGoal===g){btn.classList.add('recommended')}
   });
-}
   // Auto-switch if current goal is locked
   if(info&&info.lockedGoals&&info.lockedGoals.includes(state.profile.goal)){
     state.profile.goal=info.recGoal;saveState();
