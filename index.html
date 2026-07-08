@@ -381,7 +381,11 @@ if('serviceWorker' in navigator){
     <div class="settings-section-title">运动量<span class="info-link" onclick="showActivityInfo()">说明</span></div>
     <div class="settings-section"><div class="seg-control" style="margin:8px" id="activityControl"><div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div><div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div><div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div><div class="seg-item" data-act="high" onclick="setActivity('high')">高</div><div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div></div></div>
     <div class="settings-section-title">目标<span class="info-link" onclick="showGoalInfo()">说明</span></div>
-    <div class="settings-section"><div class="seg-control" style="margin:8px" id="goalControl"><div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div><div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div><div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div></div></div>
+    <div class="settings-section"><div class="seg-control" style="margin:8px" id="goalControl">
+      <div class="seg-item" data-goal="buddha" onclick="setProfileGoal('buddha')">佛系</div>
+      <div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div>
+      <div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div>
+      <div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div></div></div>
     <div class="recommend-box"><span class="recommend-label">每日推荐热量</span><span class="recommend-val" id="recommendCal">--</span></div>
     <div class="settings-section-title">外观</div>
     <div class="settings-section"><div class="seg-control" style="margin:8px" id="themeControl"><div class="seg-item active" data-theme="auto" onclick="setTheme('auto')">跟随系统</div><div class="seg-item" data-theme="light" onclick="setTheme('light')">浅色</div><div class="seg-item" data-theme="dark" onclick="setTheme('dark')">深色</div></div></div>
@@ -423,7 +427,7 @@ if('serviceWorker' in navigator){
   <div class="modal-overlay" id="infoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title" id="infoModalTitle">说明</div><div class="info-modal-body" id="infoModalBody"></div><button class="modal-btn danger" onclick="hideModal('infoModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:16px">关闭</button></div></div>
 
   <div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div>
-
+  
   <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><div class="loading-text" id="loadingText">加载中...</div></div>
   <div class="toast" id="toast"></div>
 
@@ -958,6 +962,7 @@ async function loadPhotosForContainer(container,foods){
   for(const f of foods){
     if(f.hasPhoto){const photo=await getPhoto(f.id);if(photo){const el=container.querySelector('[data-food-id="'+f.id+'"] .food-photo');if(el){el.style.backgroundImage='url('+photo+')';el.style.backgroundSize='cover';el.innerHTML=''}}}}
 }
+   //高亮
 function renderSettings(){
   document.getElementById('setHeight').value=state.profile.height||'';
   document.getElementById('setWeight').value=state.profile.weight||'';
