@@ -557,13 +557,14 @@ function calcBMR(p){if(!p.height||!p.weight||!p.age)return 0;const b=10*p.weight
 function calcTDEE(p){const b=calcBMR(p);if(!b)return 0;const f={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};return b*(f[p.activity]||1.2)}
 /* ③ 每日推荐热量 E — 含基础代谢保护 */
 function calcTargetCalories(){
-  const tdee=calcTDEE(state.profile);if(!tdee)return 0;
-  const bmr=calcBMR(state.profile);
+ const tdee=calcTDEE(state.profile);if(!tdee)return 0;
+ const bmr=calcBMR(state.profile);
   let e;
-  if(state.profile.goal==='lose'){e=tdee*0.85;if(e<bmr)e=bmr}
-  else if(state.profile.goal==='gain'){e=tdee*1.15}
-  else{e=tdee}
-  return Math.round(e);
+ if(state.profile.goal==='buddha'){e=tdee*0.93;if(e<bmr)e=bmr} // ➕ 佛系：纯靠躺平不运动，制造 7% 的微弱缺口（即 TDEE 的 93%）
+ else if(state.profile.goal==='lose'){e=tdee*0.85;if(e<bmr)e=bmr}
+ else if(state.profile.goal==='gain'){e=tdee*1.15}
+ else{e=tdee}
+ return Math.round(e);
 }
 /* ⑤ CalcWeight — 计算体重基数（超重及以上使用调整体重） */
 function calcCalcWeight(p){
@@ -1033,6 +1034,7 @@ function showActivityInfo(){
 function showGoalInfo(){
   document.getElementById('infoModalTitle').textContent='目标说明';
   var items=[
+    {t:'佛系',d:'不运动纯躺平，约5%~8%极小热量缺口，稳步慢减'},
     {t:'减脂',d:'减少体脂，约15%热量缺口'},
     {t:'维持',d:'保持当前体重，热量收支平衡'},
     {t:'增肌',d:'增加肌肉，约15%热量盈余'}
