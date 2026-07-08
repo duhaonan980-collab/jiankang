@@ -872,15 +872,25 @@ function renderBMI(){
   }
 }
 function applyUIConstraints(info){
-  const goals=['lose','maintain','gain'];
+  // ➕ 1. 把 'buddha' 加进目标数组里，让系统去扫描它
+  const goals=['buddha','lose','maintain','gain'];
+  
   goals.forEach(g=>{
     const btn=document.querySelector('#goalControl .seg-item[data-goal="'+g+'"]');
     if(!btn)return;
     btn.classList.remove('disabled','recommended');
     btn.disabled=false;
-    if(info&&info.lockedGoals&&info.lockedGoals.includes(g)){btn.disabled=true;btn.classList.add('disabled')}
+    
+    // ➕ 2. 佛系和减脂共享同样的锁定规则（如果减脂被锁，佛系也同步变灰）
+    let isLocked = info && info.lockedGoals && info.lockedGoals.includes(g);
+    if (g === 'buddha' && info && info.lockedGoals && info.lockedGoals.includes('lose')) {
+      isLocked = true;
+    }
+    
+    if(isLocked){btn.disabled=true;btn.classList.add('disabled')}
     if(info&&info.recGoal===g){btn.classList.add('recommended')}
   });
+} // 👈 记得补上你原代码漏掉的闭合右大括号
   // Auto-switch if current goal is locked
   if(info&&info.lockedGoals&&info.lockedGoals.includes(state.profile.goal)){
     state.profile.goal=info.recGoal;saveState();
@@ -991,6 +1001,17 @@ function renderSettings(){
         lockedGoals:[].concat(bmiInfo.lockedGoals,['gain']),recGoal:'lose',allowedGoals:bmiInfo.allowedGoals,recActivity:bmiInfo.recActivity,bmiLevel:bmiInfo.bmiLevel};
     }
   }
+  // ➕ 就在applyUIConstraints之前，强行把 'buddha' 加到允许列表里，防止被按钮拦截器锁死
+if (finalInfo.allowedGoals && !finalInfo.allowedGoals.includes('buddha')) {
+  // 如果允许减脂，那就必然允许佛系
+  if (finalInfo.allowedGoals.includes('lose')) {
+    finalInfo.allowedGoals.push('buddha');
+  }
+}
+// 如果有锁定的目标，确保佛系不被误锁（除非当前状态连减脂都被锁定了）
+if (finalInfo.lockedGoals && finalInfo.lockedGoals.includes('lose') && !finalInfo.lockedGoals.includes('buddha')) {
+  finalInfo.lockedGoals.push('buddha');
+}
   applyUIConstraints(finalInfo);
   var lockToggle=document.getElementById('appLockToggle');
   if(lockToggle)lockToggle.checked=state.appLock.enabled;
