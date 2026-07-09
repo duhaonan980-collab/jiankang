@@ -906,14 +906,13 @@ function applyUIConstraints(info){
   }
 }
 
-// ➕ 核心修复：在这里直接补上缺失的 setProfileGoal 函数！
+// 补丁：安全定义 setProfileGoal 函数
 function setProfileGoal(g) {
   if (typeof state !== 'undefined' && state.profile) {
     state.profile.goal = g;
     if (typeof saveState === 'function') saveState();
     if (typeof renderSettings === 'function') renderSettings();
-    if (typeof renderAll === 'function') renderAll(); // 兼容你可能叫这个名字
-    showToast('目标已切换');
+    if (typeof renderAll === 'function') renderAll();
   }
 }
 function applyVisualPriority(severity){
