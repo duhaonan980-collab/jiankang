@@ -894,25 +894,34 @@ function applyUIConstraints(info){
       isLocked = true;
     }
     
-    if(isLocked){btn.disabled=true;btn.classList.add('disabled')}
-    if(info&&info.recGoal===g){btn.classList.add('recommended')}
+    if(isLocked){
+      btn.disabled=true;
+      btn.classList.add('disabled');
+    }
+    if(info && info.recGoal===g){
+      btn.classList.add('recommended');
+    }
   });
 
-  // 3. 自动切换逻辑
-  if(info&&info.lockedGoals&&info.lockedGoals.includes(state.profile.goal)){
-    state.profile.goal=info.recGoal;saveState();
-    document.querySelectorAll('#goalControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.goal===state.profile.goal));
-    document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';
+  // 3. 自动安全切换逻辑（解耦跨级更新，只改状态，由renderAll安全渲染）
+  if(info && info.lockedGoals && info.lockedGoals.includes(state.profile.goal)){
+    state.profile.goal = info.recGoal;
+    if (typeof saveState === 'function') saveState();
   }
 }
 
-// 补丁：安全定义 setProfileGoal 函数
+// 补丁：安全定义 setProfileGoal 函数，在切换时执行最高层级的 renderAll 刷新
 function setProfileGoal(g) {
   if (typeof state !== 'undefined' && state.profile) {
     state.profile.goal = g;
     if (typeof saveState === 'function') saveState();
-    if (typeof renderSettings === 'function') renderSettings();
-    if (typeof renderAll === 'function') renderAll();
+    
+    // 用全局总渲染函数统领刷新，绝对不留死角、不留死循环
+    if (typeof renderAll === 'function') {
+      renderAll();
+    } else {
+      if (typeof renderSettings === 'function') renderSettings();
+    }
   }
 }
 function applyVisualPriority(severity){
