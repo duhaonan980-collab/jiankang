@@ -216,6 +216,25 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .nutri-col{display:flex;flex-direction:column;gap:10px}
 .nutri-rec{margin-top:10px;padding:10px 12px;background:rgba(0,122,255,0.06);border-radius:10px;font-size:13px;color:var(--text2);line-height:1.6}
 .nutri-rec strong{color:var(--blue);font-weight:700}
+/* Nutrition Breakdown Modal */
+.nutri-breakdown-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding:4px 0;-webkit-overflow-scrolling:touch}
+.nutri-breakdown-tab{white-space:nowrap;padding:8px 14px;border-radius:10px;border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(118,118,128,0.1);color:var(--text);transition:all .2s}
+.nutri-breakdown-tab.active{background:var(--blue);color:#fff}
+.nutri-breakdown-tab:active{transform:scale(0.95)}
+.nbd-content{min-height:180px;padding:0 4px}
+.nbd-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;background:var(--card-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid var(--card-border);border-radius:12px;animation:cardIn .3s ease both}
+.nbd-item-icon{font-size:24px;flex-shrink:0;width:32px;text-align:center}
+.nbd-item-info{flex:1;min-width:0}
+.nbd-item-name{font-size:14px;font-weight:600}
+.nbd-item-amount{font-size:12px;color:var(--text2);margin-top:1px}
+.nbd-item-bar{flex:1;max-width:90px}
+.nbd-item-bar-track{height:6px;background:rgba(118,118,128,0.12);border-radius:3px;overflow:hidden}
+.nbd-item-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.nbd-item-pct{font-size:14px;font-weight:700;min-width:38px;text-align:right}
+.nbd-empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px}
+.nbd-empty .nbd-emoji{font-size:40px;display:block;margin-bottom:8px}
+.nbd-total{text-align:center;font-size:13px;color:var(--text2);margin:4px 0 12px;padding:6px 12px;background:rgba(118,118,128,0.06);border-radius:8px}
+.nbd-header-label{display:flex;justify-content:space-between;padding:0 4px;margin-bottom:8px;font-size:12px;color:var(--text3);font-weight:600}
 /* Weight reference */
 .weight-ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .weight-ref-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(118,118,128,0.06);border-radius:10px}
@@ -322,7 +341,7 @@ if('serviceWorker' in navigator){
         </div>
       </div>
     </div>
-    <div class="card">
+    <div class="card" style="cursor:pointer" onclick="openNutritionBreakdown()">
       <div class="card-title">营养素摄入</div>
       <div class="nutri-grid">
         <div class="nutri-col">
@@ -432,6 +451,8 @@ if('serviceWorker' in navigator){
   <div class="modal-overlay" id="infoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title" id="infoModalTitle">说明</div><div class="info-modal-body" id="infoModalBody"></div><button class="modal-btn danger" onclick="hideModal('infoModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:16px">关闭</button></div></div>
 
 <div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div>
+
+  <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet" style="max-height:88vh"><div class="modal-handle"></div><div class="modal-title">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div>
   
   <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><div class="loading-text" id="loadingText">加载中...</div></div>
   <div class="toast" id="toast"></div>
@@ -1318,6 +1339,43 @@ function handlePhotoUpload(event){
 }
 
 
+
+/* ========== NUTRITION BREAKDOWN MODAL ========== */
+var nbdCurrentNutri='protein';
+function openNutritionBreakdown(){
+  const foods=getTodayFoods();
+  if(foods.length===0){
+    document.getElementById('nbdContent').innerHTML='<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物<br>添加食物后再来看营养素来源吧</div>';
+  }
+  renderNbdTab('protein');
+  showModal('nutritionModal');
+}
+function renderNbdTab(nutriKey){
+  const contentEl=document.getElementById('nbdContent');
+  const foods=getTodayFoods();
+  if(!foods.length){
+    contentEl.innerHTML='<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div>';
+    return;
+  }
+  nbdCurrentNutri=nutriKey;
+  document.querySelectorAll('.nutri-breakdown-tab').forEach(t=>t.classList.toggle('active',t.dataset.nbdNutri===nutriKey));
+  const fieldMap={protein:{key:'p',label:'蛋白质',unit:'g',decimals:0,color:'var(--green)'},carbs:{key:'c',label:'碳水',unit:'g',decimals:0,color:'var(--orange)'},fat:{key:'f',label:'脂肪',unit:'g',decimals:0,color:'var(--red)'},fiber:{key:'fi',label:'膳食纤维',unit:'g',decimals:1,color:'var(--cyan)'},vitA:{key:'va',label:'维生素A',unit:'μg',decimals:0,color:'var(--yellow)'},vitC:{key:'vc',label:'维生素C',unit:'mg',decimals:0,color:'var(--purple)'}};
+  const info=fieldMap[nutriKey];
+  if(!info){contentEl.innerHTML='';return}
+  const items=foods.map(f=>({name:f.name,icon:f.icon||'🍽️',amount:f.amount,val:(f[info.key]||0),meal:f.meal})).filter(i=>i.val>0);
+  const total=items.reduce((s,i)=>s+i.val,0);
+  items.sort((a,b)=>b.val-a.val);
+  const totalUnit=info.unit==='μg'?'μg':info.unit;
+  let html='<div class="nbd-total">合计 <strong>'+total.toFixed(info.decimals)+' '+totalUnit+'</strong> ｜ 来自 '+items.length+' 种食物</div>';
+  items.forEach((item,i)=>{
+    const pct=total>0?item.val/total*100:0;
+    const barW=total>0?Math.min(item.val/Math.max(total,1)*100,100):0;
+    const mealLabel={breakfast:'☀️早',lunch:'🌞午',dinner:'🌙晚',snack:'🍪加'}[item.meal]||'';
+    html+='<div class="nbd-item" style="animation-delay:'+(i*0.05)+'s"><div class="nbd-item-icon">'+item.icon+'</div><div class="nbd-item-info"><div class="nbd-item-name">'+item.name+'</div><div class="nbd-item-amount">'+item.amount+'g · '+mealLabel+' · '+item.val.toFixed(info.decimals)+' '+totalUnit+'</div></div><div class="nbd-item-bar"><div class="nbd-item-bar-track"><div class="nbd-item-bar-fill" style="width:'+barW+'%;background:'+info.color+'"></div></div></div><div class="nbd-item-pct" style="color:'+info.color+'">'+pct.toFixed(1)+'%</div></div>';
+  });
+  contentEl.innerHTML=html;
+}
+function switchNbdTab(nutriKey){renderNbdTab(nutriKey)}
 
 function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
