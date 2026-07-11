@@ -122,6 +122,9 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .stat-item{background:rgba(118,118,128,0.06);border-radius:12px;padding:12px;text-align:center}
 .stat-val{font-size:20px;font-weight:800}.stat-label{font-size:12px;color:var(--text2);margin-top:2px}
+.chart-mode-switch{display:flex;gap:2px;background:rgba(118,118,128,0.1);border-radius:8px;padding:2px}
+.cms-item{width:32px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all .2s;opacity:.4}
+.cms-item.active{background:var(--bg);opacity:1;box-shadow:0 1px 2px rgba(0,0,0,0.08)}
 .settings-section{margin:12px 16px;background:var(--card-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:0.5px solid var(--card-border);border-radius:var(--radius);overflow:hidden}
 .settings-section-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin:16px 16px 6px}
 .info-link{float:right;font-size:13px;color:var(--blue);font-weight:500;text-transform:none;letter-spacing:0;cursor:pointer}
@@ -347,7 +350,7 @@ if('serviceWorker' in navigator){
   <div id="history-page" class="page">
     <div class="page-header"><div class="page-title">历史记录</div></div>
     <div class="card">
-      <div class="card-title">体重变化 · <span id="weightChartMonth">本月</span></div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span>体重变化 · <span id="weightChartMonth">本月</span></span><div class="chart-mode-switch" id="chartModeSwitch"><span class="cms-item" data-mode="weight" onclick="toggleChartMode('weight')">⚖️</span><span class="cms-item" data-mode="waist" onclick="toggleChartMode('waist')">📏</span></div></div>
       <div class="weight-chart-wrap"><svg class="weight-chart-svg" id="weightChartSvg" viewBox="0 0 320 180" preserveAspectRatio="none"></svg></div>
       <div id="weightChartEmpty" style="display:none;text-align:center;padding:20px;color:var(--text3);font-size:14px">暂无体重记录<br>请在设置页点击「更新」记录体重</div>
     </div>
@@ -386,8 +389,9 @@ if('serviceWorker' in navigator){
       <div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div>
       <div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div>
       <div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div></div></div>
+  
     <div class="recommend-box"><span class="recommend-label">每日推荐热量</span><span class="recommend-val" id="recommendCal">--</span></div>
-    <div class="settings-section-title">外观</div>
+      <div class="settings-section-title">外观</div>
     <div class="settings-section"><div class="seg-control" style="margin:8px" id="themeControl"><div class="seg-item active" data-theme="auto" onclick="setTheme('auto')">跟随系统</div><div class="seg-item" data-theme="light" onclick="setTheme('light')">浅色</div><div class="seg-item" data-theme="dark" onclick="setTheme('dark')">深色</div></div></div>
     <div class="settings-section-title">应用锁</div>
     <div class="settings-section">
@@ -401,6 +405,7 @@ if('serviceWorker' in navigator){
     <div class="settings-section">
       <div class="settings-item" style="cursor:pointer" onclick="exportData()"><span class="settings-label">导出数据</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="importData()"><span class="settings-label">导入数据</span><span style="color:var(--text3)">›</span></div>
+
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
@@ -410,7 +415,7 @@ if('serviceWorker' in navigator){
 
   <div class="modal-overlay" id="amountModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">确认食物信息</div><div class="food-preview"><span class="food-preview-icon" id="amountIcon">🍽️</span><div class="food-preview-name" id="amountName">食物名称</div></div><div class="amount-input-wrap"><input class="amount-input" type="number" id="amountInput" value="100" inputmode="decimal" oninput="updateAmountResult()"><span class="amount-unit">克</span></div><div class="amount-quick"><button class="amount-quick-btn" onclick="setAmount(50,this)">50g</button><button class="amount-quick-btn active" onclick="setAmount(100,this)">100g</button><button class="amount-quick-btn" onclick="setAmount(150,this)">150g</button><button class="amount-quick-btn" onclick="setAmount(200,this)">200g</button><button class="amount-quick-btn" onclick="setAmount(300,this)">300g</button></div><div class="amount-tip" id="amountTip">💡 估不准重量？</div><div class="amount-result">热量约 <strong id="amountCalories">0</strong> kcal</div><div class="meal-select"><div class="seg-control" id="mealControl"><div class="seg-item" data-meal="breakfast" onclick="setMeal('breakfast')">早餐</div><div class="seg-item" data-meal="lunch" onclick="setMeal('lunch')">午餐</div><div class="seg-item" data-meal="dinner" onclick="setMeal('dinner')">晚餐</div><div class="seg-item" data-meal="snack" onclick="setMeal('snack')">加餐</div></div></div><button class="modal-btn primary" onclick="confirmAddFood()">添加到今日记录</button><button class="modal-btn danger" onclick="closeAmountModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div>
 
-  <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="cat-filter" id="catFilter"></div><div class="search-results" id="searchResults"></div><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div>
+  <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="cat-filter" id="catFilter"></div><div class="search-results" id="searchResults"></div><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:0">关闭</button></div></div>
 
 
   <div class="modal-overlay" id="calendarModal"><div class="modal-sheet" style="max-height:90vh"><div class="modal-handle"></div><div class="modal-title">历史记录</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div><div class="calendar-grid" id="calGrid"></div><div class="cal-stats" id="calStats"></div><div id="calDetail"></div><button class="modal-btn danger" onclick="closeCalendarModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div>
@@ -426,7 +431,7 @@ if('serviceWorker' in navigator){
 
   <div class="modal-overlay" id="infoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title" id="infoModalTitle">说明</div><div class="info-modal-body" id="infoModalBody"></div><button class="modal-btn danger" onclick="hideModal('infoModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:16px">关闭</button></div></div>
 
-  <div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div>
+<div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div>
   
   <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><div class="loading-text" id="loadingText">加载中...</div></div>
   <div class="toast" id="toast"></div>
@@ -465,6 +470,7 @@ let state = {
   pendingFood:null, pendingMeal:null, currentCat:'all',
   tempPhoto:null, theme:'auto',
   weightChartYear:new Date().getFullYear(), weightChartMonth:new Date().getMonth(),
+  chartMode:'weight',
   appLock:{enabled:false,method:'pattern',pattern:[],backupPassword:'',backupHint:''}
 };
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
@@ -513,8 +519,8 @@ function deletePhotoData(id){if(!photoDB)return;return new Promise((resolve)=>{c
 function clearAllPhotoData(){if(!photoDB)return;return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readwrite');tx.objectStore('photos').clear();tx.oncomplete=resolve;tx.onerror=resolve})}
 
 /* ========== STORAGE ========== */
-function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock}))}catch(e){showToast('存储失败')}}
-function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};/* 兼容旧版 weightRecords: 数字 → {w,waist} */
+function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode}))}catch(e){showToast('存储失败')}}
+function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';/* 兼容旧版 weightRecords: 数字 → {w,waist} */
 Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0}}catch(e){console.error(e)}}
 
 /* ========== DATE ========== */
@@ -744,7 +750,7 @@ function confirmAddFood(){
   const entry={id,name:f.name,icon:f.icon,cal:Math.round(f.cal*a/100),p:+(f.p*a/100).toFixed(1),c:+(f.c*a/100).toFixed(1),f:+(f.f*a/100).toFixed(1),fi:+((f.fi||0)*a/100).toFixed(1),va:+((f.va||0)*a/100).toFixed(0),vc:+((f.vc||0)*a/100).toFixed(1),amount:a,meal:state.pendingMeal||'snack',time:new Date().toTimeString().slice(0,5),hasPhoto:false};
   if(state.tempPhoto){entry.hasPhoto=true;savePhoto(id,state.tempPhoto);state.tempPhoto=null}
   if(!state.foodLogs[state.selectedDate])state.foodLogs[state.selectedDate]=[];
-  state.foodLogs[state.selectedDate].push(entry);saveState();closeAmountModal();renderAll();showToast('已添加: '+f.name+' '+a+'g')
+  state.foodLogs[state.selectedDate].push(entry);saveState();closeAmountModal();renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已添加: '+f.name+' '+a+'g')
 }
 function closeAmountModal(){hideModal('amountModal');state.tempPhoto=null}
 
@@ -812,10 +818,9 @@ function renderCalDetail(){
   const foods=state.foodLogs[calSelectedDate]||[];
   if(!foods.length){c.innerHTML='<div class="empty-state"><div class="text">该日无记录</div></div>';return}
   let html='<div class="cal-detail-title">'+formatDateLabel(calSelectedDate)+' · 共'+foods.length+'项</div>';
-  html+=foods.map(f=>'<div class="food-item" data-food-id="'+f.id+'"><div class="food-photo" style="background:rgba(118,118,128,0.08);display:flex;align-items:center;justify-content:center;font-size:22px">'+(f.hasPhoto?'':'<span>'+f.icon+'</span>')+'</div><div class="food-info"><div class="food-name">'+f.name+'</div><div class="food-detail">'+f.amount+'g · '+f.time+'</div></div><span class="food-cal">'+f.cal+' kcal</span></div>').join('');
+  html+=foods.map(f=>'<div class="food-item" data-food-id="'+f.id+'"><div class="food-photo" style="background:rgba(118,118,128,0.08);display:flex;align-items:center;justify-content:center;font-size:22px'+(f.hasPhoto?';cursor:pointer" onclick="viewPhoto('+f.id+')"':'')+'"'+(f.hasPhoto?'':' ')+'>'+(f.hasPhoto?'':'<span>'+f.icon+'</span>')+'</div><div class="food-info"><div class="food-name">'+f.name+'</div><div class="food-detail">'+f.amount+'g · '+f.time+'</div></div><span class="food-cal">'+f.cal+' kcal</span></div>').join('');
   const total=foods.reduce((s,f)=>s+f.cal,0);
   html+='<div style="text-align:center;padding:8px;font-size:14px;color:var(--text2)">总计: <strong style="color:var(--text)">'+total+' kcal</strong></div>';
-  if(calSelectedDate!==getDateKey(new Date()))html+='<button class="modal-btn primary" style="margin-top:8px" onclick="jumpToDate(\''+calSelectedDate+'\')">查看此日详情</button>';
   c.innerHTML=html;
   loadPhotosForContainer(c,foods)
 }
@@ -823,11 +828,11 @@ function jumpToDate(dk){closeCalendarModal();state.selectedDate=dk;renderFoodLog
 
 /* ========== FOOD LOG ========== */
 function changeDate(d){const dt=new Date(state.selectedDate);dt.setDate(dt.getDate()+d);state.selectedDate=getDateKey(dt);renderFoodLog();renderCalorieSummary();renderNutrition()}
-async function deleteFood(id){const foods=state.foodLogs[state.selectedDate]||[];state.foodLogs[state.selectedDate]=foods.filter(f=>f.id!==id);saveState();await deletePhotoData(id);renderAll();showToast('已删除')}
-function clearTodayLog(){if(!confirm('确定清空当日所有食物记录？'))return;const foods=state.foodLogs[state.selectedDate]||[];foods.forEach(f=>{if(f.hasPhoto)deletePhotoData(f.id)});state.foodLogs[state.selectedDate]=[];saveState();renderAll();showToast('已清空')}
+async function deleteFood(id){const foods=state.foodLogs[state.selectedDate]||[];state.foodLogs[state.selectedDate]=foods.filter(f=>f.id!==id);saveState();await deletePhotoData(id);renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已删除')}
+function clearTodayLog(){if(!confirm('确定清空当日所有食物记录？'))return;const foods=state.foodLogs[state.selectedDate]||[];foods.forEach(f=>{if(f.hasPhoto)deletePhotoData(f.id)});state.foodLogs[state.selectedDate]=[];saveState();renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已清空')}
 
 /* ========== RENDER ========== */
-function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeeklyChart();renderStatsGrid();renderWeightChart();renderWeightPeriodLabel()}
+function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeeklyChart();renderStatsGrid();renderWeightChart();renderWeightPeriodLabel();updateChartModeUI()}
 function renderBMI(){
   const h=state.profile.height,w=state.profile.weight;
   const bmi=calcBMI(h,w);const info=getBMIInfo(bmi);const c=document.getElementById('bmiCircle');
@@ -1049,7 +1054,7 @@ if (finalInfo.lockedGoals && finalInfo.lockedGoals.includes('lose') && !finalInf
 function renderWeeklyChart(){
   const target=calcTargetCalories();const today=new Date();const trend=[];
   for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const dk=getDateKey(d);const foods=state.foodLogs[dk]||[];const cal=foods.reduce((s,f)=>s+f.cal,0);trend.push({label:['日','一','二','三','四','五','六'][d.getDay()],cal,isOver:target>0&&cal>target,isToday:dk===getDateKey(today)})}
-  const maxCal=Math.max(...trend.map(t=>t.cal),target||1,1);
+  const maxCal=Math.max(...trend.map(t=>t.cal),1);
   document.getElementById('weeklyChart').innerHTML=trend.map(t=>{
     const h=Math.max(t.cal/maxCal*100,2);const color=t.isOver?'var(--red)':'var(--green)';const op=t.isToday?'1':'0.5';
     return '<div class="chart-col"><div class="chart-bar-wrap"><div class="chart-bar" style="height:'+h+'%;background:'+color+';opacity:'+op+'" title="'+t.cal+' kcal"></div></div><div class="chart-label" style="'+(t.isToday?'color:var(--blue);font-weight:700':'')+'">'+t.label+'</div></div>'
@@ -1144,44 +1149,60 @@ function renderWeightChart(){
     pathD+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
     dots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5" fill="var(--blue)"/><text x="'+x.toFixed(1)+'" y="'+(y-9).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text)">'+r.weight+'</text>';
   });
-  /* 腰围数据线（紫色）— 右侧Y轴 */
+  /* 腰围数据：后续 chartMode 切换用 */
   var waistRecords=records.filter(function(r){return r.waist>0});
-  var waistPath='';
-  var waistDots='';
-  var waistGridLabels='';
-  if(waistRecords.length>0){
+  if(state.chartMode==='waist'&&waistRecords.length){
+    /* 腰围模式：只渲染腰围数据 */
     var wsMin=Math.min.apply(null,waistRecords.map(function(r){return r.waist}))-2;
     var wsMax=Math.max.apply(null,waistRecords.map(function(r){return r.waist}))+2;
     if(wsMin===wsMax){wsMax+=2;wsMin-=2}
     var yScaleWs=function(ws){return padT+chartH-(ws-wsMin)/(wsMax-wsMin)*chartH};
+    var wsPath='',wsDots='';
     waistRecords.forEach(function(r,i){
       var x=xScale(r.day),y=yScaleWs(r.waist);
-      waistPath+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
-      waistDots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3" fill="var(--purple)"/><text x="'+x.toFixed(1)+'" y="'+(y+16).toFixed(1)+'" text-anchor="middle" font-size="9" font-weight="500" fill="var(--purple)">'+r.waist+'</text>';
+      wsPath+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
+      wsDots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5" fill="var(--blue)"/><text x="'+x.toFixed(1)+'" y="'+(y-9).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text)">'+r.waist+'</text>';
     });
-    for(var i=0;i<=3;i++){
-      var gy=padT+chartH*i/3;
-      var gv=wsMax-(wsMax-wsMin)*i/3;
-      waistGridLabels+='<text x="'+(W-4)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="7" fill="var(--purple)">'+gv.toFixed(0)+'cm</text>';
+    var wsGrid='';
+    for(var i=0;i<=4;i++){
+      var gy=padT+chartH*i/4;
+      var gv=wsMax-(wsMax-wsMin)*i/4;
+      wsGrid+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y1="'+gy.toFixed(1)+'" stroke="rgba(118,118,128,0.1)" stroke-width="0.5"/><text x="'+(padL-4)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="var(--text3)">'+gv.toFixed(1)+'cm</text>';
     }
+    svg.innerHTML=wsGrid+xLabels+'<path d="'+wsPath+'" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+wsDots;
+  }else{
+    /* 体重模式 */
+    var gridLines='';
+    for(var i=0;i<=4;i++){
+      var gy=padT+chartH*i/4;
+      var gv=wMax-(wMax-wMin)*i/4;
+      gridLines+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y1="'+gy.toFixed(1)+'" stroke="rgba(118,118,128,0.1)" stroke-width="0.5"/><text x="'+(padL-4)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="var(--text3)">'+gv.toFixed(1)+'</text>';
+    }
+    var xLabels='';
+    for(var d=1;d<=daysInMonth;d+=Math.ceil(daysInMonth/6)){
+      var x=xScale(d);
+      xLabels+='<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="var(--text3)">'+d+'</text>';
+    }
+    svg.innerHTML=gridLines+xLabels+'<path d="'+pathD+'" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots;
   }
-  var gridLines='';
-  for(var i=0;i<=4;i++){
-    var gy=padT+chartH*i/4;
-    var gv=wMax-(wMax-wMin)*i/4;
-    gridLines+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y1="'+gy.toFixed(1)+'" stroke="rgba(118,118,128,0.1)" stroke-width="0.5"/><text x="'+(padL-4)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="var(--text3)">'+gv.toFixed(1)+'</text>';
-  }
-  var xLabels='';
-  for(var d=1;d<=daysInMonth;d+=Math.ceil(daysInMonth/6)){
-    var x=xScale(d);
-    xLabels+='<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="var(--text3)">'+d+'</text>';
-  }
-  var waistLine=waistPath?'<path d="'+waistPath+'" fill="none" stroke="var(--purple)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>'+waistDots:'';
-  svg.innerHTML=gridLines+xLabels+waistGridLabels+'<path d="'+pathD+'" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+waistLine;
 }
 function renderWeightPeriodLabel(){
   var el=document.getElementById('weightPeriodLabel');
   if(el)el.textContent=state.weightChartYear+'年'+(state.weightChartMonth+1)+'月';
+}
+function updateChartModeUI(){
+  var sw=document.getElementById('chartModeSwitch');
+  if(!sw)return;
+  sw.querySelectorAll('.cms-item').forEach(function(el){
+    el.classList.toggle('active',el.dataset.mode===state.chartMode);
+  });
+}
+function toggleChartMode(mode){
+  if(state.chartMode===mode)return;
+  state.chartMode=mode;
+  saveState();
+  updateChartModeUI();
+  renderWeightChart();
 }
 function changeWeightPeriod(d){
   state.weightChartMonth+=d;
@@ -1273,7 +1294,7 @@ function confirmWeightUpdate(){
   state.weightRecords[todayKey]={w:w,waist:ws};
   state.profile.weight=w;
   if(ws>0)state.profile.waist=ws;
-  saveState();hideModal('weightModal');renderAll();
+  saveState();hideModal('weightModal');renderWeightChart();renderWeightPeriodLabel();updateChartModeUI();renderSettings();renderBMI();
   var msg='体重已更新: '+w+'kg';
   if(ws>0)msg+=' / 腰围: '+ws+'cm';
   showToast(msg);
@@ -1516,6 +1537,15 @@ function checkAppLockOnLaunch(){
     showPatternLockScreen('unlock','请绘制图案解锁','连接你的解锁图案','');
   }
 }
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden'&&state.appLock&&state.appLock.enabled){
+    state._lockOnNextShow=true;
+  }
+  if(document.visibilityState==='visible'&&state._lockOnNextShow){
+    state._lockOnNextShow=false;
+    showPatternLockScreen('unlock','请绘制图案解锁','连接你的解锁图案','');
+  }
+});
 function onLockFooterBtn(){
   if(patternLock.mode==='setup'){
     hidePatternLockScreen();
@@ -1569,10 +1599,10 @@ async function init(){
   await initPhotoDB();
   const now=new Date();const wd=['日','一','二','三','四','五','六'];
   document.getElementById('todayDate').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 星期'+wd[now.getDay()];
-  document.getElementById('setHeight').addEventListener('input',function(){state.profile.height=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';renderWeeklyChart()});
-  document.getElementById('setWeight').addEventListener('input',function(){state.profile.weight=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';renderWeeklyChart()});
-  document.getElementById('setAge').addEventListener('input',function(){state.profile.age=parseInt(this.value)||25;saveState();renderCalorieSummary();renderNutrition();document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';renderWeeklyChart()});
-  document.getElementById('setWaist').addEventListener('input',function(){state.profile.waist=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';renderWeeklyChart()});
+  document.getElementById('setHeight').addEventListener('input',function(){state.profile.height=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
+  document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';document.getElementById('setWeight').addEventListener('input',function(){state.profile.weight=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
+  document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';document.getElementById('setAge').addEventListener('input',function(){state.profile.age=parseInt(this.value)||25;saveState();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
+  document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';document.getElementById('setWaist').addEventListener('input',function(){state.profile.waist=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';renderWeeklyChart()});
   updateOnlineStatus();window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);
   var mq=window.matchMedia('(prefers-color-scheme:dark)');function onSchemeChange(e){if(state.theme==='auto'){document.querySelector('meta[name="theme-color"]').content=e.matches?'#000000':'#F2F2F7'}};mq.addEventListener?mq.addEventListener('change',onSchemeChange):mq.addListener(onSchemeChange);onSchemeChange(mq);
   if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除')})}).catch(function(){console.warn('[App] SW注册失败')})}
