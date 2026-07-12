@@ -14,7 +14,8 @@ const APP_SHELL_FILES = [
   './index.html',
   './sw.js',
   './favicon.png',
-  './apple-touch-icon.png'
+  './apple-touch-icon.png',
+  './food-db.js'
 ];
 
 // ==================== INSTALL ====================

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -92,6 +92,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .calorie-status.deficit{background:rgba(52,199,89,0.12);color:var(--green)}
 .calorie-status.surplus{background:rgba(255,59,48,0.12);color:var(--red)}
 .calorie-status.warn{background:rgba(255,204,0,0.15);color:var(--orange)}
+.card-clickable{cursor:pointer;position:relative}.card-clickable .card-title{display:flex;align-items:center;justify-content:space-between}.card-clickable .card-title::after{content:'›';font-size:18px;color:var(--text3);font-weight:400;transition:color .2s,transform .2s}.card-clickable:active .card-title::after{color:var(--blue);transform:translateX(2px)}
 .nutri-bar{margin-bottom:10px}.nutri-bar:last-child{margin-bottom:0}
 .nutri-bar-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
 .nutri-bar-name{color:var(--text2)}.nutri-bar-val{font-weight:600}
@@ -153,7 +154,9 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .tab-item.active{color:var(--blue)}.tab-icon{font-size:24px;line-height:1}.tab-label{font-size:11px;font-weight:500}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.show{opacity:1;pointer-events:auto}
-.modal-sheet{width:100%;max-width:500px;background:var(--bg);border-radius:24px 24px 0 0;padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));padding-bottom:calc(24px + var(--safe-bottom));max-height:calc(85vh - var(--safe-top));overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(0.32,0.72,0,1)}
+.modal-sheet{width:100%;max-width:500px;background:var(--bg);border-radius:24px 24px 0 0;padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));padding-bottom:calc(16px + var(--safe-bottom));max-height:calc(85vh - var(--safe-top));display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(0.32,0.72,0,1)}
+.modal-scroll{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0}
+.modal-actions{padding-top:12px;flex-shrink:0}
 .modal-overlay.show .modal-sheet{transform:translateY(0)}
 .modal-handle{width:36px;height:5px;background:var(--text3);border-radius:3px;margin:0 auto 16px;opacity:.6}
 .modal-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:16px}
@@ -173,6 +176,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .modal-btn.primary{background:var(--blue);color:#fff}
 .modal-btn.danger{background:rgba(255,59,48,0.1);color:var(--red)}
 .modal-btn+.modal-btn{margin-top:8px}
+.modal-actions .modal-btn+.modal-btn{margin-top:8px}
 .search-input-wrap{position:relative;margin-bottom:12px}
 .search-input{width:100%;background:rgba(118,118,128,0.08);border:none;border-radius:12px;padding:12px 14px 12px 40px;font-size:16px;font-family:inherit;outline:none;color:var(--text)}
 .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text2)}
@@ -318,7 +322,7 @@ if('serviceWorker' in navigator){
       <div><div class="page-title">热量营养检测</div><div class="page-subtitle" id="todayDate"></div></div>
       <div class="offline-badge" id="offlineBadge">● 离线模式</div>
     </div>
-    <div class="card">
+    <div class="card card-clickable" onclick="openBmiBreakdown()">
       <div class="card-title">BMI 体重状态</div>
       <div class="bmi-result">
         <div class="bmi-circle" id="bmiCircle" style="color:var(--text3)"><div class="bmi-value" id="bmiValue">--</div><div class="bmi-label" id="bmiLabel">未设置</div></div>
@@ -330,7 +334,8 @@ if('serviceWorker' in navigator){
       <button class="action-btn primary" onclick="openSearchModal()"><span class="icon">🔍</span> 手动搜索添加</button>
       <button class="action-btn secondary" onclick="document.getElementById('photoInput').click()"><span class="icon">📸</span> 拍照上传</button>
     </div>
-    <div class="card">
+    <div style="height:1px;margin:4px 28px;background:var(--card-border);opacity:0.5"></div>
+    <div class="card card-clickable" onclick="openCalorieBreakdown()">
       <div class="card-title">今日热量</div>
       <div class="calorie-main">
         <div class="ring-wrap"><svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100"><circle class="ring-bg-circle" cx="50" cy="50" r="42"/><circle class="ring-fg-circle" id="ringFg" cx="50" cy="50" r="42" stroke="var(--blue)"/></svg><div class="ring-center"><div class="ring-num" id="ringNum">0</div><div class="ring-unit">kcal</div></div></div>
@@ -341,7 +346,7 @@ if('serviceWorker' in navigator){
         </div>
       </div>
     </div>
-    <div class="card" style="cursor:pointer" onclick="openNutritionBreakdown()">
+    <div class="card card-clickable" onclick="openNutritionBreakdown()">
       <div class="card-title">营养素摄入</div>
       <div class="nutri-grid">
         <div class="nutri-col">
@@ -404,7 +409,7 @@ if('serviceWorker' in navigator){
     <div class="settings-section"><div class="seg-control" style="margin:8px" id="activityControl"><div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div><div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div><div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div><div class="seg-item" data-act="high" onclick="setActivity('high')">高</div><div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div></div></div>
     <div class="settings-section-title">目标<span class="info-link" onclick="showGoalInfo()">说明</span></div>
     <div class="settings-section"><div class="seg-control" style="margin:8px" id="goalControl">
-      <div class="seg-item" data-goal="buddha" onclick="setProfileGoal('buddha')">佛系</div>
+      <div class="seg-item" data-goal="buddha" onclick="setGoal('buddha')">佛系</div>
       <div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div>
       <div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div>
       <div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div></div></div>
@@ -432,27 +437,33 @@ if('serviceWorker' in navigator){
   </div>
   </main>
 
-  <div class="modal-overlay" id="amountModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">确认食物信息</div><div class="food-preview"><span class="food-preview-icon" id="amountIcon">🍽️</span><div class="food-preview-name" id="amountName">食物名称</div></div><div class="amount-input-wrap"><input class="amount-input" type="number" id="amountInput" value="100" inputmode="decimal" oninput="updateAmountResult()"><span class="amount-unit">克</span></div><div class="amount-quick"><button class="amount-quick-btn" onclick="setAmount(50,this)">50g</button><button class="amount-quick-btn active" onclick="setAmount(100,this)">100g</button><button class="amount-quick-btn" onclick="setAmount(150,this)">150g</button><button class="amount-quick-btn" onclick="setAmount(200,this)">200g</button><button class="amount-quick-btn" onclick="setAmount(300,this)">300g</button></div><div class="amount-tip" id="amountTip">💡 估不准重量？</div><div class="amount-result">热量约 <strong id="amountCalories">0</strong> kcal</div><div class="meal-select"><div class="seg-control" id="mealControl"><div class="seg-item" data-meal="breakfast" onclick="setMeal('breakfast')">早餐</div><div class="seg-item" data-meal="lunch" onclick="setMeal('lunch')">午餐</div><div class="seg-item" data-meal="dinner" onclick="setMeal('dinner')">晚餐</div><div class="seg-item" data-meal="snack" onclick="setMeal('snack')">加餐</div></div></div><button class="modal-btn primary" onclick="confirmAddFood()">添加到今日记录</button><button class="modal-btn danger" onclick="closeAmountModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div>
+  <div class="modal-overlay" id="amountModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">确认食物信息</div><div class="food-preview"><span class="food-preview-icon" id="amountIcon">🍽️</span><div class="food-preview-name" id="amountName">食物名称</div></div><div class="amount-input-wrap"><input class="amount-input" type="number" id="amountInput" value="100" inputmode="decimal" oninput="updateAmountResult()"><span class="amount-unit">克</span></div><div class="amount-quick"><button class="amount-quick-btn" onclick="setAmount(50,this)">50g</button><button class="amount-quick-btn active" onclick="setAmount(100,this)">100g</button><button class="amount-quick-btn" onclick="setAmount(150,this)">150g</button><button class="amount-quick-btn" onclick="setAmount(200,this)">200g</button><button class="amount-quick-btn" onclick="setAmount(300,this)">300g</button></div><div class="amount-tip" id="amountTip">💡 估不准重量？</div><div class="amount-result">热量约 <strong id="amountCalories">0</strong> kcal</div><div class="meal-select"><div class="seg-control" id="mealControl"><div class="seg-item" data-meal="breakfast" onclick="setMeal('breakfast')">早餐</div><div class="seg-item" data-meal="lunch" onclick="setMeal('lunch')">午餐</div><div class="seg-item" data-meal="dinner" onclick="setMeal('dinner')">晚餐</div><div class="seg-item" data-meal="snack" onclick="setMeal('snack')">加餐</div></div></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmAddFood()">添加到今日记录</button><button class="modal-btn danger" onclick="closeAmountModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="cat-filter" id="catFilter"></div><div class="search-results" id="searchResults"></div><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:0">关闭</button></div></div>
-
-
-  <div class="modal-overlay" id="calendarModal"><div class="modal-sheet" style="max-height:90vh"><div class="modal-handle"></div><div class="modal-title">历史记录</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div><div class="calendar-grid" id="calGrid"></div><div class="cal-stats" id="calStats"></div><div id="calDetail"></div><button class="modal-btn danger" onclick="closeCalendarModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div>
-
-  <div class="modal-overlay" id="photoModal"><div class="modal-sheet"><div class="modal-handle"></div><img class="photo-modal-img" id="photoModalImg" alt=""><div id="photoModalInfo" style="text-align:center;margin-bottom:16px"></div><button class="modal-btn danger" onclick="closePhotoModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button></div></div>
-
-  <div class="modal-overlay" id="weightModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">更新体重与腰围</div><div style="text-align:center;padding:8px 0 16px;color:var(--text2);font-size:14px">记录今日数据，追踪变化趋势</div><div class="weight-input-row"><input class="weight-update-input" type="number" id="weightModalInput" placeholder="输入体重" inputmode="decimal" step="0.1"><span class="weight-unit">kg</span></div><div class="weight-input-row" style="margin-top:4px"><input class="weight-update-input" type="number" id="waistModalInput" placeholder="输入腰围" inputmode="decimal" step="0.1"><span class="weight-unit">cm</span></div><div id="weightModalLast" style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:16px"></div><button class="modal-btn primary" onclick="confirmWeightUpdate()">确认更新</button><button class="modal-btn danger" onclick="hideModal('weightModal')" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div>
+  <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="cat-filter" id="catFilter"></div><div class="search-results" id="searchResults"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:0">关闭</button></div></div></div></div></div>
 
 
+  <div class="modal-overlay" id="calendarModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">历史记录</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div><div class="calendar-grid" id="calGrid"></div><div class="cal-stats" id="calStats"></div><div id="calDetail"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeCalendarModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div></div></div></div>
+
+  <div class="modal-overlay" id="photoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><img class="photo-modal-img" id="photoModalImg" alt=""><div id="photoModalInfo" style="text-align:center;margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closePhotoModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button></div></div></div></div></div>
+
+  <div class="modal-overlay" id="weightModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">更新体重与腰围</div><div style="text-align:center;padding:8px 0 16px;color:var(--text2);font-size:14px">记录今日数据，追踪变化趋势</div><div class="weight-input-row"><input class="weight-update-input" type="number" id="weightModalInput" placeholder="输入体重" inputmode="decimal" step="0.1"><span class="weight-unit">kg</span></div><div class="weight-input-row" style="margin-top:4px"><input class="weight-update-input" type="number" id="waistModalInput" placeholder="输入腰围" inputmode="decimal" step="0.1"><span class="weight-unit">cm</span></div><div id="weightModalLast" style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmWeightUpdate()">确认更新</button><button class="modal-btn danger" onclick="hideModal('weightModal')" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
 
-  <div class="modal-overlay" id="weightMonthModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">选择月份</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeWeightPickerYear(-1)">‹</button><div class="cal-title" id="weightPickerYearLabel">2026年</div><button class="date-nav-btn" onclick="changeWeightPickerYear(1)">›</button></div><div class="weight-month-grid" id="weightPickerGrid"></div><button class="modal-btn danger" onclick="hideModal('weightMonthModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div>
 
-  <div class="modal-overlay" id="infoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title" id="infoModalTitle">说明</div><div class="info-modal-body" id="infoModalBody"></div><button class="modal-btn danger" onclick="hideModal('infoModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:16px">关闭</button></div></div>
 
-<div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div>
+  <div class="modal-overlay" id="weightMonthModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">选择月份</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeWeightPickerYear(-1)">‹</button><div class="cal-title" id="weightPickerYearLabel">2026年</div><button class="date-nav-btn" onclick="changeWeightPickerYear(1)">›</button></div><div class="weight-month-grid" id="weightPickerGrid"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('weightMonthModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet" style="max-height:88vh"><div class="modal-handle"></div><div class="modal-title">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div>
+  <div class="modal-overlay" id="infoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="infoModalTitle">说明</div><div class="info-modal-body" id="infoModalBody"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('infoModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:16px">关闭</button></div></div></div></div></div>
+
+<div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div></div></div></div>
+
+  <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
+
+  <!-- ===== BMI BREAKDOWN MODAL ===== -->
+  <div class="modal-overlay" id="bmiModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">BMI 详细分析</div><div id="bmiBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">请先在设置页填写身高体重</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('bmiModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
+
+  <!-- ===== CALORIE BREAKDOWN MODAL ===== -->
+  <div class="modal-overlay" id="calorieModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">热量详情</div><div id="calorieBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">暂无数据</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('calorieModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
   
   <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><div class="loading-text" id="loadingText">加载中...</div></div>
   <div class="toast" id="toast"></div>
@@ -482,6 +493,8 @@ if('serviceWorker' in navigator){
   <div class="tab-item" data-page="history" onclick="switchPage('history')"><span class="tab-icon">📋</span><span class="tab-label">历史</span></div>
   <div class="tab-item" data-page="settings" onclick="switchPage('settings')"><span class="tab-icon">⚙️</span><span class="tab-label">设置</span></div>
 </nav>
+<script src="foods.js"></script>
+<script src="weight-tips.js"></script>
 <script>
 /* ========== STATE ========== */
 let state = {
@@ -496,41 +509,6 @@ let state = {
 };
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
 let photoDB=null;
-
-/* ========== FOOD DB (per 100g) ========== */
-const FOOD_DB=[
-{name:'米饭',icon:'🍚',cat:'主食',cal:116,p:2.6,c:25.9,f:0.3,fi:0.4,va:0,vc:0},{name:'面条（去汤汁）',icon:'🍜',cat:'主食',cal:110,p:3.6,c:22.2,f:0.7,fi:0.8,va:0,vc:0},{name:'馒头',icon:'🍞',cat:'主食',cal:223,p:7,c:47,f:1.1,fi:1.3,va:0,vc:0},{name:'包子',icon:'🥟',cat:'主食',cal:227,p:8.4,c:38,f:3.5,fi:1,va:10,vc:1},{name:'饺子',icon:'🥟',cat:'主食',cal:239,p:9,c:36,f:4.5,fi:1.2,va:15,vc:2},{name:'粥',icon:'🥣',cat:'主食',cal:46,p:1.1,c:9.8,f:0.2,fi:0.2,va:0,vc:0},{name:'面包',icon:'🍞',cat:'主食',cal:313,p:8.3,c:58.6,f:5.1,fi:2,va:0,vc:0},{name:'燕麦',icon:'🥣',cat:'主食',cal:367,p:15,c:61,f:7,fi:5.3,va:0,vc:0},{name:'红薯',icon:'🍠',cat:'主食',cal:99,p:1.1,c:23.1,f:0.2,fi:1.6,va:709,vc:2.4},{name:'玉米粒',icon:'🌽',cat:'主食',cal:86,p:3.2,c:19,f:1.2,fi:2.7,va:7,vc:6.8},{name:'玉米棒',icon:'🌽',cat:'主食',cal:65,p:2.4,c:14.3,f:0.9,fi:2.0,va:5,vc:5},{name:'炒饭',icon:'🍚',cat:'主食',cal:174,p:5,c:25,f:5,fi:0.8,va:20,vc:2},{name:'意面',icon:'🍝',cat:'主食',cal:158,p:5.8,c:30.9,f:0.9,fi:1.8,va:0,vc:0},{name:'年糕',icon:'🍡',cat:'主食',cal:154,p:3.2,c:33,f:0.5,fi:0.5,va:0,vc:0},{name:'油条',icon:'🌭',cat:'主食',cal:388,p:6.9,c:51,f:17.6,fi:0.9,va:0,vc:0},{name:'米粉',icon:'🍜',cat:'主食',cal:110,p:3.3,c:23,f:0.5,fi:0.4,va:0,vc:0},{name:'杂粮饭',icon:'🍚',cat:'主食',cal:126,p:3.5,c:26,f:0.8,fi:3,va:0,vc:0},
-{name:'糯米',icon:'🍚',cat:'主食',cal:168,p:3.8,c:36.5,f:0.6,fi:0.5,va:0,vc:0},{name:'饼',icon:'🥞',cat:'主食',cal:250,p:8,c:50,f:3,fi:1.5,va:0,vc:0},{name:'烧饼',icon:'🥯',cat:'主食',cal:296,p:7.5,c:55,f:6,fi:1.5,va:0,vc:0},{name:'花卷',icon:'🍞',cat:'主食',cal:217,p:6.5,c:45,f:1,fi:1,va:0,vc:0},{name:'小米粥',icon:'🥣',cat:'主食',cal:46,p:1.4,c:9.6,f:0.3,fi:0.2,va:0,vc:0},{name:'粽子',icon:'🍙',cat:'主食',cal:195,p:5,c:35,f:5,fi:0.8,va:5,vc:0},{name:'吐司',icon:'🍞',cat:'主食',cal:280,p:8,c:50,f:5,fi:2.5,va:0,vc:0},{name:'紫薯',icon:'🍠',cat:'主食',cal:106,p:1.2,c:25.5,f:0.2,fi:2,va:500,vc:2},{name:'芋头',icon:'🥔',cat:'主食',cal:79,p:2.2,c:18.1,f:0.2,fi:1,va:27,vc:6},
-{name:'鸡胸肉',icon:'🍗',cat:'肉类',cal:133,p:31,c:0,f:1.2,fi:0,va:9,vc:0},{name:'猪肉(瘦)',icon:'🥩',cat:'肉类',cal:143,p:20.3,c:0,f:6.2,fi:0,va:44,vc:0},{name:'牛肉(瘦)',icon:'🥩',cat:'肉类',cal:106,p:20.2,c:0,f:2.3,fi:0,va:7,vc:0},{name:'羊肉',icon:'🥩',cat:'肉类',cal:203,p:19,c:0,f:14.1,fi:0,va:22,vc:0},{name:'排骨',icon:'🍖',cat:'肉类',cal:278,p:16.7,c:0,f:23.1,fi:0,va:12,vc:0},{name:'鲈鱼',icon:'🐟',cat:'肉类',cal:105,p:18.6,c:0,f:3.4,fi:0,va:19,vc:0},{name:'三文鱼',icon:'🐟',cat:'肉类',cal:208,p:20,c:0,f:13,fi:0,va:12,vc:0},{name:'虾',icon:'🦐',cat:'肉类',cal:87,p:18.6,c:0,f:1.3,fi:0,va:15,vc:0},{name:'鸡蛋',icon:'🥚',cat:'肉类',cal:147,p:12.6,c:1.1,f:9.5,fi:0,va:234,vc:0},{name:'鸭肉',icon:'🦆',cat:'肉类',cal:240,p:15.5,c:0,f:19.7,fi:0,va:14,vc:0},{name:'培根',icon:'🥓',cat:'肉类',cal:181,p:22,c:0.5,f:9,fi:0,va:0,vc:0},{name:'香肠',icon:'🌭',cat:'肉类',cal:508,p:24,c:12,f:40,fi:0,va:0,vc:0},{name:'火腿',icon:'🍖',cat:'肉类',cal:330,p:16,c:1.5,f:28,fi:0,va:0,vc:0},{name:'鸡腿',icon:'🍗',cat:'肉类',cal:181,p:16,c:0,f:13,fi:0,va:18,vc:0},{name:'牛排',icon:'🥩',cat:'肉类',cal:250,p:26,c:0,f:15,fi:0,va:7,vc:0},{name:'猪排',icon:'🍖',cat:'肉类',cal:260,p:18,c:5,f:18,fi:0,va:10,vc:0},
-{name:'鸡翅',icon:'🍗',cat:'肉类',cal:194,p:19,c:0,f:14,fi:0,va:23,vc:0},{name:'鸡爪',icon:'🍗',cat:'肉类',cal:254,p:19,c:0.2,f:18,fi:0,va:0,vc:0},{name:'带鱼',icon:'🐟',cat:'肉类',cal:127,p:18,c:0,f:5,fi:0,va:28,vc:0},{name:'鳕鱼',icon:'🐟',cat:'肉类',cal:88,p:20,c:0,f:0.5,fi:0,va:14,vc:0},{name:'蟹',icon:'🦀',cat:'肉类',cal:95,p:18,c:0,f:2,fi:0,va:30,vc:0},{name:'蛤蜊',icon:'🦪',cat:'肉类',cal:62,p:10,c:2.5,f:0.6,fi:0,va:10,vc:0},{name:'鱼丸',icon:'🍡',cat:'肉类',cal:118,p:10,c:12,f:1,fi:0,va:0,vc:0},{name:'午餐肉',icon:'🥫',cat:'肉类',cal:283,p:13,c:5,f:25,fi:0,va:0,vc:0},{name:'基围虾',icon:'🦐',cat:'肉类',cal:101,p:18.5,c:0,f:1.5,fi:0,va:15,vc:0},{name:'带壳蛤蜊',icon:'🦪',cat:'肉类',cal:62,p:10,c:2.5,f:0.6,fi:0,va:10,vc:0},
-{name:'西红柿',icon:'🍅',cat:'蔬菜',cal:19,p:0.9,c:4,f:0.2,fi:0.5,va:42,vc:14},{name:'白菜',icon:'🥬',cat:'蔬菜',cal:17,p:1.3,c:3.2,f:0.1,fi:0.8,va:20,vc:31},{name:'土豆',icon:'🥔',cat:'蔬菜',cal:76,p:2,c:17.2,f:0.1,fi:1.2,va:0,vc:27},{name:'菠菜',icon:'🥬',cat:'蔬菜',cal:24,p:2.6,c:4.5,f:0.3,fi:1.7,va:487,vc:32},{name:'西兰花',icon:'🥦',cat:'蔬菜',cal:36,p:4.1,c:4.3,f:0.6,fi:1.6,va:120,vc:56},{name:'茄子',icon:'🍆',cat:'蔬菜',cal:21,p:1.1,c:4.9,f:0.2,fi:1.3,va:8,vc:5},{name:'胡萝卜',icon:'🥕',cat:'蔬菜',cal:39,p:1,c:8.8,f:0.2,fi:1.1,va:835,vc:6},{name:'豆腐',icon:'🧈',cat:'蔬菜',cal:81,p:8.1,c:4.2,f:3.7,fi:0.4,va:0,vc:0},{name:'蘑菇',icon:'🍄',cat:'蔬菜',cal:22,p:3.1,c:3.3,f:0.3,fi:1.2,va:0,vc:1},{name:'生菜',icon:'🥬',cat:'蔬菜',cal:15,p:1.3,c:2.8,f:0.2,fi:0.7,va:166,vc:10},{name:'青椒',icon:'🫑',cat:'蔬菜',cal:22,p:1,c:5.4,f:0.2,fi:1.4,va:18,vc:130},{name:'洋葱',icon:'🧅',cat:'蔬菜',cal:40,p:1.1,c:9.3,f:0.2,fi:0.9,va:0,vc:7.4},{name:'豆芽',icon:'🌱',cat:'蔬菜',cal:31,p:4.5,c:4.5,f:1.6,fi:1.5,va:3,vc:6},{name:'南瓜',icon:'🎃',cat:'蔬菜',cal:22,p:0.7,c:5.3,f:0.1,fi:0.8,va:148,vc:9},{name:'莲藕',icon:'🪷',cat:'蔬菜',cal:47,p:1.2,c:11.5,f:0.2,fi:1.2,va:0,vc:44},{name:'海带',icon:'🌊',cat:'蔬菜',cal:12,p:1.2,c:2.1,f:0.1,fi:1,va:0,vc:0},{name:'芹菜',icon:'🥬',cat:'蔬菜',cal:14,p:1.2,c:3.3,f:0.2,fi:1.2,va:60,vc:8},{name:'芦笋',icon:'🌿',cat:'蔬菜',cal:22,p:2.2,c:4.9,f:0.2,fi:1.9,va:756,vc:20},
-{name:'丝瓜',icon:'🥒',cat:'蔬菜',cal:20,p:1,c:4.2,f:0.2,fi:0.6,va:15,vc:5},{name:'冬瓜',icon:'🥬',cat:'蔬菜',cal:12,p:0.4,c:2.6,f:0.2,fi:0.7,va:0,vc:0},{name:'木耳',icon:'🍄',cat:'蔬菜',cal:27,p:1.5,c:6,f:0.2,fi:2.6,va:0,vc:0},{name:'韭菜',icon:'🥬',cat:'蔬菜',cal:26,p:2.4,c:4.6,f:0.4,fi:1.4,va:235,vc:24},{name:'卷心菜',icon:'🥬',cat:'蔬菜',cal:24,p:1.5,c:4.6,f:0.2,fi:1,va:12,vc:40},{name:'四季豆',icon:'🫛',cat:'蔬菜',cal:28,p:2,c:5.7,f:0.4,fi:1.5,va:35,vc:6},{name:'莴笋',icon:'🥬',cat:'蔬菜',cal:15,p:1,c:2.8,f:0.1,fi:0.6,va:25,vc:4},{name:'茭白',icon:'🥬',cat:'蔬菜',cal:26,p:1.2,c:5.9,f:0.2,fi:1.9,va:5,vc:5},{name:'豆角',icon:'🫛',cat:'蔬菜',cal:31,p:1.8,c:7.1,f:0.2,fi:1.5,va:20,vc:6},{name:'西葫芦',icon:'🥒',cat:'蔬菜',cal:19,p:1.2,c:3.8,f:0.2,fi:0.8,va:30,vc:6},{name:'金针菇',icon:'🍄',cat:'蔬菜',cal:32,p:2.4,c:6,f:0.4,fi:2.7,va:5,vc:2},{name:'香菇',icon:'🍄',cat:'蔬菜',cal:26,p:2.2,c:5.2,f:0.3,fi:3.3,va:0,vc:1},{name:'西红柿(小)',icon:'🍅',cat:'蔬菜',cal:22,p:1,c:5,f:0.2,fi:0.5,va:50,vc:18},
-{name:'苹果',icon:'🍎',cat:'水果',cal:52,p:0.3,c:14,f:0.2,fi:1.2,va:3,vc:4.6},{name:'李子',icon:'🍑',cat:'水果',cal:38,p:0.7,c:8.7,f:0.2,fi:0.9,va:17,vc:6},{name:'香蕉',icon:'🍌',cat:'水果',cal:89,p:1.1,c:23,f:0.3,fi:1.2,va:3,vc:8.7},{name:'橙子',icon:'🍊',cat:'水果',cal:47,p:0.9,c:12,f:0.1,fi:0.9,va:11,vc:53.2},{name:'西瓜',icon:'🍉',cat:'水果',cal:30,p:0.6,c:8,f:0.2,fi:0.2,va:28,vc:8},{name:'葡萄',icon:'🍇',cat:'水果',cal:67,p:0.6,c:17,f:0.2,fi:0.9,va:3,vc:4},{name:'草莓',icon:'🍓',cat:'水果',cal:32,p:0.7,c:7.7,f:0.3,fi:1.2,va:1,vc:58.8},{name:'梨',icon:'🍐',cat:'水果',cal:57,p:0.4,c:15,f:0.1,fi:2.6,va:1,vc:4.3},{name:'桃子',icon:'🍑',cat:'水果',cal:39,p:0.9,c:10,f:0.1,fi:0.8,va:16,vc:6.6},{name:'猕猴桃',icon:'🥝',cat:'水果',cal:61,p:1.1,c:14.7,f:0.5,fi:2.1,va:4,vc:92.7},{name:'芒果',icon:'🥭',cat:'水果',cal:60,p:0.8,c:15,f:0.4,fi:1.2,va:1082,vc:36.4},{name:'蓝莓',icon:'🫐',cat:'水果',cal:57,p:0.7,c:14,f:0.3,fi:2.4,va:3,vc:9.7},{name:'榴莲',icon:'🥥',cat:'水果',cal:147,p:1.5,c:27,f:5.3,fi:3.8,va:3,vc:19.7},{name:'哈密瓜',icon:'🍈',cat:'水果',cal:34,p:0.8,c:8,f:0.2,fi:0.9,va:169,vc:12},{name:'樱桃',icon:'🍒',cat:'水果',cal:46,p:1,c:12,f:0.3,fi:1.6,va:3,vc:7},{name:'柚子',icon:'🍊',cat:'水果',cal:42,p:0.8,c:10,f:0.1,fi:1.2,va:2,vc:23},
-{name:'荔枝',icon:'🍒',cat:'水果',cal:66,p:0.8,c:16.5,f:0.2,fi:0.5,va:2,vc:41},{name:'龙眼',icon:'🍒',cat:'水果',cal:71,p:1.2,c:17.6,f:0.1,fi:0.4,va:0,vc:43},{name:'柿子',icon:'🍅',cat:'水果',cal:74,p:0.4,c:18.5,f:0.1,fi:1.4,va:20,vc:30},{name:'百香果',icon:'🥭',cat:'水果',cal:97,p:2.2,c:23,f:0.7,fi:10.4,va:64,vc:30},{name:'火龙果',icon:'🍈',cat:'水果',cal:60,p:1.1,c:13.3,f:0.2,fi:2,va:0,vc:3},{name:'木瓜',icon:'🥭',cat:'水果',cal:43,p:0.5,c:10.8,f:0.3,fi:1.7,va:145,vc:62},{name:'椰子',icon:'🥥',cat:'水果',cal:354,p:3.3,c:15.2,f:33,fi:4,va:0,vc:3},{name:'无花果',icon:'🍊',cat:'水果',cal:65,p:1.5,c:16,f:0.3,fi:2,va:7,vc:2},{name:'菠萝',icon:'🍍',cat:'水果',cal:44,p:0.5,c:11,f:0.1,fi:1.4,va:3,vc:18},{name:'圣女果',icon:'🍅',cat:'水果',cal:22,p:1,c:5,f:0.2,fi:0.5,va:50,vc:18},
-{name:'榴莲',icon:'🥠',cat:'水果',cal:150,p:2.6,c:28.3,f:3.3,fi:5.1,va:13,vc:19},{name:'珍珠奶茶',icon:'🧋',cat:'饮料',cal:72,p:0.6,c:12.8,f:2.1,fi:0.3,va:8,vc:0},
-{name:'美汁源果粒橙',icon:'🍊',cat:'原料',cal:40,p:0.0,c:9.4,f:0.0,fi:0.0,va:0,vc:7.5},{name:'牛奶',icon:'🥛',cat:'饮料',cal:54,p:3,c:3.4,f:3.2,fi:0,va:24,vc:0},{name:'豆浆',icon:'🥛',cat:'饮料',cal:31,p:3,c:1.2,f:1.6,fi:0.6,va:0,vc:0},{name:'酸奶',icon:'🥛',cat:'饮料',cal:72,p:2.5,c:9.3,f:2.7,fi:0,va:26,vc:1},{name:'果汁',icon:'🧃',cat:'饮料',cal:45,p:0.5,c:11,f:0.1,fi:0.2,va:5,vc:30},{name:'可乐',icon:'🥤',cat:'饮料',cal:42,p:0,c:10.6,f:0,fi:0,va:0,vc:0},{name:'咖啡(黑)',icon:'☕',cat:'饮料',cal:1,p:0.1,c:0,f:0,fi:0,va:0,vc:0},{name:'奶茶',icon:'🧋',cat:'饮料',cal:50,p:1.5,c:8,f:1.5,fi:0.3,va:10,vc:0},{name:'啤酒',icon:'🍺',cat:'饮料',cal:32,p:0.4,c:2.5,f:0,fi:0,va:0,vc:0},{name:'绿茶',icon:'🍵',cat:'饮料',cal:1,p:0,c:0,f:0,fi:0,va:0,vc:0},{name:'柠檬水',icon:'🍋',cat:'饮料',cal:15,p:0.1,c:4,f:0,fi:0.1,va:0,vc:5},{name:'运动饮料',icon:'🥤',cat:'饮料',cal:26,p:0,c:6,f:0,fi:0,va:0,vc:0},
-{name:'拿铁',icon:'☕',cat:'饮料',cal:43,p:2,c:4.5,f:1.5,fi:0,va:10,vc:0},{name:'椰汁',icon:'🥥',cat:'饮料',cal:51,p:1.5,c:11,f:0.5,fi:0,va:0,vc:2},{name:'豆奶',icon:'🥛',cat:'饮料',cal:42,p:2.4,c:5.5,f:1.5,fi:0.3,va:0,vc:0},{name:'红牛（金罐 / 无气版）',icon:'🐂',cat:'饮料',cal:56,p:0.0,c:13.3,f:0.0,fi:0.0,va:0,vc:0},{name:'红牛（银蓝罐 / 有气版）',icon:'🥤',cat:'饮料',cal:46,p:0,c:11,f:0,fi:0,va:0,vc:0},{name:'美式咖啡',icon:'☕',cat:'饮料',cal:2,p:0.1,c:0,f:0,fi:0,va:0,vc:0},{name:'橙汁',icon:'🧃',cat:'饮料',cal:45,p:0.7,c:10.4,f:0.2,fi:0.2,va:50,vc:50},
-{name:'薯片',icon:'🍟',cat:'零食',cal:536,p:7,c:53,f:32,fi:3.4,va:0,vc:18},{name:'巧克力',icon:'🍫',cat:'零食',cal:546,p:7,c:58,f:31,fi:2.8,va:7,vc:0},{name:'饼干',icon:'🍪',cat:'零食',cal:433,p:9,c:71,f:12,fi:2,va:0,vc:0},{name:'坚果',icon:'🥜',cat:'零食',cal:607,p:22,c:17,f:50,fi:6.7,va:1,vc:1},{name:'冰淇淋',icon:'🍦',cat:'零食',cal:207,p:3.5,c:24,f:11,fi:0.5,va:60,vc:1},{name:'蛋糕',icon:'🍰',cat:'零食',cal:347,p:5,c:52,f:14,fi:0.8,va:80,vc:0},{name:'糖果',icon:'🍬',cat:'零食',cal:394,p:0,c:98,f:0,fi:0,va:0,vc:0},{name:'果冻',icon:'🍮',cat:'零食',cal:60,p:0,c:15,f:0,fi:0.1,va:0,vc:0},{name:'薯条',icon:'🍟',cat:'零食',cal:312,p:3.4,c:41,f:15,fi:3,va:0,vc:10},{name:'辣条',icon:'🌶️',cat:'零食',cal:300,p:15,c:40,f:12,fi:2.5,va:0,vc:5},{name:'爆米花',icon:'🍿',cat:'零食',cal:382,p:12,c:77,f:4,fi:9.2,va:7,vc:0},
-{name:'海苔',icon:'🍘',cat:'零食',cal:356,p:29,c:44,f:4,fi:15,va:7,vc:0},{name:'花生',icon:'🥜',cat:'零食',cal:567,p:25.8,c:16,f:49,fi:8.5,va:5,vc:2},{name:'瓜子',icon:'🌻',cat:'零食',cal:606,p:24,c:13,f:53,fi:5.5,va:5,vc:0},{name:'核桃',icon:'🌰',cat:'零食',cal:646,p:14.9,c:19,f:58,fi:6.7,va:2,vc:1},{name:'蛋黄派',icon:'🍰',cat:'零食',cal:408,p:6,c:53,f:20,fi:1,va:30,vc:0},{name:'山楂片',icon:'🍬',cat:'零食',cal:349,p:1,c:85,f:0.5,fi:3,va:20,vc:25},{name:'辣白菜',icon:'🌶️',cat:'零食',cal:45,p:2,c:7,f:1.5,fi:1.5,va:10,vc:15},{name:'话梅',icon:'🍬',cat:'零食',cal:256,p:1,c:62,f:0.5,fi:2,va:0,vc:0},
-{name:'番茄炒蛋',icon:'🍳',cat:'菜肴',cal:120,p:8,c:5,f:8,fi:1.2,va:80,vc:15},{name:'红烧肉',icon:'🍖',cat:'菜肴',cal:250,p:12,c:8,f:20,fi:0.3,va:12,vc:0},{name:'宫保鸡丁',icon:'🍗',cat:'菜肴',cal:200,p:15,c:12,f:10,fi:0.8,va:15,vc:3},{name:'麻婆豆腐',icon:'🌶️',cat:'菜肴',cal:150,p:10,c:6,f:10,fi:0.5,va:5,vc:1},{name:'鱼香肉丝',icon:'🥘',cat:'菜肴',cal:180,p:12,c:10,f:11,fi:0.6,va:10,vc:2},{name:'蛋炒饭',icon:'🍚',cat:'菜肴',cal:174,p:5,c:25,f:5,fi:0.8,va:20,vc:2},{name:'麻辣火锅',icon:'🍲',cat:'菜肴',cal:180,p:10,c:8,f:12,fi:1,va:20,vc:5},{name:'烤鸡',icon:'🍗',cat:'菜肴',cal:167,p:22,c:0,f:8,fi:0,va:10,vc:0},{name:'汉堡',icon:'🍔',cat:'菜肴',cal:295,p:17,c:24,f:14,fi:1.5,va:20,vc:5},{name:'披萨',icon:'🍕',cat:'菜肴',cal:266,p:11,c:33,f:10,fi:1.8,va:50,vc:5},{name:'寿司',icon:'🍣',cat:'菜肴',cal:140,p:5,c:28,f:0.5,fi:0.4,va:0,vc:2},{name:'沙拉',icon:'🥗',cat:'菜肴',cal:100,p:3,c:10,f:5,fi:2,va:100,vc:20},{name:'糖醋排骨',icon:'🍖',cat:'菜肴',cal:285,p:14,c:15,f:20,fi:0.3,va:10,vc:1},{name:'清蒸鱼',icon:'🐟',cat:'菜肴',cal:110,p:18,c:2,f:4,fi:0,va:15,vc:0},{name:'炒青菜',icon:'🥬',cat:'菜肴',cal:60,p:2,c:5,f:3.5,fi:1.5,va:100,vc:20},{name:'回锅肉',icon:'🥩',cat:'菜肴',cal:230,p:12,c:8,f:18,fi:0.5,va:15,vc:2},{name:'水煮鱼',icon:'🐟',cat:'菜肴',cal:165,p:15,c:5,f:10,fi:0.3,va:10,vc:1},{name:'地三鲜',icon:'🍆',cat:'菜肴',cal:160,p:3,c:15,f:10,fi:1.8,va:50,vc:10},{name:'酸辣土豆丝',icon:'🥔',cat:'菜肴',cal:130,p:2.5,c:18,f:5,fi:1.5,va:5,vc:15},{name:'葱爆羊肉',icon:'🥩',cat:'菜肴',cal:210,p:15,c:6,f:15,fi:0.3,va:18,vc:1},{name:'可乐鸡翅',icon:'🍗',cat:'菜肴',cal:195,p:18,c:8,f:11,fi:0.2,va:15,vc:0},{name:'麻辣香锅',icon:'🍲',cat:'菜肴',cal:220,p:12,c:10,f:15,fi:1,va:25,vc:8},{name:'小笼包',icon:'🥟',cat:'菜肴',cal:230,p:9,c:35,f:6,fi:1,va:10,vc:1},{name:'烧卖',icon:'🥟',cat:'菜肴',cal:250,p:10,c:38,f:7,fi:1,va:5,vc:1},{name:'葱油饼',icon:'🥞',cat:'菜肴',cal:330,p:6,c:50,f:12,fi:1.5,va:0,vc:0},{name:'煎饼果子',icon:'🥞',cat:'菜肴',cal:220,p:8,c:30,f:8,fi:1.2,va:10,vc:2},
-{name:'药膳鸡',icon:'🍗',cat:'菜肴',cal:180,p:22,c:3,f:8,fi:0.5,va:30,vc:2},{name:'螺蛳粉（不喝汤）',icon:'🍜',cat:'菜肴',cal:280,p:10,c:45,f:7,fi:2.5,va:10,vc:5},{name:'鸡蛋面（不喝汤）',icon:'🍜',cat:'菜肴',cal:180,p:8,c:28,f:4,fi:1,va:40,vc:2},{name:'素面（不喝汤）',icon:'🍜',cat:'菜肴',cal:140,p:4,c:26,f:2,fi:1,va:0,vc:1},{name:'炸鸡',icon:'🍗',cat:'菜肴',cal:260,p:20,c:12,f:15,fi:0.5,va:10,vc:0},{name:'麻辣烫（不喝汤）',icon:'🍲',cat:'菜肴',cal:170,p:10,c:12,f:8,fi:2,va:30,vc:15},{name:'盖浇饭',icon:'🍚',cat:'菜肴',cal:200,p:8,c:30,f:5,fi:1,va:15,vc:5},{name:'炒米粉',icon:'🍜',cat:'菜肴',cal:180,p:6,c:28,f:4,fi:1,va:5,vc:3},{name:'肠粉',icon:'🥟',cat:'菜肴',cal:130,p:5,c:22,f:2,fi:0.5,va:0,vc:0},{name:'兰州拉面（不喝汤）',icon:'🍜',cat:'菜肴',cal:160,p:7,c:25,f:4,fi:1,va:5,vc:2},{name:'肉夹馍',icon:'🥙',cat:'菜肴',cal:280,p:12,c:35,f:10,fi:1,va:5,vc:0},{name:'凉皮',icon:'🥡',cat:'菜肴',cal:160,p:5,c:28,f:3,fi:0.5,va:0,vc:0},{name:'炒年糕',icon:'🍡',cat:'菜肴',cal:200,p:5,c:35,f:5,fi:1.5,va:5,vc:5},{name:'牛肉面（不喝汤）',icon:'🍜',cat:'菜肴',cal:180,p:9,c:25,f:5,fi:1,va:10,vc:2},{name:'酸辣粉（不喝汤）',icon:'🍜',cat:'菜肴',cal:220,p:6,c:38,f:6,fi:1.5,va:10,vc:5},{name:'烤肉饭',icon:'🍚',cat:'菜肴',cal:230,p:10,c:30,f:8,fi:1,va:10,vc:3},{name:'黄焖鸡',icon:'🍗',cat:'菜肴',cal:190,p:15,c:12,f:9,fi:0.5,va:15,vc:3},{name:'肉丸汤',icon:'🍲',cat:'菜肴',cal:120,p:10,c:6,f:6,fi:0.3,va:5,vc:1},{name:'西红柿鸡蛋面',icon:'🍜',cat:'菜肴',cal:170,p:7,c:26,f:4,fi:1.2,va:60,vc:12},{name:'皮蛋瘦肉粥',icon:'🥣',cat:'菜肴',cal:80,p:4,c:14,f:1.5,fi:0.5,va:10,vc:0},{name:'炒河粉（不喝汤）',icon:'🍜',cat:'菜肴',cal:220,p:7,c:33,f:7,fi:1,va:5,vc:3},{name:'叉烧饭',icon:'🍚',cat:'菜肴',cal:250,p:12,c:35,f:7,fi:0.8,va:10,vc:2},{name:'烧鹅饭',icon:'🍚',cat:'菜肴',cal:280,p:13,c:35,f:10,fi:0.8,va:10,vc:2},{name:'炸酱面（不喝汤）',icon:'🍜',cat:'菜肴',cal:190,p:8,c:30,f:5,fi:1,va:5,vc:2},{name:'热干面（不喝汤）',icon:'🍜',cat:'菜肴',cal:200,p:7,c:32,f:5,fi:1,va:5,vc:1},{name:'锅包肉',icon:'🍖',cat:'菜肴',cal:260,p:12,c:20,f:14,fi:0.5,va:5,vc:3},{name:'口水鸡',icon:'🍗',cat:'菜肴',cal:180,p:18,c:5,f:10,fi:0.3,va:15,vc:2},{name:'宫保虾球',icon:'🦐',cat:'菜肴',cal:200,p:15,c:12,f:10,fi:0.5,va:20,vc:3},{name:'鱼香茄子',icon:'🍆',cat:'菜肴',cal:160,p:3,c:15,f:10,fi:2,va:30,vc:8},{name:'干煸豆角',icon:'🥬',cat:'菜肴',cal:150,p:4,c:12,f:9,fi:3,va:30,vc:15},{name:'蒸蛋羹',icon:'🥚',cat:'菜肴',cal:90,p:8,c:3,f:5,fi:0,va:60,vc:0},{name:'番茄牛腩',icon:'🍲',cat:'菜肴',cal:150,p:12,c:8,f:7,fi:1.5,va:60,vc:15},{name:'酸菜鱼',icon:'🐟',cat:'菜肴',cal:140,p:15,c:5,f:7,fi:1,va:10,vc:5},{name:'辣子鸡',icon:'🍗',cat:'菜肴',cal:220,p:18,c:8,f:13,fi:0.5,va:10,vc:2},{name:'毛血旺',icon:'🍲',cat:'菜肴',cal:200,p:12,c:8,f:14,fi:1,va:20,vc:5},{name:'糯米鸡',icon:'🍙',cat:'菜肴',cal:200,p:8,c:33,f:5,fi:1,va:10,vc:2},{name:'生煎包',icon:'🥟',cat:'菜肴',cal:250,p:9,c:35,f:8,fi:1,va:10,vc:1},{name:'锅贴',icon:'🥟',cat:'菜肴',cal:240,p:9,c:33,f:8,fi:1,va:5,vc:1},{name:'豆腐脑',icon:'🥣',cat:'菜肴',cal:60,p:5,c:5,f:2,fi:0.5,va:0,vc:0},{name:'油泼面',icon:'🍜',cat:'菜肴',cal:210,p:6,c:35,f:6,fi:1,va:5,vc:2},{name:'羊肉泡馍',icon:'🥣',cat:'菜肴',cal:230,p:10,c:30,f:8,fi:1,va:10,vc:2},
-{name:'红烧排骨',icon:'🍖',cat:'菜肴',cal:290,p:14,c:10,f:23,fi:0.3,va:10,vc:0},{name:'黄瓜炒鸡蛋',icon:'🍳',cat:'菜肴',cal:71,p:5.4,c:2.1,f:5.0,fi:0.3,va:90,vc:5},{name:'西红柿鸡蛋汤',icon:'🍲',cat:'菜肴',cal:40,p:3,c:3,f:2,fi:0.5,va:50,vc:8},{name:'紫菜蛋花汤',icon:'🍲',cat:'菜肴',cal:35,p:3,c:3,f:1.5,fi:0.5,va:15,vc:2},{name:'木须肉',icon:'🥘',cat:'菜肴',cal:160,p:10,c:8,f:10,fi:1,va:30,vc:3},{name:'青椒肉丝',icon:'🫑',cat:'菜肴',cal:150,p:12,c:8,f:8,fi:1,va:25,vc:15},{name:'白切鸡',icon:'🍗',cat:'菜肴',cal:167,p:22,c:0,f:8,fi:0,va:10,vc:0},{name:'红烧茄子',icon:'🍆',cat:'菜肴',cal:155,p:3,c:12,f:11,fi:2,va:40,vc:8},{name:'干锅花菜',icon:'🥦',cat:'菜肴',cal:180,p:5,c:10,f:14,fi:2.5,va:15,vc:25},{name:'蒜蓉西兰花',icon:'🥦',cat:'菜肴',cal:55,p:3.5,c:4,f:3,fi:1.6,va:120,vc:40},{name:'凉拌黄瓜',icon:'🥒',cat:'菜肴',cal:30,p:1,c:3.5,f:1.5,fi:0.5,va:15,vc:9},{name:'红烧豆腐',icon:'🧈',cat:'菜肴',cal:120,p:7,c:6,f:7,fi:0.5,va:0,vc:0},{name:'咖喱鸡',icon:'🍛',cat:'菜肴',cal:180,p:15,c:8,f:10,fi:0.8,va:15,vc:3},{name:'冬瓜排骨汤',icon:'🍲',cat:'菜肴',cal:60,p:4,c:4,f:3,fi:0.5,va:5,vc:2},{name:'韭菜炒鸡蛋',icon:'🥚',cat:'菜肴',cal:145,p:8,c:5,f:10,fi:1.2,va:200,vc:12},{name:'蒜苔炒肉',icon:'🥬',cat:'菜肴',cal:170,p:10,c:10,f:10,fi:1.5,va:20,vc:3},{name:'红烧鸡翅',icon:'🍗',cat:'菜肴',cal:195,p:18,c:5,f:12,fi:0.3,va:15,vc:0},{name:'铁板牛肉',icon:'🥩',cat:'菜肴',cal:220,p:18,c:8,f:13,fi:0.8,va:10,vc:2},{name:'干锅虾',icon:'🦐',cat:'菜肴',cal:180,p:16,c:8,f:10,fi:0.8,va:20,vc:3},{name:'西葫芦炒蛋',icon:'🥚',cat:'菜肴',cal:100,p:6,c:5,f:6,fi:0.8,va:30,vc:5},{name:'肉末茄子',icon:'🍆',cat:'菜肴',cal:160,p:7,c:12,f:10,fi:1.8,va:40,vc:8},{name:'清炒西兰花',icon:'🥦',cat:'菜肴',cal:50,p:3,c:4,f:2.5,fi:1.6,va:120,vc:40},{name:'凉拌木耳',icon:'🍄',cat:'菜肴',cal:45,p:1.5,c:5,f:2.5,fi:2.6,va:0,vc:0},{name:'皮蛋豆腐',icon:'🥚',cat:'菜肴',cal:80,p:6,c:4,f:4,fi:0.4,va:5,vc:0},{name:'蚝油生菜',icon:'🥬',cat:'菜肴',cal:40,p:1.5,c:3,f:2.5,fi:0.7,va:166,vc:10},{name:'排骨汤',icon:'🍲',cat:'菜肴',cal:80,p:6,c:3,f:5,fi:0.3,va:5,vc:1},{name:'鸡汤',icon:'🍲',cat:'菜肴',cal:60,p:5,c:2,f:3.5,fi:0,va:10,vc:0},{name:'鱼头豆腐汤',icon:'🍲',cat:'菜肴',cal:70,p:6,c:3,f:4,fi:0.3,va:10,vc:1},{name:'葱烧海参',icon:'🥘',cat:'菜肴',cal:78,p:6,c:5,f:4,fi:0.3,va:0,vc:0},{name:'蒜蓉粉丝蒸虾',icon:'🦐',cat:'菜肴',cal:160,p:12,c:12,f:7,fi:0.5,va:20,vc:2},
-{name:'白菜炒猪肉',icon:'🥬',cat:'菜肴',cal:119,p:5.7,c:2.1,f:9.8,fi:0.5,va:7,vc:9},{name:'炸鸡腿',icon:'🍗',cat:'菜肴',cal:182,p:13.6,c:6.0,f:11.8,fi:0.1,va:11,vc:0},
-{name:'糖醋里脊',icon:'🍖',cat:'菜肴',cal:250,p:15,c:20,f:12,fi:0.3,va:10,vc:2},{name:'干烧鱼',icon:'🐟',cat:'菜肴',cal:165,p:18,c:5,f:8,fi:0.3,va:15,vc:1},{name:'梅菜扣肉',icon:'🥩',cat:'菜肴',cal:320,p:12,c:8,f:27,fi:1,va:10,vc:1},{name:'东坡肉',icon:'🥩',cat:'菜肴',cal:340,p:13,c:10,f:28,fi:0.3,va:10,vc:0},{name:'北京烤鸭',icon:'🦆',cat:'菜肴',cal:240,p:18,c:6,f:16,fi:0,va:25,vc:0},{name:'担担面（不喝汤）',icon:'🍜',cat:'菜肴',cal:220,p:8,c:32,f:7,fi:1.5,va:5,vc:1},{name:'重庆小面（不喝汤）',icon:'🍜',cat:'菜肴',cal:180,p:6,c:30,f:4,fi:1,va:5,vc:2},{name:'过桥米线（不喝汤）',icon:'🍜',cat:'菜肴',cal:120,p:6,c:18,f:2,fi:0.5,va:5,vc:1},{name:'刀削面（不喝汤）',icon:'🍜',cat:'菜肴',cal:190,p:7,c:32,f:4,fi:1,va:0,vc:1},{name:'烩面（不喝汤）',icon:'🍜',cat:'菜肴',cal:170,p:7,c:28,f:3,fi:0.8,va:5,vc:1},{name:'胡辣汤',icon:'🍲',cat:'菜肴',cal:80,p:5,c:10,f:3,fi:0.8,va:10,vc:2},{name:'炒肝',icon:'🍲',cat:'菜肴',cal:130,p:10,c:8,f:6,fi:0.3,va:50,vc:2},{name:'羊蝎子',icon:'🍖',cat:'菜肴',cal:160,p:18,c:2,f:8,fi:0,va:15,vc:0},{name:'烤冷面（不喝汤）',icon:'🍜',cat:'菜肴',cal:180,p:6,c:28,f:5,fi:0.8,va:5,vc:2},{name:'手抓饼',icon:'🥞',cat:'菜肴',cal:320,p:7,c:45,f:12,fi:1.5,va:0,vc:0},{name:'葱油拌面（不喝汤）',icon:'🍜',cat:'菜肴',cal:200,p:6,c:32,f:6,fi:0.8,va:0,vc:0},{name:'阳春面（不喝汤）',icon:'🍜',cat:'菜肴',cal:130,p:4,c:25,f:2,fi:0.5,va:0,vc:0},{name:'云吞面（不喝汤）',icon:'🍜',cat:'菜肴',cal:160,p:8,c:25,f:3,fi:0.6,va:10,vc:1},{name:'盐焗鸡',icon:'🍗',cat:'菜肴',cal:180,p:22,c:1,f:9,fi:0,va:10,vc:0},{name:'啤酒鸭',icon:'🦆',cat:'菜肴',cal:200,p:14,c:5,f:14,fi:0.3,va:10,vc:1},{name:'老鸭汤',icon:'🍲',cat:'菜肴',cal:80,p:7,c:3,f:4,fi:0.2,va:10,vc:0},{name:'干锅鸡',icon:'🍗',cat:'菜肴',cal:200,p:15,c:8,f:12,fi:0.5,va:10,vc:3},
-{name:'莲藕排骨汤',icon:'🍲',cat:'菜肴',cal:90,p:6,c:6,f:5,fi:0.8,va:5,vc:3},{name:'鲫鱼豆腐汤',icon:'🍲',cat:'菜肴',cal:70,p:8,c:3,f:3,fi:0.3,va:10,vc:1},{name:'丝瓜蛋汤',icon:'🍲',cat:'菜肴',cal:50,p:3,c:4,f:2,fi:0.5,va:10,vc:3},{name:'卤肉饭',icon:'🍚',cat:'菜肴',cal:220,p:10,c:30,f:6,fi:0.5,va:10,vc:0},{name:'红烧牛肉',icon:'🥩',cat:'菜肴',cal:200,p:18,c:5,f:12,fi:0.3,va:8,vc:1},{name:'干锅肥肠',icon:'🍲',cat:'菜肴',cal:250,p:10,c:8,f:20,fi:0.5,va:5,vc:2},{name:'铁板鱿鱼',icon:'🦑',cat:'菜肴',cal:150,p:15,c:8,f:6,fi:0.3,va:10,vc:2},{name:'孜然牛肉',icon:'🥩',cat:'菜肴',cal:210,p:18,c:6,f:12,fi:0.5,va:8,vc:2},{name:'蚝油牛肉',icon:'🥩',cat:'菜肴',cal:180,p:15,c:8,f:10,fi:0.5,va:10,vc:2},{name:'西芹百合',icon:'🥬',cat:'菜肴',cal:80,p:2,c:10,f:3,fi:1.5,va:20,vc:5},{name:'松仁玉米',icon:'🌽',cat:'菜肴',cal:180,p:5,c:20,f:9,fi:1.5,va:30,vc:5},{name:'虎皮青椒',icon:'🫑',cat:'菜肴',cal:90,p:2,c:8,f:6,fi:1.2,va:20,vc:30},{name:'拔丝地瓜',icon:'🍠',cat:'菜肴',cal:200,p:2,c:40,f:5,fi:1,va:300,vc:5},{name:'小鸡炖蘑菇',icon:'🍲',cat:'菜肴',cal:130,p:12,c:5,f:7,fi:1.2,va:10,vc:2},{name:'猪肉炖粉条',icon:'🍲',cat:'菜肴',cal:170,p:8,c:20,f:6,fi:0.8,va:10,vc:2},{name:'酸菜白肉',icon:'🍲',cat:'菜肴',cal:200,p:10,c:8,f:14,fi:0.8,va:10,vc:3},{name:'溜肉段',icon:'🥩',cat:'菜肴',cal:230,p:12,c:15,f:12,fi:0.3,va:5,vc:2},{name:'干炸丸子',icon:'🍖',cat:'菜肴',cal:250,p:12,c:15,f:15,fi:0.3,va:5,vc:1},{name:'京酱肉丝',icon:'🥩',cat:'菜肴',cal:220,p:15,c:12,f:10,fi:0.5,va:10,vc:2},{name:'香菇油菜',icon:'🥬',cat:'菜肴',cal:70,p:2,c:6,f:4,fi:1.5,va:50,vc:10},{name:'蒜蓉蒸扇贝',icon:'🦪',cat:'菜肴',cal:120,p:14,c:6,f:5,fi:0.3,va:10,vc:2},{name:'粉蒸肉',icon:'🥩',cat:'菜肴',cal:250,p:11,c:20,f:14,fi:0.8,va:10,vc:1},{name:'腊味煲仔饭',icon:'🍚',cat:'菜肴',cal:230,p:9,c:32,f:7,fi:0.8,va:15,vc:1},{name:'白灼虾',icon:'🦐',cat:'菜肴',cal:95,p:18,c:1,f:1.5,fi:0,va:15,vc:0},{name:'豉汁排骨',icon:'🍖',cat:'菜肴',cal:230,p:14,c:8,f:16,fi:0.3,va:10,vc:1},{name:'芋头扣肉',icon:'🥩',cat:'菜肴',cal:280,p:10,c:15,f:22,fi:0.8,va:10,vc:1},
-{name:'空心菜（熟）',icon:'🥬',cat:'菜肴',cal:20,p:1.8,c:2.5,f:0.3,fi:1.6,va:240,vc:12},{name:'凉拌内酯豆腐',icon:'🥗',cat:'菜肴',cal:65,p:4.2,c:4.0,f:3.6,fi:0.5,va:15,vc:1},{name:'西红柿(熟)',icon:'🍅',cat:'菜肴',cal:19,p:0.8,c:4.2,f:0.2,fi:0.6,va:45,vc:8},{name:'白菜(熟)',icon:'🥬',cat:'菜肴',cal:18,p:1.1,c:3.5,f:0.1,fi:0.9,va:18,vc:18},
-{name:'土豆(熟)',icon:'🥔',cat:'菜肴',cal:77,p:2.0,c:17.5,f:0.1,fi:1.3,va:0,vc:13},{name:'菠菜(熟)',icon:'🥬',cat:'菜肴',cal:26,p:3.0,c:4.8,f:0.3,fi:2.0,va:450,vc:15},{name:'西兰花(熟)',icon:'🥦',cat:'菜肴',cal:35,p:3.5,c:4.7,f:0.6,fi:1.8,va:110,vc:28},{name:'茄子(熟)',icon:'🍆',cat:'菜肴',cal:23,p:1.0,c:5.2,f:0.2,fi:1.5,va:7,vc:2},
-{name:'胡萝卜(熟)',icon:'🥕',cat:'菜肴',cal:35,p:0.8,c:8.2,f:0.2,fi:1.3,va:850,vc:4},{name:'豆腐(熟)',icon:'🧈',cat:'菜肴',cal:84,p:8.4,c:4.0,f:3.8,fi:0.4,va:0,vc:0},{name:'蘑菇(熟)',icon:'🍄',cat:'菜肴',cal:24,p:2.8,c:3.6,f:0.3,fi:1.4,va:0,vc:0.5},{name:'生菜(熟)',icon:'🥬',cat:'菜肴',cal:17,p:1.1,c:3.1,f:0.2,fi:0.8,va:150,vc:4},
-{name:'青椒(熟)',icon:'🫑',cat:'菜肴',cal:21,p:0.9,c:5.2,f:0.2,fi:1.5,va:15,vc:75},{name:'洋葱(熟)',icon:'🧅',cat:'菜肴',cal:38,p:1.0,c:9.0,f:0.2,fi:1.0,va:0,vc:4},{name:'豆芽(熟)',icon:'🌱',cat:'菜肴',cal:28,p:3.8,c:4.2,f:1.4,fi:1.6,va:2,vc:3},{name:'南瓜(熟)',icon:'🎃',cat:'菜肴',cal:24,p:0.6,c:5.8,f:0.1,fi:0.9,va:155,vc:5},
-{name:'莲藕(熟)',icon:'🪷',cat:'菜肴',cal:45,p:1.0,c:11.2,f:0.2,fi:1.3,va:0,vc:22},{name:'海带(熟)',icon:'🌊',cat:'菜肴',cal:14,p:1.1,c:2.3,f:0.1,fi:1.1,va:0,vc:0},{name:'芹菜(熟)',icon:'🥬',cat:'菜肴',cal:15,p:1.0,c:3.6,f:0.2,fi:1.4,va:52,vc:4},{name:'芦笋(熟)',icon:'🌿',cat:'菜肴',cal:22,p:2.0,c:4.6,f:0.2,fi:2.0,va:710,vc:11},
-{name:'丝瓜(熟)',icon:'🥒',cat:'菜肴',cal:22,p:0.8,c:4.6,f:0.2,fi:0.7,va:12,vc:2},{name:'冬瓜(熟)',icon:'🥬',cat:'菜肴',cal:13,p:0.3,c:2.8,f:0.2,fi:0.8,va:0,vc:0},{name:'木耳(熟)',icon:'🍄',cat:'菜肴',cal:25,p:1.3,c:5.8,f:0.2,fi:2.8,va:0,vc:0},{name:'韭菜(熟)',icon:'🥬',cat:'菜肴',cal:27,p:2.1,c:4.9,f:0.4,fi:1.6,va:210,vc:12},
-{name:'卷心菜(熟)',icon:'🥬',cat:'菜肴',cal:23,p:1.3,c:4.6,f:0.2,fi:1.2,va:10,vc:22},{name:'四季豆(熟)',icon:'🫛',cat:'菜肴',cal:30,p:1.8,c:6.1,f:0.4,fi:1.7,va:30,vc:3},{name:'莴笋(熟)',icon:'🥬',cat:'菜肴',cal:16,p:0.9,c:3.1,f:0.1,fi:0.7,va:22,vc:2},{name:'茭白(熟)',icon:'🥬',cat:'菜肴',cal:25,p:1.0,c:5.6,f:0.2,fi:2.1,va:4,vc:2},
-{name:'豆角(熟)',icon:'🫛',cat:'菜肴',cal:33,p:1.6,c:7.4,f:0.2,fi:1.7,va:18,vc:3},{name:'西葫芦(熟)',icon:'🥒',cat:'菜肴',cal:20,p:1.0,c:4.1,f:0.2,fi:0.9,va:26,vc:3},{name:'金针菇(熟)',icon:'🍄',cat:'菜肴',cal:34,p:2.2,c:6.3,f:0.4,fi:2.9,va:4,vc:1},{name:'香菇(熟)',icon:'🍄',cat:'菜肴',cal:28,p:2.0,c:5.5,f:0.3,fi:3.5,va:0,vc:0.5},{name:'西红柿(小)(熟)',icon:'🍅',cat:'菜肴',cal:23,p:0.9,c:5.3,f:0.2,fi:0.6,va:55,vc:10},
-{name:'煎蛋',icon:'🍳',cat:'菜肴',cal:204,p:12.1,c:1.4,f:16.2,fi:0.0,va:195,vc:0},{name:'茼蒿（熟）',icon:'🥬',cat:'菜肴',cal:23,p:1.9,c:3.3,f:0.3,fi:1.8,va:300,vc:15},
-{name:'嫩豆腐',icon:'⬜',cat:'原料',cal:66,p:6.4,c:3.2,f:3.1,fi:0.0,va:0,vc:0},{name:'老豆腐',icon:'⬜',cat:'原料',cal:94,p:10.2,c:3.3,f:4.8,fi:0.4,va:0,vc:0},{name:'内酯豆腐',icon:'⬜',cat:'原料',cal:50,p:5.0,c:2.9,f:2.2,fi:0.0,va:0,vc:0},{name:'纯大豆粉',icon:'🫘',cat:'原料',cal:418,p:36.0,c:18.6,f:18.0,fi:12.5,va:35,vc:0},{name:'亚麻籽油',icon:'🍾',cat:'原料',cal:899,p:0.0,c:0.0,f:99.9,fi:0.0,va:0,vc:0},{name:'橄榄油',icon:'🍾',cat:'原料',cal:899,p:0.0,c:0.0,f:99.9,fi:0.0,va:0,vc:0},{name:'猪油',icon:'🥣',cat:'原料',cal:897,p:0.0,c:0.0,f:99.7,fi:0.0,va:0,vc:0},
-{name:'沙拉酱',icon:'🧴',cat:'原料',cal:680,p:1.1,c:4.1,f:74.2,fi:0.0,va:16,vc:0},{name:'番茄酱',icon:'🥫',cat:'原料',cal:81,p:2.1,c:17.8,f:0.2,fi:1.6,va:46,vc:7},{name:'蚝油',icon:'🧉',cat:'原料',cal:114,p:2.4,c:24.1,f:0.2,fi:0.0,va:0,vc:0},{name:'白砂糖',icon:'🍬',cat:'原料',cal:400,p:0.0,c:99.9,f:0.0,fi:0.0,va:0,vc:0},{name:'植物油',icon:'🍾',cat:'原料',cal:899,p:0.0,c:0.0,f:99.9,fi:0.0,va:0,vc:0},
-{name:'全麦面包',icon:'🍞',cat:'原料',cal:246,p:9.5,c:43.2,f:2.5,fi:5.5,va:0,vc:0},{name:'吐司面包',icon:'🍞',cat:'原料',cal:278,p:8.5,c:51.0,f:4.2,fi:2.2,va:0,vc:0},{name:'士力架',icon:'🍫',cat:'原料',cal:490,p:8.4,c:59.3,f:24.0,fi:2.5,va:0,vc:0},{name:'雪糕',icon:'🍦',cat:'原料',cal:205,p:3.2,c:22.5,f:11.4,fi:0.0,va:45,vc:0}
-];
 
 /* ========== INDEXEDDB (PHOTO STORAGE) ========== */
 function initPhotoDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open('CalorieApp',1);r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains('photos'))db.createObjectStore('photos',{keyPath:'id'})};r.onsuccess=e=>{photoDB=e.target.result;resolve()};r.onerror=()=>resolve()})}
@@ -600,7 +578,7 @@ function calcTargetCalories(){
  const tdee=calcTDEE(state.profile);if(!tdee)return 0;
  const bmr=calcBMR(state.profile);
   let e;
- if(state.profile.goal==='buddha'){e=tdee*0.93;if(e<bmr)e=bmr} // ➕ 佛系：纯靠躺平不运动，制造 7% 的微弱缺口（即 TDEE 的 93%）
+ if(state.profile.goal==='buddha'){e=tdee*0.95;if(e<bmr)e=bmr} // 佛系：轻微控制，5% 缺口
  else if(state.profile.goal==='lose'){e=tdee*0.85;if(e<bmr)e=bmr}
  else if(state.profile.goal==='gain'){e=tdee*1.15}
  else{e=tdee}
@@ -609,10 +587,7 @@ function calcTargetCalories(){
 /* ⑤ CalcWeight — 计算体重基数（超重及以上使用调整体重） */
 function calcCalcWeight(p){
   const bmi=calcBMI(p.height,p.weight);if(!bmi)return p.weight||60;
-  if(bmi<15.0)return(p.weight||60)*1.2;
-  if(bmi<16.0)return(p.weight||60)*1.15;
-  if(bmi<17.0)return(p.weight||60)*1.1;
-  if(bmi<24.0)return p.weight||60;
+  if(bmi<24.0)return p.weight||60; // 正常及偏瘦直接用实际体重
   var ideal=(p.height-100)*0.9;
   return ideal+0.25*((p.weight||60)-ideal);
 }
@@ -659,33 +634,43 @@ function getBFLevel(bf,gender){
   return l||{label:'--',color:'var(--text3)',severity:'none'};
 }
 /* BMI+体脂融合判断 */
-function getFusionType(bmi,bf,bmiOk,bfOk){
-  if(bmiOk&&bfOk)return{type:'ideal',label:'理想状态',icon:'✨',color:'var(--blue)'};
-  if(bmiOk&&!bfOk)return{type:'hidden_obesity',label:'⚠️ 隐性肥胖',icon:'⚠️',color:'var(--orange)',
+function getFusionType(bmi,bf,bmiOk,bfOk,gender){
+  gender=gender||'male';
+  var bfLow=gender==='male'?bf<14:bf<21;
+  var bfHigh=gender==='male'?bf>=25:bf>=32;
+  if(bmiOk&&!bfLow&&!bfHigh)return{type:'ideal',label:'🏆 理想状态',icon:'🏆',color:'var(--blue)',
+    msg:'BMI与体脂均处于健康范围，体型均衡，继续保持！'};
+  if(bmiOk&&bfLow)return{type:'lean',label:'💪 精瘦型',icon:'💪',color:'var(--green)',
+    msg:'BMI正常但体脂偏低（精瘦型），肌肉线条明显。注意保证营养摄入，避免过度消耗。'};
+  if(bmiOk&&bfHigh)return{type:'hidden_obesity',label:'⚠️ 隐性肥胖',icon:'⚠️',color:'var(--orange)',
     msg:'BMI正常但体脂偏高（隐性肥胖），建议减少精碳水、增加力量训练提升肌肉比例。'};
-  if(!bmiOk&&bfOk)return{type:'muscular',label:'💪 肌肉型',icon:'💪',color:'var(--green)',
+  if(!bmiOk&&!bfLow&&!bfHigh)return{type:'muscular',label:'💪 肌肉型',icon:'💪',color:'var(--green)',
     msg:'BMI偏高但体脂正常（肌肉型），体型健康无需减脂，可继续维持训练。'};
-  return{type:'both_risk',label:'⚠️ 需要减脂',icon:'⚠️',color:'var(--red)',
+  if(!bmiOk&&bfLow)return{type:'athletic',label:'🏋️ 运动员型',icon:'🏋️',color:'var(--green)',
+    msg:'BMI偏高但体脂偏低（运动员型），肌肉量大体型健壮，继续保持训练。'};
+  return{type:'overweight',label:'⚠️ 超重/肥胖',icon:'⚠️',color:'var(--red)',
     msg:'BMI与体脂均偏高，建议系统化减脂管理。'};
 }
 function calcNutritionTargets(){
   var e=calcTargetCalories();
   if(!e)return{p:0,c:0,f:0,fiber:25,va:800,vc:100,calories:0};
   var p=state.profile,cw=calcCalcWeight(p),goal=p.goal||'maintain',isMale=p.gender==='male';
-  /* ⑥ 蛋白质 */
+  /* ⑥ 蛋白质 — 减脂/增肌期 2.0g/kg，其他 1.6g/kg */
   var protein=(goal==='lose'||goal==='gain')?cw*2.0:cw*1.6;
   var proteinKcal=protein*4;
-  /* ⑦ 脂肪 — 三层最低保护 */
-  var fat=Math.max(cw*0.9,isMale?50:40,cw*0.6);
+  /* ⑦ 脂肪 — 按总热量百分比分配（减脂期略高提升饱腹感，增肌期略低为碳水让路） */
+  var fatPct={buddha:0.25,lose:0.28,maintain:0.25,gain:0.22}[goal]||0.25;
+  var fat=Math.round(e*fatPct/9);
+  var fatMin=Math.round(cw*0.8);
+  if(fat<fatMin)fat=fatMin;
   var fatKcal=fat*9;
-  /* ⑧ 碳水 — 剩余热量法 + 最低碳水保护 + 热量闭合 */
-  var remainingKcal=e-proteinKcal-fatKcal;
-  var carb=remainingKcal/4;
+  /* ⑧ 碳水 — 剩余热量 + 最低保护，不足时从脂肪借 */
+  var carb=Math.round((e-proteinKcal-fatKcal)/4);
   var carbMin=isMale?120:100;
   if(carb<carbMin){
+    var neededKcal=(carbMin-carb)*4;
+    fat=Math.max(Math.round(cw*0.6), fat-Math.ceil(neededKcal/9));
     carb=carbMin;
-    var deficit=carbMin*4-remainingKcal;
-    if(deficit>0){protein-=deficit/2/4;fat-=deficit/2/9}
   }
   /* ⑨ 微量营养素 */
   var fiber=Math.max(25,14*e/1000);
@@ -704,44 +689,6 @@ function resizeImage(url,maxSize,quality,cb){
 }
 
 /* ========== AMOUNT MODAL ========== */
-var FOOD_WEIGHT_TIPS={
-'米饭':'一拳米饭≈150g','面条':'一碗面条≈200g','馒头':'一个馒头≈100g','包子':'一个包子≈80g','饺子':'一个饺子≈25g','粥':'一碗粥≈250g','面包':'一片面包≈30g','燕麦':'一碗燕麦≈40g','红薯':'一个红薯≈200g','玉米':'一根玉米≈200g','炒饭':'一碗炒饭≈200g','意面':'一盘意面≈200g','年糕':'一条年糕≈50g','油条':'一根油条≈50g','米粉':'一碗米粉≈200g','杂粮饭':'一拳杂粮饭≈150g',
-'糯米':'一碗糯米≈150g','烧饼':'一个烧饼≈80g','花卷':'一个花卷≈80g','小米粥':'一碗小米粥≈250g','粽子':'一个粽子≈150g','吐司':'一片吐司≈30g','紫薯':'一个紫薯≈150g','芋头':'一个芋头≈100g',
-'鸡胸肉':'一块鸡胸肉≈150g','猪肉(瘦)':'一块猪肉≈100g','牛肉(瘦)':'一块牛肉≈100g','羊肉':'一份羊肉≈100g','排骨':'一块排骨≈50g','鲈鱼':'一条鲈鱼≈400g','三文鱼':'一片三文鱼≈100g','虾':'一只虾≈15g','鸡蛋':'一个鸡蛋≈50g','鸭肉':'一块鸭肉≈100g','培根':'一片培根≈15g','香肠':'一根香肠≈50g','火腿':'一片火腿≈30g','鸡腿':'一个鸡腿≈150g','牛排':'一份牛排≈200g','猪排':'一块猪排≈100g',
-'鸡翅':'一个鸡翅≈60g','鸡爪':'一只鸡爪≈30g','带鱼':'一段带鱼≈80g','鳕鱼':'一块鳕鱼≈120g','蟹':'一只蟹≈200g','蛤蜊':'一份蛤蜊≈200g','鱼丸':'一个鱼丸≈20g','午餐肉':'一片午餐肉≈30g','基围虾':'一只虾≈15g','带壳蛤蜊':'一份蛤蜊≈200g',
-'西红柿':'一个西红柿≈150g','黄瓜':'一根黄瓜≈200g','白菜':'一片白菜≈50g','土豆':'一个土豆≈150g','菠菜':'一把菠菜≈100g','西兰花':'一朵西兰花≈80g','茄子':'一根茄子≈200g','胡萝卜':'一根胡萝卜≈100g','豆腐':'一块豆腐≈100g','蘑菇':'一份蘑菇≈100g','生菜':'一棵生菜≈200g','青椒':'一个青椒≈100g','洋葱':'一个洋葱≈150g','豆芽':'一把豆芽≈100g','南瓜':'一块南瓜≈200g','莲藕':'一段莲藕≈150g','海带':'一份海带≈50g','芹菜':'一把芹菜≈100g','芦笋':'一把芦笋≈100g',
-'丝瓜':'一段丝瓜≈150g','冬瓜':'一块冬瓜≈200g','木耳':'一份木耳≈100g','韭菜':'一把韭菜≈100g','卷心菜':'半个卷心菜≈300g','四季豆':'一把四季豆≈150g','莴笋':'一根莴笋≈200g','茭白':'一根茭白≈100g','豆角':'一把豆角≈150g','西葫芦':'一根西葫芦≈200g','金针菇':'一把金针菇≈100g','香菇':'一份香菇≈100g','西红柿(小)':'一颗小番茄≈15g',
-'苹果':'一个苹果≈200g','李子':'中等李子≈45g','香蕉':'一根香蕉≈120g','橙子':'一个橙子≈150g','西瓜':'一块西瓜≈300g','葡萄':'一串葡萄≈200g','草莓':'一颗草莓≈15g','梨':'一个梨≈200g','桃子':'一个桃子≈150g','猕猴桃':'一个猕猴桃≈80g','芒果':'一个芒果≈200g','蓝莓':'一盒蓝莓≈125g','榴莲':'一块榴莲≈100g','哈密瓜':'一块哈密瓜≈200g','樱桃':'一颗樱桃≈8g','柚子':'一瓣柚子≈50g',
-'荔枝':'一颗荔枝≈20g','龙眼':'一颗龙眼≈5g','柿子':'一个柿子≈100g','百香果':'一个百香果≈30g','火龙果':'一个火龙果≈300g','木瓜':'一块木瓜≈150g','椰子':'一个椰子≈500g','无花果':'一个无花果≈50g','菠萝':'一块菠萝≈100g','圣女果':'一颗圣女果≈15g',
-'榴莲':'中等大小一块（去壳去核）≈80g',
-'牛奶':'一杯牛奶≈250g','豆浆':'一杯豆浆≈250g','酸奶':'一杯酸奶≈100g','果汁':'一杯果汁≈250g','可乐':'一罐可乐≈330g','咖啡(黑)':'一杯咖啡≈250g','奶茶':'一杯奶茶≈400g','啤酒':'一罐啤酒≈330g','绿茶':'一杯绿茶≈250g','柠檬水':'一杯柠檬水≈300g','运动饮料':'一瓶≈500g',
-'拿铁':'一杯拿铁≈350g','椰汁':'一罐椰汁≈245g','豆奶':'一杯豆奶≈250g','红牛':'一罐红牛≈250g','美式咖啡':'一杯美式≈250g','橙汁':'一杯橙汁≈250g',
-'薯片':'一袋薯片≈50g','巧克力':'一块巧克力≈40g','饼干':'一片饼干≈10g','坚果':'一把坚果≈25g','冰淇淋':'一个冰淇淋≈80g','蛋糕':'一块蛋糕≈80g','糖果':'一颗糖果≈5g','果冻':'一个果冻≈50g','薯条':'一份薯条≈100g','辣条':'一包辣条≈50g','爆米花':'一份爆米花≈50g',
-'海苔':'一包海苔≈8g','花生':'一把花生≈25g','瓜子':'一把瓜子≈25g','核桃':'一个核桃≈10g','蛋黄派':'一个蛋黄派≈30g','山楂片':'一包山楂片≈30g','辣白菜':'一份辣白菜≈100g','话梅':'一颗话梅≈5g',
-'番茄炒蛋':'一份≈200g','红烧肉':'一份≈150g','宫保鸡丁':'一份≈200g','麻婆豆腐':'一份≈200g','鱼香肉丝':'一份≈200g','蛋炒饭':'一碗≈250g','麻辣火锅':'一份≈300g','烤鸡':'一份≈200g','汉堡':'一个汉堡≈200g','披萨':'一块披萨≈120g','寿司':'一个寿司≈20g','沙拉':'一份≈150g','糖醋排骨':'一份≈200g','清蒸鱼':'一份≈200g','炒青菜':'一份≈200g','回锅肉':'一份≈200g','水煮鱼':'一份≈250g','地三鲜':'一份≈200g','酸辣土豆丝':'一份≈200g','葱爆羊肉':'一份≈150g','可乐鸡翅':'一份≈200g','麻辣香锅':'一份≈300g','小笼包':'一个≈25g','烧卖':'一个≈30g','葱油饼':'一张≈100g','煎饼果子':'一个≈200g',
-'药膳鸡':'一份≈300g','螺蛳粉':'一碗≈400g','鸡蛋面':'一碗≈300g','素面':'一碗≈250g','炸鸡':'一块≈150g','麻辣烫':'一碗≈400g','盖浇饭':'一碗≈350g','炒米粉':'一碗≈300g','肠粉':'一份≈200g','兰州拉面':'一碗≈400g','肉夹馍':'一个≈150g','凉皮':'一份≈250g','炒年糕':'一份≈200g','牛肉面':'一碗≈400g','酸辣粉':'一碗≈300g','烤肉饭':'一碗≈350g','黄焖鸡':'一份≈350g','肉丸汤':'一碗≈250g','西红柿鸡蛋面':'一碗≈300g','皮蛋瘦肉粥':'一碗≈300g','炒河粉':'一盘≈300g','叉烧饭':'一碗≈350g','烧鹅饭':'一碗≈350g','炸酱面':'一碗≈300g','热干面':'一碗≈250g','锅包肉':'一份≈200g','口水鸡':'一份≈200g','宫保虾球':'一份≈200g','鱼香茄子':'一份≈200g','干煸豆角':'一份≈200g','蒸蛋羹':'一碗≈150g','番茄牛腩':'一份≈250g','酸菜鱼':'一份≈300g','辣子鸡':'一份≈200g','毛血旺':'一份≈300g','糯米鸡':'一个≈200g','生煎包':'一个≈40g','锅贴':'一个≈30g','豆腐脑':'一碗≈250g','油泼面':'一碗≈300g','羊肉泡馍':'一碗≈300g',
-'红烧排骨':'一份≈200g','黄瓜炒鸡蛋':'一份≈300','西红柿鸡蛋汤':'一碗≈250g','紫菜蛋花汤':'一碗≈250g','木须肉':'一份≈200g','青椒肉丝':'一份≈200g','白切鸡':'一份≈150g','红烧茄子':'一份≈200g','干锅花菜':'一份≈200g','蒜蓉西兰花':'一份≈200g','凉拌黄瓜':'一份≈150g','红烧豆腐':'一份≈200g','咖喱鸡':'一份≈250g','冬瓜排骨汤':'一碗≈300g','韭菜炒鸡蛋':'一份≈200g','蒜苔炒肉':'一份≈200g','红烧鸡翅':'一份≈200g','铁板牛肉':'一份≈200g','干锅虾':'一份≈200g','西葫芦炒蛋':'一份≈200g','肉末茄子':'一份≈200g','清炒西兰花':'一份≈200g','凉拌木耳':'一份≈150g','皮蛋豆腐':'一份≈150g','蚝油生菜':'一份≈200g','排骨汤':'一碗≈300g','鸡汤':'一碗≈300g','鱼头豆腐汤':'一碗≈300g','葱烧海参':'一份≈150g','蒜蓉粉丝蒸虾':'一份≈200g',
-'白菜炒猪肉':'一份≈250g','炸鸡腿':'一只带骨≈130g',
-'糖醋里脊':'一份≈200g','干烧鱼':'一份≈250g','梅菜扣肉':'一份≈150g','东坡肉':'一份≈150g','北京烤鸭':'一份≈200g','担担面':'一碗≈300g','重庆小面':'一碗≈300g','过桥米线':'一碗≈400g','刀削面':'一碗≈350g','烩面':'一碗≈400g','胡辣汤':'一碗≈300g','炒肝':'一碗≈250g','羊蝎子':'一份≈300g','烤冷面':'一份≈200g','手抓饼':'一张≈100g','葱油拌面':'一碗≈250g','阳春面':'一碗≈250g','云吞面':'一碗≈300g','盐焗鸡':'一份≈200g','啤酒鸭':'一份≈250g','老鸭汤':'一碗≈350g','干锅鸡':'一份≈250g','莲藕排骨汤':'一碗≈350g','鲫鱼豆腐汤':'一碗≈350g','丝瓜蛋汤':'一碗≈250g','卤肉饭':'一碗≈300g','红烧牛肉':'一份≈200g','干锅肥肠':'一份≈200g','铁板鱿鱼':'一份≈200g','孜然牛肉':'一份≈200g','蚝油牛肉':'一份≈200g','西芹百合':'一份≈200g','松仁玉米':'一份≈200g','虎皮青椒':'一份≈150g','拔丝地瓜':'一份≈200g','小鸡炖蘑菇':'一份≈250g','猪肉炖粉条':'一份≈250g','酸菜白肉':'一份≈200g','溜肉段':'一份≈200g','干炸丸子':'一份≈150g','京酱肉丝':'一份≈200g','香菇油菜':'一份≈200g','蒜蓉蒸扇贝':'一份≈200g','粉蒸肉':'一份≈200g','腊味煲仔饭':'一碗≈350g','白灼虾':'一份≈200g','豉汁排骨':'一份≈200g','芋头扣肉':'一份≈150g',
-'凉拌内酯豆腐':'一盘≈400g',
-'老豆腐':'一盘≈400g','内酯豆腐':'一盘≈400g','纯大豆粉':'一小袋≈20g','亚麻籽油':'一勺≈5g','橄榄油':'一勺≈5g','猪油':'一勺≈5g'
-};
-function getFoodWeightTip(name){
-  var t=FOOD_WEIGHT_TIPS[name];
-  if(t)return '💡 估不准重量？'+t;
-  var f=FOOD_DB.find(x=>x.name===name);
-  if(f){
-    if(f.cat==='菜肴')return '💡 估不准重量？一份≈200g';
-    if(f.cat==='主食')return '💡 估不准重量？一碗≈200g';
-    if(f.cat==='饮料')return '💡 估不准重量？一杯≈250g';
-    if(f.cat==='零食')return '💡 估不准重量？一份≈50g';
-    if(f.cat==='水果')return '💡 估不准重量？一个≈150g';
-    if(f.cat==='肉类')return '💡 估不准重量？一块≈100g';
-    if(f.cat==='原料')return '💡 估不准重量？一勺≈5g一盒≈400';
-    if(f.cat==='蔬菜')return '💡 估不准重量？一份≈100g';
-  }
-  return '💡 估不准重量？一份≈200g';
-}
 function openAmountModal(food){
   state.pendingFood=food;
   document.getElementById('amountIcon').textContent=food.icon;
@@ -876,7 +823,7 @@ function renderBMI(){
       /* 融合判断（仅影响目标锁定，不显示标签） */
       var bmiOk=bmi>=18.5&&bmi<25.0;
       var bfOk=state.profile.gender==='male'?(bf>=14&&bf<25):(bf>=21&&bf<32);
-      var fusion=getFusionType(bmi,bf,bmiOk,bfOk);
+      var fusion=getFusionType(bmi,bf,bmiOk,bfOk,state.profile.gender);
       bfRow.style.display='flex';
       /* 肌肉型体型：BMI偏高但体脂正常 → 解锁维持和增肌 */
       if(fusion.type==='muscular'){
@@ -889,113 +836,81 @@ function renderBMI(){
     }else{
       bfRow.style.display='none';
     }
-    /* 融合覆盖后重新应用约束 */
-    var finalInfo=info;
-    if(fusionOverride){
-      finalInfo={label:info.label,status:info.status,color:info.color,desc:info.desc,severity:info.severity,
-        lockedGoals:fusionOverride.lockedGoals,recGoal:fusionOverride.recGoal,allowedGoals:info.allowedGoals,recActivity:info.recActivity,bmiLevel:info.bmiLevel};
-    }
-    applyVisualPriority(finalInfo.severity);
-    applyUIConstraints(finalInfo);
   }
-  else{
-    document.getElementById('bmiValue').textContent='--';document.getElementById('bmiLabel').textContent='未设置';c.style.color='var(--text3)';
-    document.getElementById('bmiStatus').textContent='请前往设置填写身高体重';document.getElementById('bmiStatus').style.color='var(--text3)';
-    document.getElementById('bmiDesc').textContent='';
-    applyVisualPriority('none');applyUIConstraints(null);
-    document.getElementById('bodyfatRow').style.display='none';
-  }
-}
-function applyUIConstraints(info){
-  // 1. 把 'buddha' 加进目标数组里，让系统去扫描它
-  const goals=['buddha','lose','maintain','gain'];
-  
-  goals.forEach(g=>{
-    const btn=document.querySelector('#goalControl .seg-item[data-goal="'+g+'"]');
-    if(!btn)return;
-    btn.classList.remove('disabled','recommended');
-    btn.disabled=false;
-    
-    // 2. 佛系和减脂共享同样的锁定规则
-    let isLocked = info && info.lockedGoals && info.lockedGoals.includes(g);
-    if (g === 'buddha' && info && info.lockedGoals && info.lockedGoals.includes('lose')) {
-      isLocked = true;
-    }
-    
-    if(isLocked){
-      btn.disabled=true;
-      btn.classList.add('disabled');
-    }
-    if(info && info.recGoal===g){
-      btn.classList.add('recommended');
-    }
-  });
 
-  // 3. 自动安全切换逻辑（解耦跨级更新，只改状态，由renderAll安全渲染）
-  if(info && info.lockedGoals && info.lockedGoals.includes(state.profile.goal)){
-    state.profile.goal = info.recGoal;
-    if (typeof saveState === 'function') saveState();
-  }
-}
-
-// 补丁：安全定义 setProfileGoal 函数，在切换时执行最高层级的 renderAll 刷新
-function setProfileGoal(g) {
-  if (typeof state !== 'undefined' && state.profile) {
-    state.profile.goal = g;
-    if (typeof saveState === 'function') saveState();
-    
-    // 用全局总渲染函数统领刷新，绝对不留死角、不留死循环
-    if (typeof renderAll === 'function') {
-      renderAll();
-    } else {
-      if (typeof renderSettings === 'function') renderSettings();
-    }
-  }
-}
-function applyVisualPriority(severity){
-  const card=document.querySelector('#main-page .card:first-child .bmi-result');
-  if(!card)return;
-  card.classList.remove('status-critical','status-warning','status-info','status-success','status-high','status-none');
-  if(severity&&severity!=='none')card.classList.add('status-'+severity);
 }
 function renderCalorieSummary(){
-  const foods=getTodayFoods();const consumed=foods.reduce((s,f)=>s+f.cal,0);const target=calcTargetCalories();
-  const pct=target>0?Math.min(consumed/target,1):0;const circ=2*Math.PI*42;const offset=circ*(1-pct);
-  document.getElementById('ringNum').textContent=consumed;
-  document.getElementById('consumedVal').textContent=consumed+' kcal';
-  document.getElementById('targetVal').textContent=target>0?target+' kcal':'请先设置个人信息';
-  const ring=document.getElementById('ringFg');ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=offset;
-  const se=document.getElementById('calorieStatus');const st=document.getElementById('calorieStatusText');
-  if(target<=0){se.className='calorie-status warn';st.textContent='请先设置个人信息';ring.style.stroke='var(--text3)'}
-  else if(consumed<=target){se.className='calorie-status deficit';st.textContent='今日热量缺口 '+(target-consumed)+' kcal';ring.style.stroke='var(--green)'}
-  else if(consumed<=target*1.05){se.className='calorie-status warn';st.textContent='热量已达上限 注意控制';ring.style.stroke='var(--orange)'}
-  else{se.className='calorie-status surplus';st.textContent='今日热量超标 '+(consumed-target)+' kcal';ring.style.stroke='var(--red)'}
+  const foods=getTodayFoods();
+  const total=foods.reduce((s,f)=>s+f.cal,0);
+  const target=calcTargetCalories();
+  document.getElementById('ringNum').textContent=total;
+  document.getElementById('consumedVal').textContent=total+' kcal';
+  document.getElementById('targetVal').textContent=target+' kcal';
+  const circumference=2*Math.PI*42;
+  const ringEl=document.getElementById('ringFg');
+  const pct=target>0?Math.min(1,total/target):0;
+  ringEl.style.strokeDasharray=circumference;
+  ringEl.style.strokeDashoffset=circumference*(1-pct);
+  const diff=total-target;
+  const statusEl=document.getElementById('calorieStatus');
+  const textEl=document.getElementById('calorieStatusText');
+  if(total===0){
+    statusEl.className='calorie-status deficit';
+    textEl.textContent='还未摄入食物';
+  }else if(total<target*0.9){
+    statusEl.className='calorie-status deficit';
+    textEl.textContent='热量缺口 '+(-diff)+' kcal';
+  }else if(total<=target*1.1){
+    statusEl.className='calorie-status warn';
+    textEl.textContent='热量平衡';
+  }else{
+    statusEl.className='calorie-status surplus';
+    textEl.textContent='热量盈余 '+diff+' kcal';
+  }
 }
 function renderNutrition(){
   const foods=getTodayFoods();
-  const tp=foods.reduce((s,f)=>s+f.p,0),tc=foods.reduce((s,f)=>s+f.c,0),tf=foods.reduce((s,f)=>s+f.f,0);
-  const tfi=foods.reduce((s,f)=>s+(f.fi||0),0),tva=foods.reduce((s,f)=>s+(f.va||0),0),tvc=foods.reduce((s,f)=>s+(f.vc||0),0);
   const t=calcNutritionTargets();
-  document.getElementById('proteinVal').textContent=tp.toFixed(0)+' / '+t.p+'g';
-  document.getElementById('carbsVal').textContent=tc.toFixed(0)+' / '+t.c+'g';
-  document.getElementById('fatVal').textContent=tf.toFixed(0)+' / '+t.f+'g';
-  document.getElementById('proteinBar').style.width=Math.min(tp/Math.max(t.p,1)*100,100)+'%';
-  document.getElementById('carbsBar').style.width=Math.min(tc/Math.max(t.c,1)*100,100)+'%';
-  document.getElementById('fatBar').style.width=Math.min(tf/Math.max(t.f,1)*100,100)+'%';
-  var fiberT=t.fiber||25,vaT=t.va||800,vcT=t.vc||100;
-  document.getElementById('fiberVal').textContent=tfi.toFixed(1)+' / '+fiberT+'g';
-  document.getElementById('vitAVal').textContent=Math.round(tva)+' / '+vaT+'μg';
-  document.getElementById('vitCVal').textContent=tvc.toFixed(0)+' / '+vcT+'mg';
-  document.getElementById('fiberBar').style.width=Math.min(tfi/fiberT*100,100)+'%';
-  document.getElementById('vitABar').style.width=Math.min(tva/vaT*100,100)+'%';
-  document.getElementById('vitCBar').style.width=Math.min(tvc/vcT*100,100)+'%';
-  var recs=[];
-  if(tfi<fiberT*0.7)recs.push('膳食纤维不足，建议多吃蔬菜水果、全谷物');
-  if(tva<vaT*0.5)recs.push('维生素A偏低，建议补充胡萝卜、动物肝脏、蛋黄');
-  if(tvc<vcT*0.5)recs.push('维生素C偏低，建议补充柑橘类水果、西兰花、青椒');
-  var el=document.getElementById('nutriRec');
-  if(recs.length){el.innerHTML='💡 <strong>营养建议</strong><br>'+recs.join('<br>');el.style.display='block'}
-  else{el.style.display='none'}
+  var tp=0,tc=0,tf=0,tfi=0,tva=0,tvc=0;
+  foods.forEach(function(f){
+    tp+=f.p||0;tc+=f.c||0;tf+=f.f||0;tfi+=f.fi||0;tva+=f.va||0;tvc+=f.vc||0;
+  });
+  document.getElementById('proteinVal').textContent=tp.toFixed(1)+' / '+t.p+'g';
+  document.getElementById('proteinBar').style.width=Math.min(100,tp/t.p*100)+'%';
+  document.getElementById('carbsVal').textContent=tc.toFixed(1)+' / '+t.c+'g';
+  document.getElementById('carbsBar').style.width=Math.min(100,tc/t.c*100)+'%';
+  document.getElementById('fatVal').textContent=tf.toFixed(1)+' / '+t.f+'g';
+  document.getElementById('fatBar').style.width=Math.min(100,tf/t.f*100)+'%';
+  document.getElementById('fiberVal').textContent=tfi.toFixed(1)+' / '+t.fiber+'g';
+  document.getElementById('fiberBar').style.width=Math.min(100,tfi/t.fiber*100)+'%';
+  document.getElementById('vitAVal').textContent=tva.toFixed(0)+' / '+t.va+'μg';
+  document.getElementById('vitABar').style.width=Math.min(100,tva/t.va*100)+'%';
+  document.getElementById('vitCVal').textContent=tvc.toFixed(0)+' / '+t.vc+'mg';
+  document.getElementById('vitCBar').style.width=Math.min(100,tvc/t.vc*100)+'%';
+  /* 动态营养建议 — 已摄入≥90%时不提示 */
+  var totalConsumed=foods.reduce(function(s,f){return s+(f.cal||0)},0);
+  var target=calcTargetCalories();
+  if(totalConsumed>0&&target>0&&totalConsumed/target>=0.9){
+    rec='';
+  }else{
+    var rec='',issues=[];
+    var calP=tp*4,calC=tc*4,calF=tf*9;
+    var totalKcal=calP+calC+calF;
+    var pPct=totalKcal>0?calP/totalKcal*100:0,cPct=totalKcal>0?calC/totalKcal*100:0,fPct=totalKcal>0?calF/totalKcal*100:0;
+    if(tp<t.p*0.7)issues.push({icon:'🥩',text:'蛋白质不足，差 '+(t.p-tp).toFixed(0)+'g 达标，建议加一份鸡胸/鸡蛋/蛋白粉'});
+    else if(tp>t.p*1.3)issues.push({icon:'⚠️',text:'蛋白质偏高，可能超出日常需求'});
+    if(tfi<t.fiber*0.6)issues.push({icon:'🥬',text:'膳食纤维不足，多吃绿叶菜、粗粮、豆类'});
+    if(tc>t.c*1.15)issues.push({icon:'🌾',text:'碳水偏高（超出推荐 '+(tc-t.c).toFixed(0)+'g），注意控制主食'});
+    if(tf>t.f*1.15)issues.push({icon:'🫒',text:'脂肪偏高（超出推荐 '+(tf-t.f).toFixed(0)+'g），建议清淡烹饪'});
+    if(issues.length===0){
+      var ratio='蛋白质'+pPct.toFixed(0)+'% / 碳水'+cPct.toFixed(0)+'% / 脂肪'+fPct.toFixed(0)+'%';
+      var ideal='15-20% / 50-60% / 25-30%';
+      rec='✅ 今日各项营养素达标！<br><span style="font-size:12px;color:var(--text2)">当前热量比: '+ratio+'<br>推荐比: '+ideal+'</span>';
+    }else{
+      rec=issues.slice(0,4).map(function(i){return i.icon+' '+i.text}).join('<br>');
+    }
+  }
+  document.getElementById('nutriRec').innerHTML=rec;
 }
 function renderFoodLog(){
   var titleEl=document.getElementById('mainDateNavTitle');
@@ -1045,7 +960,7 @@ function renderSettings(){
   if(bf!==null&&bf>0&&bmi>0){
     var bmiOk=bmi>=18.5&&bmi<25.0;
     var bfOk=state.profile.gender==='male'?(bf>=14&&bf<25):(bf>=21&&bf<32);
-    var fusion=getFusionType(bmi,bf,bmiOk,bfOk);
+    var fusion=getFusionType(bmi,bf,bmiOk,bfOk,state.profile.gender);
     if(fusion.type==='muscular'){
       finalInfo={label:bmiInfo.label,status:bmiInfo.status,color:bmiInfo.color,desc:bmiInfo.desc,severity:bmiInfo.severity,
         lockedGoals:bmiInfo.lockedGoals.filter(g=>g!=='maintain'&&g!=='gain'),recGoal:'maintain',allowedGoals:bmiInfo.allowedGoals,recActivity:bmiInfo.recActivity,bmiLevel:bmiInfo.bmiLevel};
@@ -1055,22 +970,41 @@ function renderSettings(){
         lockedGoals:[].concat(bmiInfo.lockedGoals,['gain']),recGoal:'lose',allowedGoals:bmiInfo.allowedGoals,recActivity:bmiInfo.recActivity,bmiLevel:bmiInfo.bmiLevel};
     }
   }
-  // ➕ 就在applyUIConstraints之前，强行把 'buddha' 加到允许列表里，防止被按钮拦截器锁死
-if (finalInfo.allowedGoals && !finalInfo.allowedGoals.includes('buddha')) {
-  // 如果允许减脂，那就必然允许佛系
-  if (finalInfo.allowedGoals.includes('lose')) {
-    finalInfo.allowedGoals.push('buddha');
-  }
-}
-// 如果有锁定的目标，确保佛系不被误锁（除非当前状态连减脂都被锁定了）
-if (finalInfo.lockedGoals && finalInfo.lockedGoals.includes('lose') && !finalInfo.lockedGoals.includes('buddha')) {
-  finalInfo.lockedGoals.push('buddha');
-}
   applyUIConstraints(finalInfo);
   var lockToggle=document.getElementById('appLockToggle');
   if(lockToggle)lockToggle.checked=state.appLock.enabled;
   var lockDesc=document.getElementById('appLockDesc');
   if(lockDesc){if(state.appLock.enabled){lockDesc.textContent='已启用图案解锁，每次打开应用需绘制图案验证身份'}else{lockDesc.textContent='开启后每次打开应用需要绘制图案验证身份，保护你的隐私数据'}}
+}
+/* ========== BMI UI 约束引擎 ========== */
+function applyUIConstraints(info){
+  if(!info)return;
+  /* 锁定/禁用不允许的目标按钮 */
+  document.querySelectorAll('#goalControl .seg-item').forEach(function(el){
+    var goal=el.dataset.goal;
+    var locked=info.lockedGoals&&info.lockedGoals.indexOf(goal)>=0;
+    el.classList.toggle('disabled',locked);
+    el.classList.toggle('recommended',info.recGoal===goal&&!locked);
+    /* 如果当前选中的目标被锁定，强制切换到推荐目标 */
+    if(locked&&state.profile.goal===goal&&info.recGoal){
+      state.profile.goal=info.recGoal;
+      saveState();
+    }
+  });
+  /* 更新激活态 */
+  document.querySelectorAll('#goalControl .seg-item').forEach(function(el){
+    el.classList.toggle('active',el.dataset.goal===state.profile.goal);
+  });
+  /* 推荐活动量 */
+  if(info.recActivity){
+    document.querySelectorAll('#activityControl .seg-item').forEach(function(el){
+      el.classList.toggle('disabled',false);
+      el.classList.toggle('recommended',el.dataset.act===info.recActivity);
+    });
+  }
+  /* 记录推荐信息到 DOM 供调试 */
+  var goalCtrl=document.getElementById('goalControl');
+  if(goalCtrl)goalCtrl.dataset.bmiLevel=(info.bmiLevel||0);
 }
 function renderWeeklyChart(){
   const target=calcTargetCalories();const today=new Date();const trend=[];
@@ -1377,6 +1311,106 @@ function renderNbdTab(nutriKey){
 }
 function switchNbdTab(nutriKey){renderNbdTab(nutriKey)}
 
+/* ========== BMI BREAKDOWN MODAL ========== */
+function openBmiBreakdown(){
+  const h=state.profile.height,w=state.profile.weight;
+  const bmi=calcBMI(h,w);
+  var content='';
+  if(bmi<=0){
+    content='<div class="nbd-empty"><span class="nbd-emoji">⚖️</span>请先在设置页<br>填写身高体重</div>';
+    document.getElementById('bmiBreakdownContent').innerHTML=content;
+    showModal('bmiModal');
+    return;
+  }
+  const info=getBMIInfo(bmi);
+  const bf=calcBodyFat(state.profile);
+  const tdee=calcTDEE(state.profile);
+  const targetCal=calcTargetCalories();
+  var bfHtml='';
+  if(bf!==null&&bf>0){
+    var bfLevel=getBFLevel(bf,state.profile.gender);
+    bfHtml='<div class="info-modal-item"><div class="info-modal-item-title">体脂率估算</div><div class="info-modal-item-desc"><span style="font-size:22px;font-weight:800;color:'+bfLevel.color+'">'+bf+'%</span> <span style="color:'+bfLevel.color+';font-weight:600;font-size:14px">'+bfLevel.label+'</span></div></div>';
+  }
+  var fusionHtml='';
+  if(bf!==null&&bf>0){
+    var bmiOk=bmi>=18.5&&bmi<25.0;
+    var bfOk=state.profile.gender==='male'?(bf>=14&&bf<25):(bf>=21&&bf<32);
+    var fusion=getFusionType(bmi,bf,bmiOk,bfOk,state.profile.gender);
+    if(fusion){
+      fusionHtml='<div class="info-modal-item"><div class="info-modal-item-title">体型判断</div><div class="info-modal-item-desc">'+(fusion.msg||fusion.label||'')+'</div></div>';
+    }
+  }
+  /* 最近体重记录 */
+  var weightHtml='';
+  var wrKeys=Object.keys(state.weightRecords).sort().reverse();
+  if(wrKeys.length>0){
+    var lastKey=wrKeys[0];
+    var lastRec=state.weightRecords[lastKey];
+    var lastW=lastRec?(typeof lastRec==='object'?lastRec.w:lastRec):0;
+    var lastWaist=lastRec&&typeof lastRec==='object'?lastRec.waist||0:0;
+    var diffW=lastW>0&&state.profile.weight>0?(lastW-state.profile.weight).toFixed(1):0;
+    var diffLabel=diffW>0?'<span style="color:var(--red)">+'+diffW+'</span>':diffW<0?'<span style="color:var(--green)">'+diffW+'</span>':'<span style="color:var(--text2)">±0</span>';
+    var dateLabel=lastKey===getDateKey(new Date())?'今天':formatDateLabel(lastKey);
+    weightHtml='<div class="info-modal-item"><div class="info-modal-item-title">最近体重记录（'+dateLabel+'）</div><div class="info-modal-item-desc">体重 <span style="font-size:22px;font-weight:800">'+lastW+'</span> kg '+(diffW!=0?'（较当前'+diffLabel+'）':'')+(lastWaist>0?' ｜ 腰围 '+lastWaist+' cm':'')+'</div></div>';
+  }
+  var recGoalLabel={buddha:'佛系',lose:'减脂',maintain:'维持',gain:'增肌'};
+  var recGoalDesc={buddha:'不运动纯躺平，约5%~8%极小热量缺口',lose:'减少体脂，约15%热量缺口',maintain:'保持当前体重',gain:'增加肌肉，约15%热量盈余'};
+  content='<div class="info-modal-body">'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">BMI 数值</div><div class="info-modal-item-desc"><span style="font-size:28px;font-weight:800;color:'+info.color+'">'+bmi.toFixed(1)+'</span> <span style="color:'+info.color+';font-weight:600">'+info.label+'</span></div></div>'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">健康状态</div><div class="info-modal-item-desc" style="color:'+info.color+'">'+info.status+'</div></div>'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">评估建议</div><div class="info-modal-item-desc">'+info.desc+'</div></div>'+
+    bfHtml+
+    fusionHtml+
+    weightHtml+
+    '<div class="info-modal-item"><div class="info-modal-item-title">健康范围</div><div class="info-modal-item-desc">健康 BMI: <strong>18.5 ~ 24.0</strong> ｜ 标准体重: <strong>'+Math.round(22*(h/100)*(h/100))+' kg</strong></div></div>'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">推荐方向</div><div class="info-modal-item-desc">建议目标: <strong style="color:var(--blue)">'+(recGoalLabel[info.recGoal]||info.recGoal)+'</strong> ｜ '+(recGoalDesc[info.recGoal]||'')+'</div></div>'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">每日推荐热量</div><div class="info-modal-item-desc">TDEE: <strong>'+tdee+' kcal</strong> ｜ 推荐摄入: <strong style="color:var(--blue)">'+targetCal+' kcal</strong></div></div>'+
+  '</div>';
+  document.getElementById('bmiBreakdownContent').innerHTML=content;
+  showModal('bmiModal');
+}
+
+/* ========== CALORIE BREAKDOWN MODAL ========== */
+function openCalorieBreakdown(){
+  const foods=getTodayFoods();
+  const target=calcTargetCalories();
+  const consumed=foods.reduce((s,f)=>s+f.cal,0);
+  var content='';
+  if(target<=0){
+    content='<div class="nbd-empty"><span class="nbd-emoji">📊</span>请先在设置页<br>填写个人信息</div>';
+    document.getElementById('calorieBreakdownContent').innerHTML=content;
+    showModal('calorieModal');
+    return;
+  }
+  const meals=[{key:'breakfast',name:'☀️ 早餐',icon:'☀️'},{key:'lunch',name:'🌞 午餐',icon:'🌞'},{key:'dinner',name:'🌙 晚餐',icon:'🌙'},{key:'snack',name:'🍪 加餐',icon:'🍪'}];
+  var mealHtml='';
+  meals.forEach(m=>{
+    const mf=foods.filter(f=>f.meal===m.key);
+    if(mf.length===0){
+      mealHtml+='<div class="info-modal-item" style="opacity:0.4"><div class="info-modal-item-title">'+m.name+'</div><div class="info-modal-item-desc"><span style="color:var(--text3)">🍽️ 暂无记录</span></div></div>';
+      return;
+    }
+    const mc=mf.reduce((s,f)=>s+f.cal,0);
+    const mp=mf.reduce((s,f)=>s+(f.p||0),0);
+    const mc2=mf.reduce((s,f)=>s+(f.c||0),0);
+    const mf2=mf.reduce((s,f)=>s+(f.f||0),0);
+    const pct=target>0?(mc/target*100).toFixed(1):0;
+    mealHtml+='<div class="info-modal-item"><div class="info-modal-item-title">'+m.name+' <span style="font-size:13px;color:var(--text2);font-weight:400">'+mf.length+' 项</span></div><div class="info-modal-item-desc"><span style="font-size:22px;font-weight:800">'+mc+'</span> kcal <span style="color:var(--text2);font-size:13px">占每日 '+pct+'%</span><br><span style="font-size:12px;color:var(--text2)">蛋白质 '+mp.toFixed(0)+'g · 碳水 '+mc2.toFixed(0)+'g · 脂肪 '+mf2.toFixed(0)+'g</span></div></div>';
+  });
+  var statusHtml='';
+  var diff=target-consumed;
+  if(diff>0){statusHtml='<div class="info-modal-item" style="background:rgba(52,199,89,0.06);border-radius:10px;margin-top:8px"><div class="info-modal-item-title" style="color:var(--green)">📉 热量缺口</div><div class="info-modal-item-desc" style="color:var(--green)">还差 <strong>'+diff+' kcal</strong> 达到目标，缺口 '+(diff/target*100).toFixed(0)+'%</div></div>'}
+  else if(diff===0){statusHtml='<div class="info-modal-item" style="background:rgba(90,200,250,0.06);border-radius:10px;margin-top:8px"><div class="info-modal-item-title" style="color:var(--cyan)">⚖️ 热量平衡</div><div class="info-modal-item-desc" style="color:var(--cyan)">今日摄入恰好达到目标！</div></div>'}
+  else{statusHtml='<div class="info-modal-item" style="background:rgba(255,59,48,0.06);border-radius:10px;margin-top:8px"><div class="info-modal-item-title" style="color:var(--red)">📈 热量超标</div><div class="info-modal-item-desc" style="color:var(--red)">超出目标 <strong>'+Math.abs(diff)+' kcal</strong>，超标 '+(Math.abs(diff)/target*100).toFixed(0)+'%</div></div>'}
+  content='<div class="info-modal-body">'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">📊 总览</div><div class="info-modal-item-desc">已摄入 <span style="font-size:28px;font-weight:800">'+consumed+'</span> kcal ｜ 目标 <strong>'+target+' kcal</strong></div></div>'+
+    mealHtml+
+    statusHtml+
+  '</div>';
+  document.getElementById('calorieBreakdownContent').innerHTML=content;
+  showModal('calorieModal');
+}
+
 function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
 function hideModal(id){document.getElementById(id).classList.remove('show')}
@@ -1593,6 +1627,7 @@ function onPatternComplete(dots){
 function checkAppLockOnLaunch(){
   if(state.appLock&&state.appLock.enabled){
     showPatternLockScreen('unlock','请绘制图案解锁','连接你的解锁图案','');
+    state._lockOnNextShow=false;
   }
 }
 document.addEventListener('visibilitychange',function(){
@@ -1601,7 +1636,9 @@ document.addEventListener('visibilitychange',function(){
   }
   if(document.visibilityState==='visible'&&state._lockOnNextShow){
     state._lockOnNextShow=false;
-    showPatternLockScreen('unlock','请绘制图案解锁','连接你的解锁图案','');
+    if(!document.getElementById('lockScreen').classList.contains('show')){
+      showPatternLockScreen('unlock','请绘制图案解锁','连接你的解锁图案','');
+    }
   }
 });
 function onLockFooterBtn(){
@@ -1653,6 +1690,7 @@ function skipBackupPassword(){
 /* ========== INIT ========== */
 async function init(){
   loadState();
+  checkAppLockOnLaunch();
   if(state.theme==='auto'){document.documentElement.removeAttribute('data-theme')}else{document.documentElement.setAttribute('data-theme',state.theme)};if(state.theme==='dark')document.querySelector('meta[name="theme-color"]').content='#000000';
   await initPhotoDB();
   const now=new Date();const wd=['日','一','二','三','四','五','六'];
@@ -1666,7 +1704,6 @@ async function init(){
   if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除')})}).catch(function(){console.warn('[App] SW注册失败')})}
   renderAll();
   generateIcon();
-  checkAppLockOnLaunch();
   if(!state.profile.height&&!state.profile.weight)setTimeout(()=>showToast('请在设置填写身高体重开始使用'),500)
 }
 function generateIcon(){const c=document.createElement('canvas');c.width=180;c.height=180;const ctx=c.getContext('2d');const g=ctx.createLinearGradient(0,0,180,180);g.addColorStop(0,'#34C759');g.addColorStop(1,'#007AFF');ctx.fillStyle=g;const r=40;ctx.beginPath();ctx.moveTo(r,0);ctx.lineTo(180-r,0);ctx.quadraticCurveTo(180,0,180,r);ctx.lineTo(180,180-r);ctx.quadraticCurveTo(180,180,180-r,180);ctx.lineTo(r,180);ctx.quadraticCurveTo(0,180,0,180-r);ctx.lineTo(0,r);ctx.quadraticCurveTo(0,0,r,0);ctx.closePath();ctx.fill();ctx.font='90px -apple-system,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🥗',90,92);const link=document.createElement('link');link.rel='apple-touch-icon';link.href=c.toDataURL();document.head.appendChild(link)}
@@ -1674,3 +1711,6 @@ init();
 </script>
 </body>
 </html>
+
+
+
