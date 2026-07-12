@@ -471,9 +471,6 @@ if('serviceWorker' in navigator){
 
   <div class="modal-overlay" id="weightModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">更新体重与腰围</div><div style="text-align:center;padding:8px 0 16px;color:var(--text2);font-size:14px">记录今日数据，追踪变化趋势</div><div class="weight-input-row"><input class="weight-update-input" type="number" id="weightModalInput" placeholder="输入体重" inputmode="decimal" step="0.1"><span class="weight-unit">kg</span></div><div class="weight-input-row" style="margin-top:4px"><input class="weight-update-input" type="number" id="waistModalInput" placeholder="输入腰围" inputmode="decimal" step="0.1"><span class="weight-unit">cm</span></div><div id="weightModalLast" style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmWeightUpdate()">确认更新</button><button class="modal-btn danger" onclick="hideModal('weightModal')" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
-
-
-
   <div class="modal-overlay" id="weightMonthModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">选择月份</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeWeightPickerYear(-1)">‹</button><div class="cal-title" id="weightPickerYearLabel">2026年</div><button class="date-nav-btn" onclick="changeWeightPickerYear(1)">›</button></div><div class="weight-month-grid" id="weightPickerGrid"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('weightMonthModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div></div></div></div>
 
   <div class="modal-overlay" id="infoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="infoModalTitle">说明</div><div class="info-modal-body" id="infoModalBody"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('infoModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:16px">关闭</button></div></div></div></div></div>
@@ -1122,7 +1119,6 @@ function renderWeightChart(){
   var yScaleW=function(w){return padT+chartH-(w-wMin)/(wMax-wMin)*chartH};
   var pathD='';
   var dots='';
-  /* 标签防重叠：估算宽度 6px/字符，交替上下偏移，重叠则跳过 */
   var labelSlots=[];
   function slotOverlap(x,w){
     var x1=x-w/2,x2=x+w/2;
@@ -1145,10 +1141,8 @@ function renderWeightChart(){
     pathD+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
     addDotLabel(i,r.weight,x,y);
   });
-  /* 腰围数据：后续 chartMode 切换用 */
   var waistRecords=records.filter(function(r){return r.waist>0});
   if(state.chartMode==='waist'&&waistRecords.length){
-    /* 腰围模式：只渲染腰围数据 */
     var wsMin=Math.min.apply(null,waistRecords.map(function(r){return r.waist}))-2;
     var wsMax=Math.max.apply(null,waistRecords.map(function(r){return r.waist}))+2;
     if(wsMin===wsMax){wsMax+=2;wsMin-=2}
@@ -1181,7 +1175,6 @@ function renderWeightChart(){
     }
     svg.innerHTML=wsGrid+xLabels+'<path d="'+wsPath+'" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+wsDots;
   }else{
-    /* 体重模式 */
     var gridLines='';
     for(var i=0;i<=4;i++){
       var gy=padT+chartH*i/4;
@@ -1251,7 +1244,6 @@ function renderWeightPicker(){
       var weights=recs.map(function(dk){var r=state.weightRecords[dk];return typeof r==='object'?r.w:r});
       var avg=weights.reduce(function(a,b){return a+b},0)/weights.length;
       val=avg.toFixed(1)+'kg';
-      /* 腰围 */
       var waists=recs.map(function(dk){var r=state.weightRecords[dk];return typeof r==='object'?r.waist:0}).filter(function(v){return v>0});
       if(waists.length){var avgW=waists.reduce(function(a,b){return a+b},0)/waists.length;val+=' / '+avgW.toFixed(0)+'cm'}
     }
@@ -1265,6 +1257,7 @@ function selectWeightMonthFromPicker(m){
   hideModal('weightMonthModal');
   renderWeightChart();renderWeightPeriodLabel();
 }
+
 function updateWeightRecord(){
   var todayKey=getDateKey(new Date());
   var lastRec=state.weightRecords[todayKey];
@@ -1411,26 +1404,6 @@ function openBmiBreakdown(){
     '<text x="'+markerX+'" y="8" font-size="9" font-weight="700" fill="'+info.color+'" text-anchor="middle">'+bmi.toFixed(1)+'</text>'+
     '</svg>';
 
-  /* 体重构成分解 */
-  var bodyCompHtml='';
-  if(bf!==null&&bf>0){
-    var fatMass=(ww*bf/100).toFixed(1);
-    var leanMass=(ww-fatMass).toFixed(1);
-    var fatPct=bf;
-    var leanPct=100-bf;
-    bodyCompHtml=
-      '<div class="bmi-comp-bar" style="margin:6px 0">'+
-        '<div class="bmi-comp-bar-track"><div class="bmi-comp-bar-fill" style="width:'+fatPct+'%;background:var(--orange)"></div></div>'+
-      '</div>'+
-      '<div class="bmi-comp-rows">'+
-        '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--orange)"></span><span class="cal-macro-label">脂肪量</span><span class="cal-macro-gram">'+fatMass+' kg</span><span class="cal-macro-pct" style="color:var(--orange)">'+fatPct.toFixed(1)+'%</span></div>'+
-        '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--blue)"></span><span class="cal-macro-label">瘦体重</span><span class="cal-macro-gram">'+leanMass+' kg</span><span class="cal-macro-pct" style="color:var(--blue)">'+leanPct.toFixed(1)+'%</span></div>'+
-        '<div class="cal-macro-row" style="border-top:1px solid var(--card-border);padding-top:6px;margin-top:4px"><span></span><span class="cal-macro-label" style="color:var(--text2)">体重</span><span class="cal-macro-gram" style="color:var(--text)">'+ww+' kg</span><span class="cal-macro-pct" style="color:var(--text2)">100%</span></div>'+
-      '</div>';
-  }else{
-    bodyCompHtml='<div style="text-align:center;padding:8px;color:var(--text3);font-size:13px">填写腰围后可估算体脂构成</div>';
-  }
-
   /* 目标体重范围 */
   var minW=(18.5*Math.pow(hh/100,2)).toFixed(1);
   var maxW=(24*Math.pow(hh/100,2)).toFixed(1);
@@ -1443,40 +1416,6 @@ function openBmiBreakdown(){
     (toGain>0?'<br><span style="color:var(--green)">需要增 <strong>'+toGain+' kg</strong> 进入健康区间</span>':'')+
     (toLose==0&&toGain==0?'<br><span style="color:var(--green)">✅ 当前体重已在健康范围内</span>':'')+
     '<br><span style="color:var(--text2);font-size:12px">理想体重 '+(profile.goal==='gain'?idealW+' kg (BMI 22)<br>增肌期建议 '+(idealW+5)+'~'+(idealW+10)+' kg':idealW+' kg')+'</span></div>';
-
-  /* 最近体重趋势 */
-  var wrKeys=Object.keys(state.weightRecords).sort().reverse();
-  var trendHtml='<div style="margin:4px 0">';
-  if(wrKeys.length>0){
-    var lastKey=wrKeys[0];
-    var lastRec=state.weightRecords[lastKey];
-    var lastW=lastRec?(typeof lastRec==='object'?lastRec.w:lastRec):0;
-    var diffW=lastW>0&&ww>0?(lastW-ww).toFixed(1):0;
-    var diffIcon=diffW>0?'↑':diffW<0?'↓':'→';
-    var diffColor=diffW>0?'var(--red)':diffW<0?'var(--green)':'var(--text2)';
-    var dateLabel=lastKey===getDateKey(new Date())?'今天':formatDateLabel(lastKey);
-    trendHtml+='<div class="cal-macro-row"><span style="font-size:16px">⚖️</span><span class="cal-macro-label" style="color:var(--text)">最新记录（'+dateLabel+'）</span><span class="cal-macro-gram" style="font-size:18px;font-weight:800;color:'+diffColor+'">'+diffIcon+' '+diffW+'</span><span class="cal-macro-pct" style="color:var(--text2);font-weight:400">'+lastW+' kg</span></div>';
-    var recentKeys=wrKeys.slice(0,5);
-    if(recentKeys.length>1){
-      trendHtml+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border)">';
-      recentKeys.forEach(function(dk,i){
-        var rec=state.weightRecords[dk];
-        var recW=rec?(typeof rec==='object'?rec.w:rec):0;
-        var label=dk===getDateKey(new Date())?'今天':formatDateLabel(dk);
-        var nextKey=recentKeys[i+1];
-        var nextRec=nextKey?state.weightRecords[nextKey]:null;
-        var nextW=nextRec?(typeof nextRec==='object'?nextRec.w:nextRec):0;
-        var d=nextW>0?(recW-nextW).toFixed(1):'--';
-        var dIcon=d==='--'?'':d>0?'↑':d<0?'↓':'→';
-        var dColor=d==='--'?'var(--text3)':d>0?'var(--red)':'var(--green)';
-        trendHtml+='<div class="cal-macro-row" style="padding:2px 0;font-size:12px"><span class="cal-macro-label" style="font-size:12px;color:var(--text2)">'+label+'</span><span class="cal-macro-gram" style="font-size:12px;min-width:30px">'+recW+'</span><span class="cal-macro-pct" style="font-size:11px;min-width:24px;color:'+dColor+'">'+(dIcon?dIcon+' '+d:'')+'</span></div>';
-      });
-      trendHtml+='</div>';
-    }
-  }else{
-    trendHtml+='<div style="text-align:center;padding:8px;color:var(--text3);font-size:13px">暂无体重记录</div>';
-  }
-  trendHtml+='</div>';
 
   /* 体型判断（综合BMI+体脂）*/
   var fusionHtml='';
@@ -1493,14 +1432,8 @@ function openBmiBreakdown(){
     '<div class="info-modal-item"><div class="info-modal-item-title">📊 BMI 定位</div><div class="info-modal-item-desc" style="padding:0">'+
       bmiGaugeSvg+
     '</div></div>'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">🧬 体重构成</div>'+
-      bodyCompHtml+
-    '</div>'+
     '<div class="info-modal-item"><div class="info-modal-item-title">🎯 目标体重范围</div>'+
       weightRangeHtml+
-    '</div>'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">📈 体重趋势</div>'+
-      trendHtml+
     '</div>'+
     (fusionHtml?'<div class="info-modal-item" style="border-bottom:none">'+fusionHtml+'</div>':'')+
   '</div>';
@@ -1905,6 +1838,5 @@ init();
 </script>
 </body>
 </html>
-
 
 
