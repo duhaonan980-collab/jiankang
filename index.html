@@ -135,6 +135,29 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .info-modal-item:last-child{border-bottom:none}
 .info-modal-item-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
 .info-modal-item-desc{font-size:13px;color:var(--text2);line-height:1.5}
+/* 热量详情弹窗 */
+.cal-macro-grid{display:flex;align-items:center;gap:12px;margin-top:6px}
+.cal-macro-donut{flex-shrink:0}
+.cal-breakdown-macros{flex:1;min-width:0}
+.cal-macro-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:13px}
+.cal-macro-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cal-macro-label{flex:1;color:var(--text)}
+.cal-macro-gram{color:var(--text2);text-align:right;min-width:36px}
+.cal-macro-pct{min-width:42px;text-align:right;font-weight:600;font-size:12px}
+.cal-bmr-grid{padding:4px 0}
+.cal-bmr-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:14px}
+.cal-bmr-label{color:var(--text2)}
+.cal-bmr-val{font-weight:600;color:var(--text)}
+.cal-status-box{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;margin:8px 0}
+.cal-status-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.cal-status-title{font-size:15px;font-weight:700;margin-bottom:2px}
+.cal-status-desc{font-size:13px;line-height:1.5;color:var(--text2)}
+/* BMI 弹窗 */
+.bmi-comp-bar{margin:6px 0}
+.bmi-comp-bar-track{height:10px;background:rgba(118,118,128,0.12);border-radius:5px;overflow:hidden}
+.bmi-comp-bar-fill{height:100%;border-radius:5px;transition:width .5s ease}
+.bmi-comp-rows{margin:4px 0}
+.bmi-target-range{font-size:14px;line-height:1.8;color:var(--text2)}
 .settings-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--card-border)}
 .settings-item:last-child{border-bottom:none}.settings-label{font-size:16px}
 .settings-input{width:80px;text-align:right;background:transparent;border:none;font-size:16px;font-weight:500;color:var(--text);font-family:inherit;outline:none}
@@ -1099,10 +1122,28 @@ function renderWeightChart(){
   var yScaleW=function(w){return padT+chartH-(w-wMin)/(wMax-wMin)*chartH};
   var pathD='';
   var dots='';
+  /* 标签防重叠：估算宽度 6px/字符，交替上下偏移，重叠则跳过 */
+  var labelSlots=[];
+  function slotOverlap(x,w){
+    var x1=x-w/2,x2=x+w/2;
+    for(var si=0;si<labelSlots.length;si++){
+      var s=labelSlots[si];
+      if(!(x1>s.x2||x2<s.x1))return true;
+    }
+    return false;
+  }
+  function addDotLabel(i,v,x,y){
+    var w=v.toString().length*6+4;
+    if(i>0&&i<records.length-1&&slotOverlap(x,w))return false;
+    labelSlots.push({x1:x-w/2,x2:x+w/2});
+    var yOff=i%2===0?-9:14;
+    dots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5" fill="var(--blue)"/><text x="'+x.toFixed(1)+'" y="'+(y+yOff).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text)">'+v+'</text>';
+    return true;
+  }
   records.forEach(function(r,i){
     var x=xScale(r.day),y=yScaleW(r.weight);
     pathD+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
-    dots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5" fill="var(--blue)"/><text x="'+x.toFixed(1)+'" y="'+(y-9).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text)">'+r.weight+'</text>';
+    addDotLabel(i,r.weight,x,y);
   });
   /* 腰围数据：后续 chartMode 切换用 */
   var waistRecords=records.filter(function(r){return r.waist>0});
@@ -1113,10 +1154,24 @@ function renderWeightChart(){
     if(wsMin===wsMax){wsMax+=2;wsMin-=2}
     var yScaleWs=function(ws){return padT+chartH-(ws-wsMin)/(wsMax-wsMin)*chartH};
     var wsPath='',wsDots='';
+    var wsSlots=[];
+    function wsSlotOverlap(x,w){
+      var x1=x-w/2,x2=x+w/2;
+      for(var si=0;si<wsSlots.length;si++){var s=wsSlots[si];if(!(x1>s.x2||x2<s.x1))return true}
+      return false;
+    }
+    function addWsDotLabel(i,v,x,y){
+      var w=v.toString().length*6+4;
+      if(i>0&&i<waistRecords.length-1&&wsSlotOverlap(x,w))return false;
+      wsSlots.push({x1:x-w/2,x2:x+w/2});
+      var yOff=i%2===0?-9:14;
+      wsDots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5" fill="var(--blue)"/><text x="'+x.toFixed(1)+'" y="'+(y+yOff).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text)">'+v+'</text>';
+      return true;
+    }
     waistRecords.forEach(function(r,i){
       var x=xScale(r.day),y=yScaleWs(r.waist);
       wsPath+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
-      wsDots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5" fill="var(--blue)"/><text x="'+x.toFixed(1)+'" y="'+(y-9).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text)">'+r.waist+'</text>';
+      addWsDotLabel(i,r.waist,x,y);
     });
     var wsGrid='';
     for(var i=0;i<=4;i++){
@@ -1313,8 +1368,8 @@ function switchNbdTab(nutriKey){renderNbdTab(nutriKey)}
 
 /* ========== BMI BREAKDOWN MODAL ========== */
 function openBmiBreakdown(){
-  const h=state.profile.height,w=state.profile.weight;
-  const bmi=calcBMI(h,w);
+  const hh=state.profile.height,ww=state.profile.weight;
+  const bmi=calcBMI(hh,ww);
   var content='';
   if(bmi<=0){
     content='<div class="nbd-empty"><span class="nbd-emoji">⚖️</span>请先在设置页<br>填写身高体重</div>';
@@ -1324,87 +1379,226 @@ function openBmiBreakdown(){
   }
   const info=getBMIInfo(bmi);
   const bf=calcBodyFat(state.profile);
-  const tdee=calcTDEE(state.profile);
-  const targetCal=calcTargetCalories();
-  var bfHtml='';
+  const profile=state.profile;
+  const gender=profile.gender||'male';
+  /* BMI 色带 SVG */
+  const bmiMin=10,bmiMax=35,bmiRange=bmiMax-bmiMin;
+  var bmiGaugeSvg='<svg width="100%" height="48" viewBox="0 0 300 48" style="display:block;margin:8px 0">'+
+    '<defs><linearGradient id="bmiGrad" x1="0" y1="0" x2="1" y2="0">'+
+      '<stop offset="'+(15-bmiMin)/bmiRange*100+'%" stop-color="var(--red)"/>'+
+      '<stop offset="'+(15-bmiMin)/bmiRange*100+'%" stop-color="var(--cyan)"/>'+
+      '<stop offset="'+(18.5-bmiMin)/bmiRange*100+'%" stop-color="var(--cyan)"/>'+
+      '<stop offset="'+(18.5-bmiMin)/bmiRange*100+'%" stop-color="var(--green)"/>'+
+      '<stop offset="'+(24-bmiMin)/bmiRange*100+'%" stop-color="var(--green)"/>'+
+      '<stop offset="'+(24-bmiMin)/bmiRange*100+'%" stop-color="var(--orange)"/>'+
+      '<stop offset="'+(28-bmiMin)/bmiRange*100+'%" stop-color="var(--orange)"/>'+
+      '<stop offset="'+(28-bmiMin)/bmiRange*100+'%" stop-color="var(--red)"/>'+
+      '<stop offset="100%" stop-color="var(--red)"/>'+
+    '</linearGradient></defs>'+
+    '<rect x="4" y="16" width="280" height="12" rx="6" fill="url(#bmiGrad)" opacity="0.6"/>'+
+    '<text x="4" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">10</text>'+
+    '<text x="'+(4+(18.5-bmiMin)/bmiRange*280)+'" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">18.5</text>'+
+    '<text x="'+(4+(24-bmiMin)/bmiRange*280)+'" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">24</text>'+
+    '<text x="'+(4+(28-bmiMin)/bmiRange*280)+'" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">28</text>'+
+    '<text x="284" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">35</text>'+
+    '<text x="20" y="12" font-size="7" fill="var(--text3)" text-anchor="middle">偏瘦</text>'+
+    '<text x="'+(4+((18.5+24)/2-bmiMin)/bmiRange*280)+'" y="12" font-size="7" fill="var(--green)" text-anchor="middle">健康</text>'+
+    '<text x="'+(4+((24+28)/2-bmiMin)/bmiRange*280)+'" y="12" font-size="7" fill="var(--orange)" text-anchor="middle">超重</text>'+
+    '<text x="274" y="12" font-size="7" fill="var(--red)" text-anchor="middle">肥胖</text>';
+  var clampBmi=Math.max(bmiMin+0.5,Math.min(bmiMax-0.5,bmi));
+  var markerX=4+(clampBmi-bmiMin)/bmiRange*280;
+  bmiGaugeSvg+='<polygon points="'+(markerX-6)+',16 '+markerX+',10 '+(markerX+6)+',16" fill="'+info.color+'" stroke="'+info.color+'" stroke-width="1"/>'+
+    '<text x="'+markerX+'" y="8" font-size="9" font-weight="700" fill="'+info.color+'" text-anchor="middle">'+bmi.toFixed(1)+'</text>'+
+    '</svg>';
+
+  /* 体重构成分解 */
+  var bodyCompHtml='';
   if(bf!==null&&bf>0){
-    var bfLevel=getBFLevel(bf,state.profile.gender);
-    bfHtml='<div class="info-modal-item"><div class="info-modal-item-title">体脂率估算</div><div class="info-modal-item-desc"><span style="font-size:22px;font-weight:800;color:'+bfLevel.color+'">'+bf+'%</span> <span style="color:'+bfLevel.color+';font-weight:600;font-size:14px">'+bfLevel.label+'</span></div></div>';
+    var fatMass=(ww*bf/100).toFixed(1);
+    var leanMass=(ww-fatMass).toFixed(1);
+    var fatPct=bf;
+    var leanPct=100-bf;
+    bodyCompHtml=
+      '<div class="bmi-comp-bar" style="margin:6px 0">'+
+        '<div class="bmi-comp-bar-track"><div class="bmi-comp-bar-fill" style="width:'+fatPct+'%;background:var(--orange)"></div></div>'+
+      '</div>'+
+      '<div class="bmi-comp-rows">'+
+        '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--orange)"></span><span class="cal-macro-label">脂肪量</span><span class="cal-macro-gram">'+fatMass+' kg</span><span class="cal-macro-pct" style="color:var(--orange)">'+fatPct.toFixed(1)+'%</span></div>'+
+        '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--blue)"></span><span class="cal-macro-label">瘦体重</span><span class="cal-macro-gram">'+leanMass+' kg</span><span class="cal-macro-pct" style="color:var(--blue)">'+leanPct.toFixed(1)+'%</span></div>'+
+        '<div class="cal-macro-row" style="border-top:1px solid var(--card-border);padding-top:6px;margin-top:4px"><span></span><span class="cal-macro-label" style="color:var(--text2)">体重</span><span class="cal-macro-gram" style="color:var(--text)">'+ww+' kg</span><span class="cal-macro-pct" style="color:var(--text2)">100%</span></div>'+
+      '</div>';
+  }else{
+    bodyCompHtml='<div style="text-align:center;padding:8px;color:var(--text3);font-size:13px">填写腰围后可估算体脂构成</div>';
   }
-  var fusionHtml='';
-  if(bf!==null&&bf>0){
-    var bmiOk=bmi>=18.5&&bmi<25.0;
-    var bfOk=state.profile.gender==='male'?(bf>=14&&bf<25):(bf>=21&&bf<32);
-    var fusion=getFusionType(bmi,bf,bmiOk,bfOk,state.profile.gender);
-    if(fusion){
-      fusionHtml='<div class="info-modal-item"><div class="info-modal-item-title">体型判断</div><div class="info-modal-item-desc">'+(fusion.msg||fusion.label||'')+'</div></div>';
-    }
-  }
-  /* 最近体重记录 */
-  var weightHtml='';
+
+  /* 目标体重范围 */
+  var minW=(18.5*Math.pow(hh/100,2)).toFixed(1);
+  var maxW=(24*Math.pow(hh/100,2)).toFixed(1);
+  var idealW=Math.round(22*Math.pow(hh/100,2));
+  var wwNum=parseFloat(ww);
+  var toLose=wwNum>maxW?(wwNum-maxW).toFixed(1):0;
+  var toGain=wwNum<minW?(minW-wwNum).toFixed(1):0;
+  var weightRangeHtml='<div class="bmi-target-range">健康体重范围: <strong>'+minW+' ~ '+maxW+' kg</strong>'+
+    (toLose>0?'<br><span style="color:var(--orange)">需要减 <strong>'+toLose+' kg</strong> 进入健康区间</span>':'')+
+    (toGain>0?'<br><span style="color:var(--green)">需要增 <strong>'+toGain+' kg</strong> 进入健康区间</span>':'')+
+    (toLose==0&&toGain==0?'<br><span style="color:var(--green)">✅ 当前体重已在健康范围内</span>':'')+
+    '<br><span style="color:var(--text2);font-size:12px">理想体重 '+(profile.goal==='gain'?idealW+' kg (BMI 22)<br>增肌期建议 '+(idealW+5)+'~'+(idealW+10)+' kg':idealW+' kg')+'</span></div>';
+
+  /* 最近体重趋势 */
   var wrKeys=Object.keys(state.weightRecords).sort().reverse();
+  var trendHtml='<div style="margin:4px 0">';
   if(wrKeys.length>0){
     var lastKey=wrKeys[0];
     var lastRec=state.weightRecords[lastKey];
     var lastW=lastRec?(typeof lastRec==='object'?lastRec.w:lastRec):0;
-    var lastWaist=lastRec&&typeof lastRec==='object'?lastRec.waist||0:0;
-    var diffW=lastW>0&&state.profile.weight>0?(lastW-state.profile.weight).toFixed(1):0;
-    var diffLabel=diffW>0?'<span style="color:var(--red)">+'+diffW+'</span>':diffW<0?'<span style="color:var(--green)">'+diffW+'</span>':'<span style="color:var(--text2)">±0</span>';
+    var diffW=lastW>0&&ww>0?(lastW-ww).toFixed(1):0;
+    var diffIcon=diffW>0?'↑':diffW<0?'↓':'→';
+    var diffColor=diffW>0?'var(--red)':diffW<0?'var(--green)':'var(--text2)';
     var dateLabel=lastKey===getDateKey(new Date())?'今天':formatDateLabel(lastKey);
-    weightHtml='<div class="info-modal-item"><div class="info-modal-item-title">最近体重记录（'+dateLabel+'）</div><div class="info-modal-item-desc">体重 <span style="font-size:22px;font-weight:800">'+lastW+'</span> kg '+(diffW!=0?'（较当前'+diffLabel+'）':'')+(lastWaist>0?' ｜ 腰围 '+lastWaist+' cm':'')+'</div></div>';
+    trendHtml+='<div class="cal-macro-row"><span style="font-size:16px">⚖️</span><span class="cal-macro-label" style="color:var(--text)">最新记录（'+dateLabel+'）</span><span class="cal-macro-gram" style="font-size:18px;font-weight:800;color:'+diffColor+'">'+diffIcon+' '+diffW+'</span><span class="cal-macro-pct" style="color:var(--text2);font-weight:400">'+lastW+' kg</span></div>';
+    var recentKeys=wrKeys.slice(0,5);
+    if(recentKeys.length>1){
+      trendHtml+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--card-border)">';
+      recentKeys.forEach(function(dk,i){
+        var rec=state.weightRecords[dk];
+        var recW=rec?(typeof rec==='object'?rec.w:rec):0;
+        var label=dk===getDateKey(new Date())?'今天':formatDateLabel(dk);
+        var nextKey=recentKeys[i+1];
+        var nextRec=nextKey?state.weightRecords[nextKey]:null;
+        var nextW=nextRec?(typeof nextRec==='object'?nextRec.w:nextRec):0;
+        var d=nextW>0?(recW-nextW).toFixed(1):'--';
+        var dIcon=d==='--'?'':d>0?'↑':d<0?'↓':'→';
+        var dColor=d==='--'?'var(--text3)':d>0?'var(--red)':'var(--green)';
+        trendHtml+='<div class="cal-macro-row" style="padding:2px 0;font-size:12px"><span class="cal-macro-label" style="font-size:12px;color:var(--text2)">'+label+'</span><span class="cal-macro-gram" style="font-size:12px;min-width:30px">'+recW+'</span><span class="cal-macro-pct" style="font-size:11px;min-width:24px;color:'+dColor+'">'+(dIcon?dIcon+' '+d:'')+'</span></div>';
+      });
+      trendHtml+='</div>';
+    }
+  }else{
+    trendHtml+='<div style="text-align:center;padding:8px;color:var(--text3);font-size:13px">暂无体重记录</div>';
   }
-  var recGoalLabel={buddha:'佛系',lose:'减脂',maintain:'维持',gain:'增肌'};
-  var recGoalDesc={buddha:'不运动纯躺平，约5%~8%极小热量缺口',lose:'减少体脂，约15%热量缺口',maintain:'保持当前体重',gain:'增加肌肉，约15%热量盈余'};
+  trendHtml+='</div>';
+
+  /* 体型判断（综合BMI+体脂）*/
+  var fusionHtml='';
+  if(bf!==null&&bf>0){
+    var bmiOk=bmi>=18.5&&bmi<25.0;
+    var bfOk=gender==='male'?(bf>=14&&bf<25):(bf>=21&&bf<32);
+    var fusion=getFusionType(bmi,bf,bmiOk,bfOk,gender);
+    if(fusion){
+      fusionHtml='<div class="cal-status-box" style="background:rgba(118,118,128,0.06)"><div class="cal-status-icon">'+(fusion.icon||'💪')+'</div><div><div class="cal-status-title" style="color:'+(fusion.color||'var(--text)')+'">'+(fusion.label||'')+'</div><div class="cal-status-desc" style="color:var(--text2)">'+(fusion.msg||'')+'</div></div></div>';
+    }
+  }
+
   content='<div class="info-modal-body">'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">BMI 数值</div><div class="info-modal-item-desc"><span style="font-size:28px;font-weight:800;color:'+info.color+'">'+bmi.toFixed(1)+'</span> <span style="color:'+info.color+';font-weight:600">'+info.label+'</span></div></div>'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">健康状态</div><div class="info-modal-item-desc" style="color:'+info.color+'">'+info.status+'</div></div>'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">评估建议</div><div class="info-modal-item-desc">'+info.desc+'</div></div>'+
-    bfHtml+
-    fusionHtml+
-    weightHtml+
-    '<div class="info-modal-item"><div class="info-modal-item-title">健康范围</div><div class="info-modal-item-desc">健康 BMI: <strong>18.5 ~ 24.0</strong> ｜ 标准体重: <strong>'+Math.round(22*(h/100)*(h/100))+' kg</strong></div></div>'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">推荐方向</div><div class="info-modal-item-desc">建议目标: <strong style="color:var(--blue)">'+(recGoalLabel[info.recGoal]||info.recGoal)+'</strong> ｜ '+(recGoalDesc[info.recGoal]||'')+'</div></div>'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">每日推荐热量</div><div class="info-modal-item-desc">TDEE: <strong>'+tdee+' kcal</strong> ｜ 推荐摄入: <strong style="color:var(--blue)">'+targetCal+' kcal</strong></div></div>'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">📊 BMI 定位</div><div class="info-modal-item-desc" style="padding:0">'+
+      bmiGaugeSvg+
+    '</div></div>'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">🧬 体重构成</div>'+
+      bodyCompHtml+
+    '</div>'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">🎯 目标体重范围</div>'+
+      weightRangeHtml+
+    '</div>'+
+    '<div class="info-modal-item"><div class="info-modal-item-title">📈 体重趋势</div>'+
+      trendHtml+
+    '</div>'+
+    (fusionHtml?'<div class="info-modal-item" style="border-bottom:none">'+fusionHtml+'</div>':'')+
   '</div>';
   document.getElementById('bmiBreakdownContent').innerHTML=content;
   showModal('bmiModal');
 }
-
 /* ========== CALORIE BREAKDOWN MODAL ========== */
 function openCalorieBreakdown(){
   const foods=getTodayFoods();
   const target=calcTargetCalories();
   const consumed=foods.reduce((s,f)=>s+f.cal,0);
+  const profile=state.profile;
   var content='';
-  if(target<=0){
+  if(target<=0||!profile.height||!profile.weight){
     content='<div class="nbd-empty"><span class="nbd-emoji">📊</span>请先在设置页<br>填写个人信息</div>';
     document.getElementById('calorieBreakdownContent').innerHTML=content;
     showModal('calorieModal');
     return;
   }
-  const meals=[{key:'breakfast',name:'☀️ 早餐',icon:'☀️'},{key:'lunch',name:'🌞 午餐',icon:'🌞'},{key:'dinner',name:'🌙 晚餐',icon:'🌙'},{key:'snack',name:'🍪 加餐',icon:'🍪'}];
-  var mealHtml='';
-  meals.forEach(m=>{
-    const mf=foods.filter(f=>f.meal===m.key);
-    if(mf.length===0){
-      mealHtml+='<div class="info-modal-item" style="opacity:0.4"><div class="info-modal-item-title">'+m.name+'</div><div class="info-modal-item-desc"><span style="color:var(--text3)">🍽️ 暂无记录</span></div></div>';
-      return;
-    }
-    const mc=mf.reduce((s,f)=>s+f.cal,0);
-    const mp=mf.reduce((s,f)=>s+(f.p||0),0);
-    const mc2=mf.reduce((s,f)=>s+(f.c||0),0);
-    const mf2=mf.reduce((s,f)=>s+(f.f||0),0);
-    const pct=target>0?(mc/target*100).toFixed(1):0;
-    mealHtml+='<div class="info-modal-item"><div class="info-modal-item-title">'+m.name+' <span style="font-size:13px;color:var(--text2);font-weight:400">'+mf.length+' 项</span></div><div class="info-modal-item-desc"><span style="font-size:22px;font-weight:800">'+mc+'</span> kcal <span style="color:var(--text2);font-size:13px">占每日 '+pct+'%</span><br><span style="font-size:12px;color:var(--text2)">蛋白质 '+mp.toFixed(0)+'g · 碳水 '+mc2.toFixed(0)+'g · 脂肪 '+mf2.toFixed(0)+'g</span></div></div>';
-  });
+  /* --- 宏观营养素 & 计算 --- */
+  const tp=foods.reduce((s,f)=>s+(f.p||0),0);
+  const tc=foods.reduce((s,f)=>s+(f.c||0),0);
+  const tf=foods.reduce((s,f)=>s+(f.f||0),0);
+  const calP=tp*4,calC=tc*4,calF=tf*9;
+  const totalMacroKcal=calP+calC+calF;
+  const pPct=totalMacroKcal>0?calP/totalMacroKcal*100:0;
+  const cPct=totalMacroKcal>0?calC/totalMacroKcal*100:0;
+  const fPct=totalMacroKcal>0?calF/totalMacroKcal*100:0;
+  const bmr=calcBMR(profile);
+  const tdee=calcTDEE(profile);
+  const actLabels={low:'偏低',normal:'正常',medium:'稍高',high:'高',extreme:'极高'};
+  const actFactors={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
+  const goalLabels={buddha:'佛系',lose:'减脂',maintain:'维持',gain:'增肌'};
+  const diff=target-consumed;
+  /* --- 宏量营养素圆环 SVG --- */
+  function donutArc(pct,color,rotStart){
+    var r=37,cx=50,cy=50,sw=11;
+    var circ=2*Math.PI*r;
+    var len=circ*pct/100;
+    var off=-rotStart/100*circ;
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-dasharray="'+len.toFixed(1)+' '+(circ-len).toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+  }
+  var donutSvg='<svg width="100" height="100" viewBox="0 0 100 100">';
+  if(totalMacroKcal>0){
+    donutSvg+=donutArc(pPct,'var(--green)',0);
+    donutSvg+=donutArc(cPct,'var(--orange)',pPct);
+    donutSvg+=donutArc(fPct,'var(--red)',pPct+cPct);
+  }else{
+    donutSvg+='<circle cx="50" cy="50" r="37" fill="none" stroke="var(--text3)" stroke-width="11" stroke-dasharray="240 11" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>';
+  }
+  donutSvg+='<circle cx="50" cy="50" r="30" fill="var(--bg)"/>';
+  donutSvg+='<text x="50" y="47" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text)">'+consumed+'</text>';
+  donutSvg+='<text x="50" y="60" text-anchor="middle" font-size="9" fill="var(--text2)">kcal</text>';
+  donutSvg+='</svg>';
+  /* --- 宏量营养素详情 --- */
+  var macroDetailHtml='';
+  if(totalMacroKcal>0){
+    macroDetailHtml='<div class="cal-breakdown-macros">'+
+      '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--green)"></span><span class="cal-macro-label">蛋白质</span><span class="cal-macro-gram">'+tp.toFixed(0)+'g</span><span class="cal-macro-pct" style="color:var(--green)">'+pPct.toFixed(1)+'%</span></div>'+
+      '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--orange)"></span><span class="cal-macro-label">碳水</span><span class="cal-macro-gram">'+tc.toFixed(0)+'g</span><span class="cal-macro-pct" style="color:var(--orange)">'+cPct.toFixed(1)+'%</span></div>'+
+      '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--red)"></span><span class="cal-macro-label">脂肪</span><span class="cal-macro-gram">'+tf.toFixed(0)+'g</span><span class="cal-macro-pct" style="color:var(--red)">'+fPct.toFixed(1)+'%</span></div>'+
+      '<div class="cal-macro-row" style="border-top:1px solid var(--card-border);padding-top:6px;margin-top:4px"><span></span><span class="cal-macro-label" style="color:var(--text2)">合计</span><span class="cal-macro-gram" style="color:var(--text)">'+totalMacroKcal.toFixed(0)+'kcal</span><span class="cal-macro-pct" style="color:var(--text2)">100%</span></div>'+
+    '</div>';
+  }else{
+    macroDetailHtml='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px">暂无食物记录</div>';
+  }
+  var macroSection='<div class="info-modal-item"><div class="cal-macro-header"><span class="info-modal-item-title">🥗 宏量营养素分布</span></div><div class="cal-macro-grid"><div class="cal-macro-donut">'+donutSvg+'</div>'+macroDetailHtml+'</div></div>';
+  /* --- BMR vs TDEE --- */
+  var bmrSection='<div class="info-modal-item"><div class="info-modal-item-title">🔥 基础代谢 vs 总消耗</div><div class="cal-bmr-grid">'+
+    '<div class="cal-bmr-item"><span class="cal-bmr-label">基础代谢 BMR</span><span class="cal-bmr-val">'+bmr+' kcal</span></div>'+
+    '<div class="cal-bmr-item"><span class="cal-bmr-label">活动系数</span><span class="cal-bmr-val">'+(actLabels[profile.activity]||'未知')+' ×'+(actFactors[profile.activity]||'1.2')+'</span></div>'+
+    '<div class="cal-bmr-item" style="border-top:1px solid var(--card-border);padding-top:8px"><span class="cal-bmr-label" style="font-weight:700">总消耗 TDEE</span><span class="cal-bmr-val" style="font-weight:700">'+tdee+' kcal</span></div>'+
+    '<div class="cal-bmr-item"><span class="cal-bmr-label">目标调节</span><span class="cal-bmr-val" style="color:var(--text2)">'+(goalLabels[profile.goal]||'维持')+' → '+target+' kcal</span></div>'+
+  '</div></div>';
+  /* --- 盈亏状态（卡片化）--- */
   var statusHtml='';
-  var diff=target-consumed;
-  if(diff>0){statusHtml='<div class="info-modal-item" style="background:rgba(52,199,89,0.06);border-radius:10px;margin-top:8px"><div class="info-modal-item-title" style="color:var(--green)">📉 热量缺口</div><div class="info-modal-item-desc" style="color:var(--green)">还差 <strong>'+diff+' kcal</strong> 达到目标，缺口 '+(diff/target*100).toFixed(0)+'%</div></div>'}
-  else if(diff===0){statusHtml='<div class="info-modal-item" style="background:rgba(90,200,250,0.06);border-radius:10px;margin-top:8px"><div class="info-modal-item-title" style="color:var(--cyan)">⚖️ 热量平衡</div><div class="info-modal-item-desc" style="color:var(--cyan)">今日摄入恰好达到目标！</div></div>'}
-  else{statusHtml='<div class="info-modal-item" style="background:rgba(255,59,48,0.06);border-radius:10px;margin-top:8px"><div class="info-modal-item-title" style="color:var(--red)">📈 热量超标</div><div class="info-modal-item-desc" style="color:var(--red)">超出目标 <strong>'+Math.abs(diff)+' kcal</strong>，超标 '+(Math.abs(diff)/target*100).toFixed(0)+'%</div></div>'}
+  if(diff>0){
+    var pctOfTarget=consumed/target*100;
+    statusHtml='<div class="cal-status-box" style="background:rgba(52,199,89,0.08)">'+
+      '<div class="cal-status-icon">✅</div>'+
+      '<div><div class="cal-status-title" style="color:var(--green)">还在安全区</div>'+
+      '<div class="cal-status-desc">已摄入 <strong>'+consumed+' kcal</strong>（'+pctOfTarget.toFixed(0)+'%），还能再吃 <strong>'+diff+' kcal</strong> 达到目标</div></div></div>';
+  }else if(diff===0){
+    statusHtml='<div class="cal-status-box" style="background:rgba(90,200,250,0.08)">'+
+      '<div class="cal-status-icon">⚖️</div>'+
+      '<div><div class="cal-status-title" style="color:var(--cyan)">刚好达标</div>'+
+      '<div class="cal-status-desc">今日摄入恰好等于目标，继续保持！</div></div></div>';
+  }else{
+    var overPct=Math.abs(diff)/target*100;
+    statusHtml='<div class="cal-status-box" style="background:rgba(255,59,48,0.08)">'+
+      '<div class="cal-status-icon">⚠️</div>'+
+      '<div><div class="cal-status-title" style="color:var(--red)">已超过目标</div>'+
+      '<div class="cal-status-desc">已摄入 <strong>'+consumed+' kcal</strong>，超出目标 <strong>'+Math.abs(diff)+' kcal</strong>（'+overPct.toFixed(0)+'%）</div></div></div>';
+  }
+  
   content='<div class="info-modal-body">'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">📊 总览</div><div class="info-modal-item-desc">已摄入 <span style="font-size:28px;font-weight:800">'+consumed+'</span> kcal ｜ 目标 <strong>'+target+' kcal</strong></div></div>'+
-    mealHtml+
+    macroSection+
+    bmrSection+
     statusHtml+
   '</div>';
   document.getElementById('calorieBreakdownContent').innerHTML=content;
