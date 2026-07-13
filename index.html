@@ -158,6 +158,42 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .bmi-comp-bar-fill{height:100%;border-radius:5px;transition:width .5s ease}
 .bmi-comp-rows{margin:4px 0}
 .bmi-target-range{font-size:14px;line-height:1.8;color:var(--text2)}
+/* 缺少的营养区域 */
+.def-item{display:flex;align-items:flex-start;padding:5px 0 5px 6px;gap:5px;font-size:13px;line-height:1.4}
+.def-badge{display:inline-block;width:18px;height:18px;border-radius:50%;text-align:center;line-height:18px;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px}
+.def-badge.red{background:var(--red)}
+.def-badge.yellow{background:var(--orange)}
+.def-info{flex:1;min-width:0}
+.def-name{font-weight:600;font-size:13px}
+.def-risk{font-size:11px;color:var(--text2);margin-top:1px}
+.def-tip{font-size:11px;color:var(--text2);margin-top:1px}
+.def-fold{text-align:center;padding:3px 0;font-size:13px;color:var(--blue);cursor:pointer;font-weight:500}
+.def-fold:active{opacity:.6}
+/* 完整营养分析弹窗 */
+.full-nutri-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding:2px 0;-webkit-overflow-scrolling:touch}
+.full-nutri-tab{white-space:nowrap;padding:8px 14px;border-radius:10px;border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(118,118,128,0.1);color:var(--text);transition:all .2s}
+.full-nutri-tab.active{background:var(--blue);color:#fff}
+.full-nutri-tab:active{transform:scale(0.95)}
+.full-nutri-content{padding:4px;min-height:160px}
+.fn-item{display:flex;align-items:center;gap:8px;padding:9px 10px;margin-bottom:5px;background:var(--card-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid var(--card-border);border-radius:12px;animation:cardIn .3s ease both}
+.fn-item-icon{font-size:18px;flex-shrink:0;width:26px;text-align:center}
+.fn-item-info{flex:1;min-width:0}
+.fn-item-name{font-size:14px;font-weight:600}
+.fn-item-amount{font-size:11px;color:var(--text2);margin-top:1px;line-height:1.4}
+.fn-item-risk{font-size:11px;color:var(--red);margin-top:2px;line-height:1.3}
+.fn-item-tip{font-size:11px;color:var(--text2);margin-top:1px}
+.fn-item-bar{flex:1;max-width:70px}
+.fn-item-bar-track{height:6px;background:rgba(118,118,128,0.12);border-radius:3px;overflow:hidden}
+.fn-item-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.fn-item-pct{font-size:13px;font-weight:700;min-width:40px;text-align:right}
+.fn-empty{text-align:center;padding:32px 16px;color:var(--text3);font-size:14px}
+.fn-empty .fn-emoji{font-size:36px;display:block;margin-bottom:8px}
+/* Phyto chips */
+.phyto-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.phyto-chip{display:flex;align-items:center;gap:4px;padding:8px 14px;border-radius:14px;font-size:13px;font-weight:600;transition:all .2s}
+.phyto-chip.have{background:rgba(52,199,89,0.12);color:var(--green)}
+.phyto-chip.miss{background:rgba(118,118,128,0.1);color:var(--text3)}
+.fn-source{font-size:12px;color:var(--text2);margin-top:4px;padding:4px 0;line-height:1.5}
 .settings-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--card-border)}
 .settings-item:last-child{border-bottom:none}.settings-label{font-size:16px}
 .settings-input{width:80px;text-align:right;background:transparent;border:none;font-size:16px;font-weight:500;color:var(--text);font-family:inherit;outline:none}
@@ -369,21 +405,24 @@ if('serviceWorker' in navigator){
         </div>
       </div>
     </div>
-    <div class="card card-clickable" onclick="openNutritionBreakdown()">
+    <div class="card card-clickable" onclick="openFullNutritionAnalysis()">
       <div class="card-title">营养素摄入</div>
       <div class="nutri-grid">
         <div class="nutri-col">
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">蛋白质</span><span class="nutri-bar-val" id="proteinVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="proteinBar" style="width:0%;background:var(--green)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">碳水化合物</span><span class="nutri-bar-val" id="carbsVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="carbsBar" style="width:0%;background:var(--orange)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">脂肪</span><span class="nutri-bar-val" id="fatVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fatBar" style="width:0%;background:var(--red)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">蛋白质</span><span class="nutri-bar-val" id="proteinVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="proteinBar" style="width:0%"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">碳水化合物</span><span class="nutri-bar-val" id="carbsVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="carbsBar" style="width:0%"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">脂肪</span><span class="nutri-bar-val" id="fatVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fatBar" style="width:0%"></div></div></div>
         </div>
         <div class="nutri-col">
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">膳食纤维</span><span class="nutri-bar-val" id="fiberVal">0 / 25g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fiberBar" style="width:0%;background:var(--cyan)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素A</span><span class="nutri-bar-val" id="vitAVal">0 / 800μg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitABar" style="width:0%;background:var(--yellow)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素C</span><span class="nutri-bar-val" id="vitCVal">0 / 100mg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitCBar" style="width:0%;background:var(--purple)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">膳食纤维</span><span class="nutri-bar-val" id="fiberVal">0 / 25g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fiberBar" style="width:0%"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素A</span><span class="nutri-bar-val" id="vitAVal">0 / 800μg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitABar" style="width:0%"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素C</span><span class="nutri-bar-val" id="vitCVal">0 / 100mg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitCBar" style="width:0%"></div></div></div>
         </div>
       </div>
-      <div class="nutri-rec" id="nutriRec"></div>
+      <div id="deficiencySection" style="display:none;margin-top:10px;border-top:0.5px solid var(--card-border);padding-top:10px" onclick="event.stopPropagation()">
+        <div style="font-size:13px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ 缺少的营养</div>
+        <div id="deficiencyList"></div>
+      </div>
       <div class="disclaimer" style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:10px;padding:8px 10px;background:rgba(118,118,128,0.06);border-radius:10px">本结果基于公开的营养学公式和一般健康成年人膳食建议计算，仅供日常饮食规划参考，不构成医疗诊断或个体化营养治疗建议。孕妇、哺乳期女性、未成年人、老年人及患有慢性疾病或特殊健康状况的人群，请咨询医生或注册营养师后使用。</div>
     </div>
     <div class="card">
@@ -477,7 +516,7 @@ if('serviceWorker' in navigator){
 
 <div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
+  <div class="modal-overlay" id="fullNutriModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">完整营养分析</div><div class="full-nutri-tabs" id="fullNutriTabs"><button class="full-nutri-tab active" data-full-tab="macro" onclick="switchFullNutriTab('macro')">宏量</button><button class="full-nutri-tab" data-full-tab="vitamin" onclick="switchFullNutriTab('vitamin')">维生素</button><button class="full-nutri-tab" data-full-tab="mineral" onclick="switchFullNutriTab('mineral')">矿物质</button><button class="full-nutri-tab" data-full-tab="fatty" onclick="switchFullNutriTab('fatty')">脂氨</button><button class="full-nutri-tab" data-full-tab="phyto" onclick="switchFullNutriTab('phyto')">植物</button></div><div class="full-nutri-content" id="fullNutriContent"><div class="fn-empty"><span class="fn-emoji">🍽️</span>今天还没有记录食物</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('fullNutriModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
 
   <!-- ===== BMI BREAKDOWN MODAL ===== -->
   <div class="modal-overlay" id="bmiModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">BMI 详细分析</div><div id="bmiBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">请先在设置页填写身高体重</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('bmiModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
@@ -888,6 +927,309 @@ function renderCalorieSummary(){
     textEl.textContent='热量盈余 '+diff+' kcal';
   }
 }
+/* ========== 完整营养分析系统 ========== */
+/* 每日推荐摄入量（DRI）按性别适配 */
+function getDRI(key,isMale){
+  const DRI_TABLE={
+    p:{male:null,female:null,label:'蛋白质',unit:'g'},
+    c:{male:null,female:null,label:'碳水',unit:'g'},
+    f:{male:null,female:null,label:'脂肪',unit:'g'},
+    fi:{male:25,female:25,label:'膳食纤维',unit:'g'},
+    va:{male:800,female:700,label:'维生素A',unit:'μg'},
+    vc:{male:100,female:100,label:'维生素C',unit:'mg'},
+    vd:{male:10,female:10,label:'维生素D',unit:'μg'},
+    ve:{male:14,female:14,label:'维生素E',unit:'mg'},
+    vk:{male:120,female:120,label:'维生素K',unit:'μg'},
+    b1:{male:1.4,female:1.2,label:'维生素B1',unit:'mg'},
+    b3:{male:16,female:14,label:'维生素B3',unit:'mg'},
+    b6:{male:1.4,female:1.2,label:'维生素B6',unit:'mg'},
+    b9:{male:400,female:400,label:'叶酸(B9)',unit:'μg'},
+    b12:{male:2.4,female:2.4,label:'维生素B12',unit:'μg'},
+    ca:{male:800,female:800,label:'钙',unit:'mg'},
+    fe:{male:12,female:20,label:'铁',unit:'mg'},
+    zn:{male:12.5,female:7.5,label:'锌',unit:'mg'},
+    se:{male:60,female:60,label:'硒',unit:'μg'},
+    mg:{male:350,female:300,label:'镁',unit:'mg'},
+    k:{male:2000,female:2000,label:'钾',unit:'mg'},
+    om3:{male:1.6,female:1.1,label:'Omega-3',unit:'g'},
+    om6:{male:17,female:12,label:'Omega-6',unit:'g'}
+  };
+  var row=DRI_TABLE[key];
+  if(!row)return null;
+  var v=row[isMale?'male':'female'];
+  return{v:v,label:row.label,unit:row.unit};
+}
+/* 缺少后果 & 食物建议 */
+var NUTRI_RISK={
+  p:'肌肉流失、免疫力下降',vk:'凝血功能异常、骨密度降低',
+  va:'夜盲症、皮肤干燥、免疫力下降',b1:'脚气病、神经损伤',
+  vc:'坏血病、牙龈出血、伤口愈合慢',b3:'糙皮病、皮炎、痴呆',
+  vd:'骨软化症、骨质疏松、免疫力下降',b6:'皮炎、贫血、神经损伤',
+  ve:'溶血性贫血、神经损伤',b9:'胎儿神经管畸形、巨幼细胞贫血',
+  vk:'凝血功能异常、骨密度降低',b12:'恶性贫血、神经退化',
+  ca:'骨密度下降、抽筋、骨质疏松',se:'克山病、免疫力下降',
+  fe:'缺铁性贫血、疲劳、注意力下降',mg:'肌肉痉挛、心律不齐、焦虑',
+  zn:'免疫力下降、味觉减退、伤口难愈',k:'乏力、心律不齐、血压异常',
+  om3:'皮肤干燥、炎症加剧、认知功能下降',
+  om6:'皮肤干燥起皮、脱发',
+  fi:'便秘、肠道菌群失衡'
+};
+var NUTRI_TIPS={
+  p:'鸡胸肉🐔、鸡蛋🥚、鱼肉🐟、豆腐',
+  c:'米饭🍚、面条🍜、全麦面包🍞、红薯🍠',
+  f:'橄榄油🫒、牛油果🥑、坚果🥜、三文鱼🍣',
+  fi:'燕麦、绿叶菜🥬、豆类、粗粮',
+  va:'胡萝卜🥕、南瓜🎃、猪肝、菠菜🥬',
+  vc:'柑橘🍊、猕猴桃🥝、彩椒🫑、西兰花🥦',
+  vd:'晒太阳☀️、三文鱼🍣、蛋黄🥚、动物肝脏',
+  ve:'坚果🥜、葵花籽、菠菜🥬、植物油',
+  vk:'菠菜🥬、西兰花🥦、纳豆、动物肝脏',
+  b1:'糙米🌾、瘦肉🥩、豆类、花生🥜',
+  b3:'鸡胸肉🐔、鱼肉🐟、花生🥜、蘑菇🍄',
+  b6:'鸡肉🐔、鱼🐟、香蕉🍌、土豆🥔',
+  b9:'绿叶菜🥬、豆类、动物肝脏、柑橘🍊',
+  b12:'动物肝脏、鱼🐟、蛋🥚、牛奶🥛',
+  ca:'牛奶🥛、酸奶、豆腐、芝麻、绿叶菜🥬',
+  fe:'猪肝🐷、红肉🥩、菠菜🥬、黑木耳',
+  zn:'生蚝🦪、牛肉🥩、坚果🥜、豆类',
+  se:'坚果🥜、动物内脏、海产品🦐、鸡蛋🥚',
+  mg:'绿叶菜🥬、坚果🥜、豆类、全谷物🌾',
+  k:'香蕉🍌、土豆🥔、菠菜🥬、牛油果🥑',
+  om3:'三文鱼🍣、亚麻籽、核桃🌰、奇亚籽',
+  om6:'大豆油、葵花籽油、核桃🌰、黑芝麻'
+};
+/* 食物字段映射到营养素key */
+var FOOD_FIELD_MAP={p:'p',c:'c',f:'f',fi:'fi',va:'va',vc:'vc',vd:'vd',ve:'ve',vk:'vk',b1:'b1',b3:'b3',b6:'b6',b9:'b9',b12:'b12',ca:'ca',fe:'fe',zn:'zn',se:'se',mg:'mg',k:'k',om3:'om3',om6:'om6'};
+/* 宏量用 calcNutritionTargets，微量用 DRI */
+var MICRO_KEYS=['va','vc','vd','ve','vk','b1','b3','b6','b9','b12','ca','fe','zn','se','mg','k','om3','om6','fi'];
+/* 按分类分 Tab */
+var NUTRI_TABS={
+  macro:['p','c','f','fi'],
+  vitamin:['va','vc','vd','ve','vk','b1','b3','b6','b9','b12'],
+  mineral:['ca','fe','zn','se','mg','k'],
+  fatty:['om3','om6']
+};
+/* 计算今日营养素合计 */
+function calcTodayTotals(){
+  var foods=getTodayFoods(),totals={};
+  Object.keys(FOOD_FIELD_MAP).forEach(function(k){totals[k]=0});
+  foods.forEach(function(f){
+    Object.keys(FOOD_FIELD_MAP).forEach(function(key){
+      totals[key]+=f[FOOD_FIELD_MAP[key]]||0;
+    });
+  });
+  return totals;
+}
+/* 获取缺失营养列表（低于50%） */
+function getDeficiencies(totals,targets){
+  var isMale=state.profile.gender==='male';
+  var defs=[];
+  MICRO_KEYS.forEach(function(key){
+    var consumed=totals[key]||0;
+    var driInfo=getDRI(key,isMale);
+    if(!driInfo||!driInfo.v)return;
+    var targetVal=driInfo.v;
+    var pct=targetVal>0?consumed/targetVal*100:0;
+    if(pct<50){
+      defs.push({
+        key:key,consumed:consumed,target:targetVal,pct:pct,
+        label:driInfo.label,unit:driInfo.unit,
+        risk:NUTRI_RISK[key]||'',tip:NUTRI_TIPS[key]||''
+      });
+    }
+  });
+  /* 也检查宏量蛋白碳水脂肪（用已算好的 targets）*/
+  var macroChecks=[
+    {key:'p',label:'蛋白质',unit:'g',consumed:totals.p,target:targets.p},
+    {key:'c',label:'碳水',unit:'g',consumed:totals.c,target:targets.c},
+    {key:'f',label:'脂肪',unit:'g',consumed:totals.f,target:targets.f}
+  ];
+  macroChecks.forEach(function(m){
+    if(!m.target)return;
+    var pct=m.target>0?m.consumed/m.target*100:0;
+    if(pct<50){
+      defs.push({
+        key:m.key,consumed:m.consumed,target:m.target,pct:pct,
+        label:m.label,unit:m.unit,
+        risk:NUTRI_RISK[m.key]||'',tip:NUTRI_TIPS[m.key]||''
+      });
+    }
+  });
+  defs.sort(function(a,b){return a.pct-b.pct});
+  return defs;
+}
+/* 渲染缺少营养到首页 */
+function renderDeficiencies(){
+  var foods=getTodayFoods();
+  if(!foods.length){
+    var section=document.getElementById('deficiencySection');
+    if(section)section.style.display='none';
+    return;
+  }
+  var totals=calcTodayTotals();
+  var targets=calcNutritionTargets();
+  var defs=getDeficiencies(totals,targets);
+  var section=document.getElementById('deficiencySection');
+  var list=document.getElementById('deficiencyList');
+  if(!section||!list)return;
+  if(defs.length===0){section.style.display='none';return}
+  section.style.display='block';
+  var show=defs.slice(0,3);
+  var rest=defs.slice(3);
+  var html='';
+  show.forEach(function(d){
+    var cls=d.pct<30?'red':'yellow';
+    var pctStr=d.pct.toFixed(0);
+    html+='<div class="def-item"><span class="def-badge '+cls+'">'+pctStr+'%</span><div class="def-info"><span class="def-name">'+d.label+'</span>';
+    if(d.risk)html+='<div class="def-risk">'+d.risk+'</div>';
+    if(d.tip)html+='<div class="def-tip">→ '+d.tip+'</div>';
+    html+='</div></div>';
+  });
+  if(rest.length>0){
+    html+='<div class="def-fold" id="defFoldBtn" onclick="event.stopPropagation();toggleDefFold()">📎 还有 '+rest.length+' 项 展开 →</div>';
+    html+='<div id="defRest" style="display:none">';
+    rest.forEach(function(d){
+      var cls=d.pct<30?'red':'yellow';
+      var pctStr=d.pct.toFixed(0);
+      html+='<div class="def-item"><span class="def-badge '+cls+'">'+pctStr+'%</span><div class="def-info"><span class="def-name">'+d.label+'</span>';
+      if(d.risk)html+='<div class="def-risk">'+d.risk+'</div>';
+      if(d.tip)html+='<div class="def-tip">→ '+d.tip+'</div>';
+      html+='</div></div>';
+    });
+    html+='</div>';
+  }
+  list.innerHTML=html;
+}
+function toggleDefFold(){
+  var rest=document.getElementById('defRest');
+  var btn=document.getElementById('defFoldBtn');
+  if(!rest||!btn)return;
+  if(rest.style.display==='none'){
+    rest.style.display='block';
+    btn.textContent='📎 收起 −';
+  }else{
+    rest.style.display='none';
+    btn.textContent='📎 还有 '+(rest.children.length)+' 项 展开 →';
+  }
+}
+/* 渲染单个营养进度条（通用） */
+function fnBarHTML(consumed,target,pct,colorType){
+  var filled=target>0?Math.min(100,pct):0;
+  var color=colorType==='red'?'var(--red)':(colorType==='yellow'?'var(--orange)':'var(--green)');
+  return '<div class="fn-item-bar"><div class="fn-item-bar-track"><div class="fn-item-bar-fill" style="width:'+filled+'%;background:'+color+'"></div></div></div><div class="fn-item-pct" style="color:'+color+'">'+pct.toFixed(0)+'%</div>';
+}
+/* ========== 完整营养分析弹窗 ========== */
+var currentFullNutriTab='macro';
+function openFullNutritionAnalysis(){
+  var foods=getTodayFoods();
+  if(foods.length===0){
+    document.getElementById('fullNutriContent').innerHTML='<div class="fn-empty"><span class="fn-emoji">🍽️</span>今天还没有记录食物</div>';
+  }
+  renderFullNutriTab('macro');
+  showModal('fullNutriModal');
+}
+function switchFullNutriTab(tabKey){
+  renderFullNutriTab(tabKey);
+  document.querySelectorAll('.full-nutri-tab').forEach(function(t){t.classList.toggle('active',t.dataset.fullTab===tabKey)});
+}
+function renderFullNutriTab(tabKey){
+  currentFullNutriTab=tabKey;
+  var contentEl=document.getElementById('fullNutriContent');
+  var foods=getTodayFoods();
+  if(!foods.length){
+    contentEl.innerHTML='<div class="fn-empty"><span class="fn-emoji">🍽️</span>今天还没有记录食物</div>';
+    return;
+  }
+  document.querySelectorAll('.full-nutri-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.full-nutri-tab').forEach(function(t){
+    if(t.dataset.fullTab===tabKey)t.classList.add('active');
+  });
+  var totals=calcTodayTotals();
+  var targets=calcNutritionTargets();
+  var isMale=state.profile.gender==='male';
+  var keys=NUTRI_TABS[tabKey]||[];
+  if(tabKey==='phyto'){
+    contentEl.innerHTML=renderPhytoTab(foods);
+    return;
+  }
+  var html='';
+  keys.forEach(function(key){
+    var consumed=totals[key]||0;
+    var targetVal=0,label='',unit='',risk='',tip='';
+    if(key==='p'||key==='c'||key==='f'){
+      var macroTargets={p:targets.p,c:targets.c,f:targets.f};
+      targetVal=macroTargets[key]||0;
+      var macroLabels={p:'蛋白质',c:'碳水化合物',f:'脂肪'};
+      label=macroLabels[key]||key;
+      unit='g';
+    }else{
+      var dri=getDRI(key,isMale);
+      if(dri){targetVal=dri.v;label=dri.label;unit=dri.unit;}
+    }
+    risk=NUTRI_RISK[key]||'';
+    tip=NUTRI_TIPS[key]||'';
+    var pct=targetVal>0?consumed/targetVal*100:0;
+    var colorType=(pct<30?'red':(pct<60?'yellow':'green'));
+    var icon='🍽️';
+    var iconMap={'p':'🥩','c':'🌾','f':'🫒','fi':'🥬','va':'🥕','vc':'🍊','vd':'☀️','ve':'🥜','vk':'🥦','b1':'🌾','b3':'🐔','b6':'🍌','b9':'🥬','b12':'🥩','ca':'🥛','fe':'🥩','zn':'🦪','se':'🥜','mg':'🥬','k':'🍌','om3':'🐟','om6':'🫒'};
+    icon=iconMap[key]||'🍽️';
+    var consumedStr=unit==='μg'?consumed.toFixed(0):consumed.toFixed(1);
+    var tgtStr=unit==='μg'?targetVal.toFixed(0):targetVal.toFixed(0);
+    html+='<div class="fn-item" style="animation-delay:0s">';
+    html+='<div class="fn-item-icon">'+icon+'</div>';
+    html+='<div class="fn-item-info">';
+    html+='<div class="fn-item-name">'+label+' <span style="font-weight:400;font-size:12px;color:var(--text2)">'+consumedStr+' / '+tgtStr+unit+'</span></div>';
+    if(risk)html+='<div class="fn-item-risk">'+risk+'</div>';
+    if(tip)html+='<div class="fn-item-tip">'+tip+'</div>';
+    html+='</div>';
+    html+=fnBarHTML(consumed,targetVal,pct,colorType);
+    html+='</div>';
+  });
+  contentEl.innerHTML=html;
+}
+/* 植物化学物 Tab */
+function renderPhytoTab(foods){
+  var phytoDefs=[
+    {key:'lycopene',label:'番茄红素',icon:'🍅',source:'番茄🍅、西瓜🍉、粉红葡萄柚'},
+    {key:'anthocyanin',label:'花青素',icon:'🫐',source:'蓝莓🫐、紫甘蓝、桑葚'},
+    {key:'sulforaphane',label:'萝卜硫素',icon:'🥦',source:'西兰花🥦、羽衣甘蓝、卷心菜'},
+    {key:'allicin',label:'大蒜素',icon:'🧄',source:'大蒜🧄、洋葱🧅、韭菜'},
+    {key:'lutein',label:'叶黄素',icon:'🌽',source:'玉米🌽、蛋黄🥚、菠菜🥬'},
+    {key:'beta_carotene',label:'β-胡萝卜素',icon:'🥕',source:'胡萝卜🥕、南瓜🎃、红薯🍠'}
+  ];
+  /* 收集所有食物 phyto 字段 */
+  var allPhyto=[];
+  foods.forEach(function(f){
+    if(f.phyto&&Array.isArray(f.phyto)){
+      f.phyto.forEach(function(p){if(allPhyto.indexOf(p)<0)allPhyto.push(p)});
+    }
+  });
+  var html='<div class="phyto-grid">';
+  var count=0;
+  phytoDefs.forEach(function(pd){
+    var hasIt=allPhyto.indexOf(pd.key)>=0;
+    if(hasIt)count++;
+    html+='<div class="phyto-chip '+(hasIt?'have':'miss')+'">'+pd.icon+' '+pd.label+(hasIt?' ✅':' ❌')+'</div>';
+  });
+  html+='</div>';
+  html+='<div style="text-align:center;padding:4px 0 10px;font-size:13px;color:var(--text2)">今日摄入 <strong>'+(count)+'</strong> / '+phytoDefs.length+' 种植物化学物</div>';
+  /* 缺少的推荐 */
+  var missing=phytoDefs.filter(function(pd){return allPhyto.indexOf(pd.key)<0});
+  if(missing.length>0 && missing.length<phytoDefs.length){
+    html+='<div class="fn-source">🍽️ 建议补充：'+missing.map(function(m){return m.icon+m.label+'（'+m.source+'）'}).join('、')+'</div>';
+  }else if(missing.length===phytoDefs.length){
+    html+='<div class="fn-source">💡 试试吃彩色蔬果来摄入更多植物化学物吧！</div>';
+  }
+  /* 来源食物列表 */
+  html+='<div style="margin-top:10px;border-top:0.5px solid var(--card-border);padding-top:8px">';
+  html+='<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px">📋 每种植物化学物对应的食物</div>';
+  phytoDefs.forEach(function(pd){
+    html+='<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:13px"><span>'+pd.icon+'</span><span style="font-weight:500">'+pd.label+'</span><span style="color:var(--text2);font-size:12px">'+pd.source+'</span></div>';
+  });
+  html+='</div>';
+  return html;
+}
+
 function renderNutrition(){
   const foods=getTodayFoods();
   const t=calcNutritionTargets();
@@ -897,40 +1239,23 @@ function renderNutrition(){
   });
   document.getElementById('proteinVal').textContent=tp.toFixed(1)+' / '+t.p+'g';
   document.getElementById('proteinBar').style.width=Math.min(100,tp/t.p*100)+'%';
+  document.getElementById('proteinBar').style.background='var(--green)';
   document.getElementById('carbsVal').textContent=tc.toFixed(1)+' / '+t.c+'g';
   document.getElementById('carbsBar').style.width=Math.min(100,tc/t.c*100)+'%';
+  document.getElementById('carbsBar').style.background='var(--orange)';
   document.getElementById('fatVal').textContent=tf.toFixed(1)+' / '+t.f+'g';
   document.getElementById('fatBar').style.width=Math.min(100,tf/t.f*100)+'%';
+  document.getElementById('fatBar').style.background='var(--red)';
   document.getElementById('fiberVal').textContent=tfi.toFixed(1)+' / '+t.fiber+'g';
   document.getElementById('fiberBar').style.width=Math.min(100,tfi/t.fiber*100)+'%';
+  document.getElementById('fiberBar').style.background='var(--cyan)';
   document.getElementById('vitAVal').textContent=tva.toFixed(0)+' / '+t.va+'μg';
   document.getElementById('vitABar').style.width=Math.min(100,tva/t.va*100)+'%';
+  document.getElementById('vitABar').style.background='var(--yellow)';
   document.getElementById('vitCVal').textContent=tvc.toFixed(0)+' / '+t.vc+'mg';
   document.getElementById('vitCBar').style.width=Math.min(100,tvc/t.vc*100)+'%';
-  /* 动态营养建议 — 已摄入≥90%时不提示 */
-  var totalConsumed=foods.reduce(function(s,f){return s+(f.cal||0)},0);
-  var target=calcTargetCalories();
-  if(totalConsumed>0&&target>0&&totalConsumed/target>=0.9){
-    rec='';
-  }else{
-    var rec='',issues=[];
-    var calP=tp*4,calC=tc*4,calF=tf*9;
-    var totalKcal=calP+calC+calF;
-    var pPct=totalKcal>0?calP/totalKcal*100:0,cPct=totalKcal>0?calC/totalKcal*100:0,fPct=totalKcal>0?calF/totalKcal*100:0;
-    if(tp<t.p*0.7)issues.push({icon:'🥩',text:'蛋白质不足，差 '+(t.p-tp).toFixed(0)+'g 达标，建议加一份鸡胸/鸡蛋/蛋白粉'});
-    else if(tp>t.p*1.3)issues.push({icon:'⚠️',text:'蛋白质偏高，可能超出日常需求'});
-    if(tfi<t.fiber*0.6)issues.push({icon:'🥬',text:'膳食纤维不足，多吃绿叶菜、粗粮、豆类'});
-    if(tc>t.c*1.15)issues.push({icon:'🌾',text:'碳水偏高（超出推荐 '+(tc-t.c).toFixed(0)+'g），注意控制主食'});
-    if(tf>t.f*1.15)issues.push({icon:'🫒',text:'脂肪偏高（超出推荐 '+(tf-t.f).toFixed(0)+'g），建议清淡烹饪'});
-    if(issues.length===0){
-      var ratio='蛋白质'+pPct.toFixed(0)+'% / 碳水'+cPct.toFixed(0)+'% / 脂肪'+fPct.toFixed(0)+'%';
-      var ideal='15-20% / 50-60% / 25-30%';
-      rec='✅ 今日各项营养素达标！<br><span style="font-size:12px;color:var(--text2)">当前热量比: '+ratio+'<br>推荐比: '+ideal+'</span>';
-    }else{
-      rec=issues.slice(0,4).map(function(i){return i.icon+' '+i.text}).join('<br>');
-    }
-  }
-  document.getElementById('nutriRec').innerHTML=rec;
+  document.getElementById('vitCBar').style.background='var(--purple)';
+  renderDeficiencies();
 }
 function renderFoodLog(){
   var titleEl=document.getElementById('mainDateNavTitle');
@@ -1323,42 +1648,6 @@ function handlePhotoUpload(event){
 
 
 /* ========== NUTRITION BREAKDOWN MODAL ========== */
-var nbdCurrentNutri='protein';
-function openNutritionBreakdown(){
-  const foods=getTodayFoods();
-  if(foods.length===0){
-    document.getElementById('nbdContent').innerHTML='<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物<br>添加食物后再来看营养素来源吧</div>';
-  }
-  renderNbdTab('protein');
-  showModal('nutritionModal');
-}
-function renderNbdTab(nutriKey){
-  const contentEl=document.getElementById('nbdContent');
-  const foods=getTodayFoods();
-  if(!foods.length){
-    contentEl.innerHTML='<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div>';
-    return;
-  }
-  nbdCurrentNutri=nutriKey;
-  document.querySelectorAll('.nutri-breakdown-tab').forEach(t=>t.classList.toggle('active',t.dataset.nbdNutri===nutriKey));
-  const fieldMap={protein:{key:'p',label:'蛋白质',unit:'g',decimals:0,color:'var(--green)'},carbs:{key:'c',label:'碳水',unit:'g',decimals:0,color:'var(--orange)'},fat:{key:'f',label:'脂肪',unit:'g',decimals:0,color:'var(--red)'},fiber:{key:'fi',label:'膳食纤维',unit:'g',decimals:1,color:'var(--cyan)'},vitA:{key:'va',label:'维生素A',unit:'μg',decimals:0,color:'var(--yellow)'},vitC:{key:'vc',label:'维生素C',unit:'mg',decimals:0,color:'var(--purple)'}};
-  const info=fieldMap[nutriKey];
-  if(!info){contentEl.innerHTML='';return}
-  const items=foods.map(f=>({name:f.name,icon:f.icon||'🍽️',amount:f.amount,val:(f[info.key]||0),meal:f.meal})).filter(i=>i.val>0);
-  const total=items.reduce((s,i)=>s+i.val,0);
-  items.sort((a,b)=>b.val-a.val);
-  const totalUnit=info.unit==='μg'?'μg':info.unit;
-  let html='<div class="nbd-total">合计 <strong>'+total.toFixed(info.decimals)+' '+totalUnit+'</strong> ｜ 来自 '+items.length+' 种食物</div>';
-  items.forEach((item,i)=>{
-    const pct=total>0?item.val/total*100:0;
-    const barW=total>0?Math.min(item.val/Math.max(total,1)*100,100):0;
-    const mealLabel={breakfast:'☀️早',lunch:'🌞午',dinner:'🌙晚',snack:'🍪加'}[item.meal]||'';
-    html+='<div class="nbd-item" style="animation-delay:'+(i*0.05)+'s"><div class="nbd-item-icon">'+item.icon+'</div><div class="nbd-item-info"><div class="nbd-item-name">'+item.name+'</div><div class="nbd-item-amount">'+item.amount+'g · '+mealLabel+' · '+item.val.toFixed(info.decimals)+' '+totalUnit+'</div></div><div class="nbd-item-bar"><div class="nbd-item-bar-track"><div class="nbd-item-bar-fill" style="width:'+barW+'%;background:'+info.color+'"></div></div></div><div class="nbd-item-pct" style="color:'+info.color+'">'+pct.toFixed(1)+'%</div></div>';
-  });
-  contentEl.innerHTML=html;
-}
-function switchNbdTab(nutriKey){renderNbdTab(nutriKey)}
-
 /* ========== BMI BREAKDOWN MODAL ========== */
 function openBmiBreakdown(){
   const hh=state.profile.height,ww=state.profile.weight;
