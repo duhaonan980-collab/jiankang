@@ -317,6 +317,30 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .lock-footer{margin-top:40px;text-align:center}
 .lock-footer-btn{font-size:15px;color:var(--blue);background:none;border:none;font-family:inherit;cursor:pointer;padding:8px 20px}
 .lock-footer-btn:active{opacity:.6}
+/* Settings: collapsible panels */
+.collapsible{overflow:hidden;max-height:0;transition:max-height .45s ease}
+.collapsible.open{max-height:600px}
+.collapsible-inner{padding:12px 16px;border-top:0.5px solid var(--card-border)}
+.algo-card{background:rgba(118,118,128,0.06);border-radius:14px;padding:14px;margin:8px 0}
+.algo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.algo-name{font-size:15px;font-weight:700}
+.algo-stars{font-size:12px;color:var(--text3)}
+.algo-compare{display:flex;gap:10px;flex-wrap:wrap}
+.algo-compare-item{flex:1;min-width:90px;padding:10px;border-radius:12px;background:rgba(255,255,255,0.6);text-align:center}
+.algo-compare-item .val{font-size:20px;font-weight:800;color:var(--blue)}
+.algo-compare-item .label{font-size:11px;color:var(--text2);margin-top:2px}
+.algo-compare-item .stars{font-size:11px;color:var(--orange);margin-top:1px}
+.algo-compare-item.active{border:1.5px solid var(--blue);background:rgba(0,122,255,0.06)}
+@media(prefers-color-scheme:dark){.algo-compare-item{background:rgba(255,255,255,0.08)}}
+.gender-section{display:none}
+.gender-section.show{display:block}
+.bf-fields{display:flex;gap:10px;margin:8px 0}
+.bf-field{flex:1;text-align:center}
+.bf-field-label{font-size:11px;color:var(--text2);display:block;text-align:center;margin-bottom:3px}
+.bf-field input{width:100%;text-align:center;background:rgba(118,118,128,0.08);border:none;border-radius:10px;padding:10px 8px;font-size:16px;font-weight:600;color:var(--text);font-family:inherit;outline:none}
+.bf-field input:focus{background:rgba(0,122,255,0.08);box-shadow:0 0 0 2px rgba(0,122,255,0.2)}
+.bf-hint{font-size:12px;color:var(--text2);background:rgba(118,118,128,0.06);border-radius:8px;padding:8px 12px;margin:8px 0;line-height:1.5}
+.goal-tip{padding:6px 10px;margin-top:6px;border-radius:8px;font-size:12px;line-height:1.5;background:rgba(0,122,255,0.08);color:var(--text2)}
 </style>
 </head>
 <body>
@@ -419,26 +443,97 @@ if('serviceWorker' in navigator){
   <!-- ===== SETTINGS PAGE 设置页面 ===== -->
   <div id="settings-page" class="page">
     <div class="page-header"><div class="page-title">设置</div></div>
+
+    <!-- ===== 区块 1：个人信息（必填） ===== -->
     <div class="settings-section-title">个人信息</div>
     <div class="settings-section">
       <div class="settings-item"><span class="settings-label">身高</span><div style="display:flex;align-items:center;gap:4px"><input class="settings-input" type="number" id="setHeight" placeholder="170" inputmode="decimal"><span style="color:var(--text2);font-size:14px">cm</span></div></div>
       <div class="settings-item"><span class="settings-label">体重</span><div style="display:flex;align-items:center;gap:4px"><input class="settings-input" type="number" id="setWeight" placeholder="65" inputmode="decimal"><span style="color:var(--text2);font-size:14px">kg</span></div></div>
       <div class="settings-item"><span class="settings-label">年龄</span><div style="display:flex;align-items:center;gap:4px"><input class="settings-input" type="number" id="setAge" placeholder="25" inputmode="numeric"><span style="color:var(--text2);font-size:14px">岁</span></div></div>
-      <div class="settings-item"><span class="settings-label">性别</span><div class="seg-control" style="width:140px;margin:0"><div class="seg-item active" data-gender="male" onclick="setGender('male')">男</div><div class="seg-item" data-gender="female" onclick="setGender('female')">女</div></div></div>
-      <div class="settings-item"><span class="settings-label">腰围</span><div style="display:flex;align-items:center;gap:4px"><input class="settings-input" type="number" id="setWaist" placeholder="72" inputmode="decimal"><span style="color:var(--text2);font-size:14px">cm</span></div></div>
+      <div class="settings-item"><span class="settings-label">性别</span><div class="seg-control" style="width:140px;margin:0" id="genderControl"><div class="seg-item active" data-gender="male" onclick="setGender('male')">男</div><div class="seg-item" data-gender="female" onclick="setGender('female')">女</div></div></div>
     </div>
-    <button class="update-btn" onclick="updateWeightRecord()"><span style="font-size:20px">⚖️</span> 更新体重记录</button>
-    <div class="settings-section-title">运动量<span class="info-link" onclick="showActivityInfo()">说明</span></div>
-    <div class="settings-section"><div class="seg-control" style="margin:8px" id="activityControl"><div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div><div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div><div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div><div class="seg-item" data-act="high" onclick="setActivity('high')">高</div><div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div></div></div>
-    <div class="settings-section-title">目标<span class="info-link" onclick="showGoalInfo()">说明</span></div>
-    <div class="settings-section"><div class="seg-control" style="margin:8px" id="goalControl">
-      <div class="seg-item" data-goal="buddha" onclick="setGoal('buddha')">佛系</div>
-      <div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div>
-      <div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div>
-      <div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div></div></div>
-  
-    <div class="recommend-box"><span class="recommend-label">每日推荐热量</span><span class="recommend-val" id="recommendCal">--</span></div>
-      <div class="settings-section-title">外观</div>
+    <button class="update-btn" onclick="updateWeightRecord()" style="margin:0 16px 16px;width:calc(100% - 32px)"><span style="font-size:20px">⚖️</span> 更新体重记录</button>
+
+    <!-- ===== 区块 2：身体测量（选填·可折叠） ===== -->
+    <div class="settings-section-title">身体测量</div>
+    <div class="settings-section">
+      <div class="settings-item" style="background:rgba(52,199,89,0.06);border-bottom:none;cursor:pointer" onclick="document.getElementById('bfMeasure').classList.toggle('open');state.profile._bfOpen=document.getElementById('bfMeasure').classList.contains('open');saveState();document.getElementById('bfExpandLabel').textContent=state.profile._bfOpen?'▲ 收起':'▼ 展开'">
+        <span class="settings-label"><span style="margin-right:6px">📏</span>体脂测量字段 <span style="font-size:11px;color:var(--green);font-weight:600">选填</span></span>
+        <span id="bfExpandLabel" style="color:var(--text3);font-size:15px">▼ 展开</span>
+      </div>
+      <div class="collapsible" id="bfMeasure">
+        <div class="collapsible-inner">
+          <!-- 算法选择 -->
+          <div style="margin-bottom:10px">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:4px">体脂算法 <span style="font-size:11px;color:var(--blue);font-weight:600">自动选择最优</span></div>
+            <div class="seg-control" style="width:100%" id="bfMethodControl">
+              <div class="seg-item active" data-method="auto" onclick="setBFMethod('auto')">自动</div>
+              <div class="seg-item" data-method="navy" onclick="setBFMethod('navy')">U.S. Navy</div>
+              <div class="seg-item" data-method="hybrid" onclick="setBFMethod('hybrid')">混合法</div>
+              <div class="seg-item" data-method="bmi" onclick="setBFMethod('bmi')">BMI法</div>
+            </div>
+          </div>
+          <!-- 共用字段 -->
+          <div class="bf-fields">
+            <div class="bf-field"><span class="bf-field-label">腰围</span><input type="number" id="setWaist" placeholder="72" inputmode="decimal"><span style="font-size:10px;color:var(--text2);display:block;text-align:center;margin-top:2px">cm</span></div>
+            <div class="bf-field"><span class="bf-field-label">颈围</span><input type="number" id="setNeck" placeholder="36" inputmode="decimal"><span style="font-size:10px;color:var(--text2);display:block;text-align:center;margin-top:2px">cm</span></div>
+            <div class="bf-field gender-section" id="hipField"><span class="bf-field-label">臀围</span><input type="number" id="setHip" placeholder="90" inputmode="decimal"><span style="font-size:10px;color:var(--text2);display:block;text-align:center;margin-top:2px">cm</span></div>
+          </div>
+          <div class="bf-hint" id="bfHint">💡 填写腰围+颈围后激活 U.S. Navy 体脂公式（精度最高）。女性额外填写臀围。留空则使用 BMI 估算。</div>
+          <!-- 算法对比 -->
+          <div class="algo-card" id="algoCompareCard">
+            <div class="algo-header">
+              <span class="algo-name">体脂结果对比</span>
+              <span class="algo-stars">各算法同时显示</span>
+            </div>
+            <div class="algo-compare" id="algoCompareInner">
+              <div class="algo-compare-item"><div class="val" id="bfNavyVal">--</div><div class="label">Navy 法</div><div class="stars">★★★★</div></div>
+              <div class="algo-compare-item"><div class="val" id="bfHybridVal">--</div><div class="label">混合法</div><div class="stars">★★★</div></div>
+              <div class="algo-compare-item"><div class="val" id="bfBMIVal">--</div><div class="label">BMI 法</div><div class="stars">★★</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 区块 3：目标与活动 ===== -->
+    <div class="settings-section-title">目标与活动</div>
+    <div class="settings-section">
+      <div class="settings-item" style="background:rgba(255,149,0,0.04);border-bottom:0.5px solid var(--card-border);cursor:pointer" onclick="document.getElementById('goalSection').classList.toggle('open');state.profile._goalOpen=document.getElementById('goalSection').classList.contains('open');saveState();document.getElementById('goalExpandLabel').textContent=state.profile._goalOpen?'▲':'▼'">
+        <span class="settings-label"><span style="margin-right:6px">🎯</span>运动与饮食目标</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;font-weight:600;color:var(--blue);background:rgba(0,122,255,0.1);padding:4px 10px;border-radius:20px" id="goalCalBadge">--</span>
+          <span id="goalExpandLabel" style="color:var(--text3);font-size:15px">▼</span>
+        </span>
+      </div>
+      <div class="collapsible open" id="goalSection">
+        <div class="collapsible-inner">
+          <div style="margin-bottom:14px">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:4px">日常活动量 <span class="info-link" onclick="showActivityInfo()" style="float:right">说明</span></div>
+            <div class="seg-control" style="width:100%" id="activityControl">
+              <div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div>
+              <div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div>
+              <div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div>
+              <div class="seg-item" data-act="high" onclick="setActivity('high')">高</div>
+              <div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--text2);margin-bottom:4px">饮食目标 <span class="info-link" onclick="showGoalInfo()" style="float:right">说明</span></div>
+            <div class="seg-control" style="width:100%" id="goalControl">
+              <div class="seg-item" data-goal="buddha" onclick="setGoal('buddha')">佛系</div>
+              <div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div>
+              <div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div>
+              <div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div>
+            </div>
+            <div class="goal-tip" id="goalTip"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 其他设置 ===== -->
+    <div class="settings-section-title">外观</div>
     <div class="settings-section"><div class="seg-control" style="margin:8px" id="themeControl"><div class="seg-item active" data-theme="auto" onclick="setTheme('auto')">跟随系统</div><div class="seg-item" data-theme="light" onclick="setTheme('light')">浅色</div><div class="seg-item" data-theme="dark" onclick="setTheme('dark')">深色</div></div></div>
     <div class="settings-section-title">应用锁</div>
     <div class="settings-section">
@@ -452,11 +547,10 @@ if('serviceWorker' in navigator){
     <div class="settings-section">
       <div class="settings-item" style="cursor:pointer" onclick="exportData()"><span class="settings-label">导出数据</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="importData()"><span class="settings-label">导入数据</span><span style="color:var(--text3)">›</span></div>
-
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.11.0</div><div>营养追踪 · 体重管理 · 拍照上传 · 全面屏适配</div></div>
+    <div class="about-text"><div class="ver">热量营养检测 v3.12.0</div><div>营养追踪 · 体重管理 · 拍照上传 · U.S. Navy 体脂算法</div></div>
   </div>
   </main>
 
@@ -469,7 +563,7 @@ if('serviceWorker' in navigator){
 
   <div class="modal-overlay" id="photoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><img class="photo-modal-img" id="photoModalImg" alt=""><div id="photoModalInfo" style="text-align:center;margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closePhotoModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="weightModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">更新体重与腰围</div><div style="text-align:center;padding:8px 0 16px;color:var(--text2);font-size:14px">记录今日数据，追踪变化趋势</div><div class="weight-input-row"><input class="weight-update-input" type="number" id="weightModalInput" placeholder="输入体重" inputmode="decimal" step="0.1"><span class="weight-unit">kg</span></div><div class="weight-input-row" style="margin-top:4px"><input class="weight-update-input" type="number" id="waistModalInput" placeholder="输入腰围" inputmode="decimal" step="0.1"><span class="weight-unit">cm</span></div><div id="weightModalLast" style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmWeightUpdate()">确认更新</button><button class="modal-btn danger" onclick="hideModal('weightModal')" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
+  <div class="modal-overlay" id="weightModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">更新体重与腰围</div><div style="text-align:center;padding:8px 0 16px;color:var(--text2);font-size:14px">记录今日数据，追踪变化趋势</div><div class="weight-input-row"><input class="weight-update-input" type="number" id="weightModalInput" placeholder="输入体重" inputmode="decimal" step="0.1"><span class="weight-unit">kg</span></div><div class="weight-input-row" style="margin-top:4px"><input class="weight-update-input" type="number" id="waistModalInput" placeholder="输入腰围（选填）" inputmode="decimal" step="0.1"><span class="weight-unit">cm</span></div><div id="weightModalLast" style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmWeightUpdate()">确认更新</button><button class="modal-btn danger" onclick="hideModal('weightModal')" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
   <div class="modal-overlay" id="weightMonthModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">选择月份</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeWeightPickerYear(-1)">‹</button><div class="cal-title" id="weightPickerYearLabel">2026年</div><button class="date-nav-btn" onclick="changeWeightPickerYear(1)">›</button></div><div class="weight-month-grid" id="weightPickerGrid"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('weightMonthModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div></div></div></div>
 
@@ -518,7 +612,7 @@ if('serviceWorker' in navigator){
 <script>
 /* ========== STATE ========== */
 let state = {
-  profile:{height:0,weight:0,age:25,gender:'male',waist:0,activity:'low',goal:'lose'},
+  profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',activity:'low',goal:'lose'},
   foodLogs:{}, weightRecords:{},
   selectedDate:getDateKey(new Date()),
   pendingFood:null, pendingMeal:null, currentCat:'all',
@@ -540,7 +634,7 @@ function clearAllPhotoData(){if(!photoDB)return;return new Promise((resolve)=>{c
 /* ========== STORAGE ========== */
 function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode}))}catch(e){showToast('存储失败')}}
 function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';/* 兼容旧版 weightRecords: 数字 → {w,waist} */
-Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0}}catch(e){console.error(e)}}
+Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto'}}catch(e){console.error(e)}}
 
 /* ========== DATE ========== */
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -617,7 +711,43 @@ function calcCalcWeight(p){
 /* ② 腿围修正: BF_WC = 0.6×(waistRatio - 45) */
 /* ③ 活动量修正: low+2 / normal+0 / medium-1 / high-2 / extreme-3 */
 /* ④ 最终: BodyFat% = BF_BMI + BF_WC + ActivityModifier, clamp [3,45] */
-function calcBodyFat(p){
+/* ========== Body Fat 算法引擎 ========== */
+/* ① U.S. Navy 法 */
+/* 注意：腰围 UI 已去掉，保留算法用于已有数据的兼容。无腰围时返回 null 自动降级。 */
+function calcBodyFatNavy(p){
+  if(!p.height||!p.weight)return null;
+  if(!p.neck)return null; /* 颈围必填 */
+  const bmi=calcBMI(p.height,p.weight);if(!bmi)return null;
+  const h=p.height; const n=p.neck; const w=p.waist||0;
+  const isMale=p.gender==='male';
+  if(isMale){
+    /* 男性: BF=86.010×log10(waist-neck) - 70.041×log10(height) + 36.76 */
+    if(!w||!n)return null;
+    const d1=Math.log10(w-n); const d2=Math.log10(h);
+    let bf=86.010*d1 - 70.041*d2 + 36.76;
+    bf=Math.max(3,Math.min(45,bf));
+    return Math.round(bf*10)/10;
+  }else{
+    /* 女性: BF=163.205×log10(waist+hip-neck) - 97.684×log10(height) - 78.387 */
+    const hi=p.hip||0;
+    if(!w||!hi||!n)return null;
+    const d1=Math.log10(w+hi-n); const d2=Math.log10(h);
+    let bf=163.205*d1 - 97.684*d2 - 78.387;
+    bf=Math.max(3,Math.min(45,bf));
+    return Math.round(bf*10)/10;
+  }
+}
+/* ② BMI 估算法（不含腰围/活动量修正） */
+function calcBodyFatBMI(p){
+  if(!p.height||!p.weight||!p.age)return null;
+  const bmi=calcBMI(p.height,p.weight);if(!bmi)return null;
+  const sex=p.gender==='male'?1:0;
+  let bf=1.2*bmi+0.23*p.age-10.8*sex-5.4;
+  bf=Math.max(3,Math.min(45,bf));
+  return Math.round(bf*10)/10;
+}
+/* ③ 混合法（原算法：BMI+腰围+活动量） */
+function calcBodyFatHybrid(p){
   if(!p.height||!p.weight||!p.age)return null;
   const bmi=calcBMI(p.height,p.weight);if(!bmi)return null;
   const sex=p.gender==='male'?1:0;
@@ -629,6 +759,25 @@ function calcBodyFat(p){
   let bf=bfBMI+bfWC+mod;
   bf=Math.max(3,Math.min(45,bf));
   return Math.round(bf*10)/10;
+}
+/* ④ 全部算法结果 */
+function calcBodyFatAll(p){
+  return{
+    navy:calcBodyFatNavy(p),
+    hybrid:calcBodyFatHybrid(p),
+    bmi:calcBodyFatBMI(p)
+  };
+}
+/* 默认体脂计算（按 bfMethod 自动选择最佳） */
+function calcBodyFat(p){
+  const m=p.bfMethod||'auto';
+  if(m==='navy'){const v=calcBodyFatNavy(p);if(v!==null)return v}
+  if(m==='hybrid'){const v=calcBodyFatHybrid(p);if(v!==null)return v}
+  if(m==='bmi'){const v=calcBodyFatBMI(p);if(v!==null)return v}
+  /* auto: Navy > 混合 > BMI */
+  var v=calcBodyFatNavy(p);if(v!==null)return v;
+  v=calcBodyFatHybrid(p);if(v!==null)return v;
+  return calcBodyFatBMI(p);
 }
 /* 体脂等级表 */
 const BF_LEVELS_MALE=[
@@ -675,8 +824,10 @@ function calcNutritionTargets(){
   var e=calcTargetCalories();
   if(!e)return{p:0,c:0,f:0,fiber:25,va:800,vc:100,calories:0};
   var p=state.profile,cw=calcCalcWeight(p),goal=p.goal||'maintain',isMale=p.gender==='male';
-  /* ⑥ 蛋白质 — 减脂/增肌期 2.0g/kg，其他 1.6g/kg */
-  var protein=(goal==='lose'||goal==='gain')?cw*2.0:cw*1.6;
+  /* ⑥ 蛋白质 — 减脂/增肌期 2.0g/kg，其他 1.6g/kg，年龄系数补偿（30岁以上肌肉合成效率下降） */
+  var age=p.age||25;
+  var ageFactor=1+Math.max(0,(age-30)*0.006); /* 30岁后每年+0.6%，60岁时约1.18倍 */
+  var protein=((goal==='lose'||goal==='gain')?cw*2.0:cw*1.6)*ageFactor;
   var proteinKcal=protein*4;
   /* ⑦ 脂肪 — 按总热量百分比分配（减脂期略高提升饱腹感，增肌期略低为碳水让路） */
   var fatPct={buddha:0.25,lose:0.28,maintain:0.25,gain:0.22}[goal]||0.25;
@@ -940,7 +1091,7 @@ function renderFoodLog(){
   const foods=getTodayFoods();
   const c=document.getElementById('mainFoodLogContainer');
   if(!c)return;
-  if(!foods.length){c.innerHTML='<div class="empty-state"><span class="emoji">🍽️</span><div class="text">今天还没有记录食物<br>点击上方按钮开始</div></div>';return}
+  if(!foods.length){c.innerHTML='<div class="empty-state"><span class="emoji">🍽️</span><div style="display:block;color:var(--text3);font-size:14px;line-height:1.6;margin-top:4px">今天还没有记录食物<br>点击上方按钮开始记录</div></div>';return}
   const meals=[{key:'breakfast',name:'早餐',icon:'🌅'},{key:'lunch',name:'午餐',icon:'☀️'},{key:'dinner',name:'晚餐',icon:'🌙'},{key:'snack',name:'加餐',icon:'🍪'}];
   let html='';
   meals.forEach(m=>{const mf=foods.filter(f=>f.meal===m.key);if(!mf.length)return;const mc=mf.reduce((s,f)=>s+f.cal,0);
@@ -966,13 +1117,32 @@ function renderSettings(){
   document.getElementById('setHeight').value=state.profile.height||'';
   document.getElementById('setWeight').value=state.profile.weight||'';
   document.getElementById('setAge').value=state.profile.age||'';
-  document.getElementById('setWaist').value=state.profile.waist||'';
-  document.querySelectorAll('[data-gender]').forEach(el=>el.classList.toggle('active',el.dataset.gender===state.profile.gender));
+  document.querySelectorAll('#genderControl .seg-item, [data-gender]').forEach(el=>el.classList.toggle('active',el.dataset.gender===state.profile.gender));
+  /* 身体测量字段 */
+  var waistEl=document.getElementById('setWaist');if(waistEl)waistEl.value=state.profile.waist||'';
+  var neckEl=document.getElementById('setNeck');if(neckEl)neckEl.value=state.profile.neck||'';
+  var hipEl=document.getElementById('setHip');if(hipEl)hipEl.value=state.profile.hip||'';
+  /* 臀区仅女性显示 */
+  var hipField=document.getElementById('hipField');
+  if(hipField)hipField.style.display=state.profile.gender==='female'?'block':'none';
+  /* 算法选择 */
+  document.querySelectorAll('#bfMethodControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.method===state.profile.bfMethod));
+  /* 算法对比 */
+  /* 恢复折叠状态 */
+  var bfEl=document.getElementById('bfMeasure');
+  if(bfEl){bfEl.classList.toggle('open',!!state.profile._bfOpen);document.getElementById('bfExpandLabel').textContent=state.profile._bfOpen?'▲ 收起':'▼ 展开'}
+  var goalEl=document.getElementById('goalSection');
+  if(goalEl){goalEl.classList.toggle('open',!!state.profile._goalOpen);document.getElementById('goalExpandLabel').textContent=state.profile._goalOpen?'▲':'▼'}
+  renderBFCompare();
+  /* 活动量 + 目标 */
   document.querySelectorAll('#activityControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.act===state.profile.activity));
   document.querySelectorAll('#goalControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.goal===state.profile.goal));
   document.querySelectorAll('#themeControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.theme===state.theme));
-  document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';
-  // BMI 约束层：根据 BMI + 融合判断锁定/推荐目标按钮
+  /* 推荐热量 badge */
+  var cal=calcTargetCalories();
+  var badge=document.getElementById('goalCalBadge');
+  if(badge)badge.textContent=cal>0?cal+' kcal/日':'--';
+  /* BMI 约束层 */
   const bmi=calcBMI(state.profile.height,state.profile.weight);
   const bmiInfo=getBMIInfo(bmi);
   var finalInfo=bmiInfo;
@@ -991,10 +1161,36 @@ function renderSettings(){
     }
   }
   applyUIConstraints(finalInfo);
+  /* 应用锁 */
   var lockToggle=document.getElementById('appLockToggle');
   if(lockToggle)lockToggle.checked=state.appLock.enabled;
   var lockDesc=document.getElementById('appLockDesc');
   if(lockDesc){if(state.appLock.enabled){lockDesc.textContent='已启用图案解锁，每次打开应用需绘制图案验证身份'}else{lockDesc.textContent='开启后每次打开应用需要绘制图案验证身份，保护你的隐私数据'}}
+}
+/* 渲染体脂算法对比 */
+function renderBFCompare(){
+  var all=calcBodyFatAll(state.profile);
+  var nEl=document.getElementById('bfNavyVal');
+  var hEl=document.getElementById('bfHybridVal');
+  var bEl=document.getElementById('bfBMIVal');
+  if(nEl)nEl.textContent=all.navy!==null?all.navy+'%':'--';
+  if(hEl)hEl.textContent=all.hybrid!==null?all.hybrid+'%':'--';
+  if(bEl)bEl.textContent=all.bmi!==null?all.bmi+'%':'--';
+  /* 高亮当前选中的算法 */
+  var activeMethod=state.profile.bfMethod||'auto';
+  if(activeMethod==='auto'){
+    /* 选精度最高的 */
+    if(all.navy!==null)activeMethod='navy';
+    else if(all.hybrid!==null)activeMethod='hybrid';
+    else activeMethod='bmi';
+  }
+  var items=document.querySelectorAll('#algoCompareInner .algo-compare-item');
+  if(items.length>=3){
+    [].forEach.call(items,function(el,i){el.classList.remove('active')});
+    if(activeMethod==='navy'&&items[0])items[0].classList.add('active');
+    else if(activeMethod==='hybrid'&&items[1])items[1].classList.add('active');
+    else if(activeMethod==='bmi'&&items[2])items[2].classList.add('active');
+  }
 }
 /* ========== BMI UI 约束引擎 ========== */
 function applyUIConstraints(info){
@@ -1022,6 +1218,22 @@ function applyUIConstraints(info){
       el.classList.toggle('recommended',el.dataset.act===info.recActivity);
     });
   }
+  /* 目标提示 */
+  var goalTip=document.getElementById('goalTip');
+  if(goalTip){
+    var bmi=calcBMI(state.profile.height,state.profile.weight);
+    if(!bmi){goalTip.textContent='';}else{
+      var bmiLabel=getBMIInfo(bmi).label;
+      var locked=info.lockedGoals||[];
+      var recGoalNames={'buddha':'佛系','lose':'减脂','maintain':'维持','gain':'增肌'};
+      var lockedStr=locked.map(function(g){return recGoalNames[g]||g}).join('、');
+      var rec=info.recGoal?recGoalNames[info.recGoal]:'';
+      var parts=['当前 BMI '+bmi.toFixed(1)+'（'+bmiLabel+'）'];
+      if(locked.length>0)parts.push(lockedStr+'不可用');
+      if(rec)parts.push('推荐 '+rec);
+      goalTip.textContent=parts.join(' · ');
+    }
+  }
   /* 记录推荐信息到 DOM 供调试 */
   var goalCtrl=document.getElementById('goalControl');
   if(goalCtrl)goalCtrl.dataset.bmiLevel=(info.bmiLevel||0);
@@ -1029,10 +1241,22 @@ function applyUIConstraints(info){
 function renderWeeklyChart(){
   const target=calcTargetCalories();const today=new Date();const trend=[];
   for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const dk=getDateKey(d);const foods=state.foodLogs[dk]||[];const cal=foods.reduce((s,f)=>s+f.cal,0);trend.push({label:['日','一','二','三','四','五','六'][d.getDay()],cal,isOver:target>0&&cal>target,isToday:dk===getDateKey(today)})}
-  const maxCal=Math.max(...trend.map(t=>t.cal),1);
-  document.getElementById('weeklyChart').innerHTML=trend.map(t=>{
-    const h=Math.max(t.cal/maxCal*100,2);const color=t.isOver?'var(--red)':'var(--green)';const op=t.isToday?'1':'0.5';
-    return '<div class="chart-col"><div class="chart-bar-wrap"><div class="chart-bar" style="height:'+h+'%;background:'+color+';opacity:'+op+'" title="'+t.cal+' kcal"></div></div><div class="chart-label" style="'+(t.isToday?'color:var(--blue);font-weight:700':'')+'">'+t.label+'</div></div>'
+  var refCal=Math.max(...trend.map(function(t){return t.cal}),target,1);
+  var chartEl=document.getElementById('weeklyChart');
+  var barMaxH=chartEl?chartEl.clientHeight-22:78;
+  if(barMaxH<40)barMaxH=78;
+  chartEl.innerHTML=trend.map(function(t){
+    var base=14;
+    var varH=barMaxH-base;
+    var ratio=refCal>0?Math.min(t.cal/refCal,2):0;
+    var h=Math.round(ratio*varH)+base;
+    if(h>barMaxH+6)h=barMaxH+6;
+    var color;
+    if(t.cal===0)color='rgba(118,118,128,0.15)';
+    else if(t.isOver)color='var(--red)';
+    else color='var(--green)';
+    var op=t.isToday?'1':'0.6';
+    return '<div class="chart-col"><div class="chart-bar-wrap"><div class="chart-bar" style="height:'+h+'px;background:'+color+';opacity:'+op+'" title="'+t.cal+' kcal"></div></div><div class="chart-label" style="'+(t.isToday?'color:var(--blue);font-weight:700':'')+'">'+t.label+'</div></div>'
   }).join('')
 }
 function renderStatsGrid(){
@@ -1049,6 +1273,7 @@ function renderStatsGrid(){
 }
 
 /* ========== SETTINGS HANDLERS ========== */
+function setBFMethod(m){state.profile.bfMethod=m;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
 function setGender(g){state.profile.gender=g;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
 function setActivity(a){state.profile.activity=a;saveState();renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart()}
 function setGoal(g){state.profile.goal=g;saveState();renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart()}
@@ -1079,8 +1304,8 @@ function showGoalInfo(){
 
 /* ========== DATA MANAGEMENT ========== */
 function exportData(){const json=JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords},null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='热量营养检测_数据_'+getDateKey(new Date())+'.json';a.click();URL.revokeObjectURL(url);showToast('数据已导出')}
-function importData(){const input=document.createElement('input');input.type='file';input.accept='.json';input.onchange=function(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=function(ev){try{const d=JSON.parse(ev.target.result);state.profile=d.profile||state.profile;if(!state.profile.waist)state.profile.waist=0;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0}});saveState();renderAll();showToast('数据已导入')}catch(err){showToast('导入失败: 文件格式错误')}};reader.readAsText(f)};input.click()}
-async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');await clearAllPhotoData();state={profile:{height:0,weight:0,age:25,gender:'male',waist:0,activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,currentCat:'all',tempPhoto:null,theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),appLock:{enabled:false,method:'pattern',pattern:[]}};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
+function importData(){const input=document.createElement('input');input.type='file';input.accept='.json';input.onchange=function(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=function(ev){try{const d=JSON.parse(ev.target.result);state.profile=d.profile||state.profile;if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0}});saveState();renderAll();showToast('数据已导入')}catch(err){showToast('导入失败: 文件格式错误')}};reader.readAsText(f)};input.click()}
+async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');await clearAllPhotoData();state={profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,currentCat:'all',tempPhoto:null,theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),chartMode:'weight',appLock:{enabled:false,method:'pattern',pattern:[]}};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
 async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？食物记录不会被删除。'))return;await clearAllPhotoData();Object.values(state.foodLogs).forEach(foods=>foods.forEach(f=>f.hasPhoto=false));saveState();renderAll();if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({type:'CLEAR_PHOTO_CACHE'})}showToast('照片缓存已清除')}
 
 /* ========== WEIGHT TRACKING ========== */
@@ -1817,15 +2042,18 @@ function skipBackupPassword(){
 /* ========== INIT ========== */
 async function init(){
   loadState();
+  state.selectedDate=getDateKey(new Date()); /* 每次打开默认今天 */
   checkAppLockOnLaunch();
   if(state.theme==='auto'){document.documentElement.removeAttribute('data-theme')}else{document.documentElement.setAttribute('data-theme',state.theme)};if(state.theme==='dark')document.querySelector('meta[name="theme-color"]').content='#000000';
   await initPhotoDB();
   const now=new Date();const wd=['日','一','二','三','四','五','六'];
   document.getElementById('todayDate').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 星期'+wd[now.getDay()];
   document.getElementById('setHeight').addEventListener('input',function(){state.profile.height=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
-  document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';document.getElementById('setWeight').addEventListener('input',function(){state.profile.weight=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
-  document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';document.getElementById('setAge').addEventListener('input',function(){state.profile.age=parseInt(this.value)||25;saveState();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
-  document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';document.getElementById('setWaist').addEventListener('input',function(){state.profile.waist=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();document.getElementById('recommendCal').textContent=calcTargetCalories()>0?calcTargetCalories()+' kcal':'--';renderWeeklyChart()});
+  document.getElementById('setWeight').addEventListener('input',function(){var w=parseFloat(this.value)||0;state.profile.weight=w;if(w>0){var k=getDateKey(new Date());state.weightRecords[k]=(state.weightRecords[k]&&typeof state.weightRecords[k]==='object')?state.weightRecords[k]:{w:0,waist:0};state.weightRecords[k].w=w}saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart();renderWeightChart();renderWeightPeriodLabel()});
+  document.getElementById('setAge').addEventListener('input',function(){state.profile.age=parseInt(this.value)||25;saveState();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
+  var waistEl=document.getElementById('setWaist');if(waistEl)waistEl.addEventListener('input',function(){state.profile.waist=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
+  var neckEl=document.getElementById('setNeck');if(neckEl)neckEl.addEventListener('input',function(){state.profile.neck=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()});
+  var hipEl=document.getElementById('setHip');if(hipEl)hipEl.addEventListener('input',function(){state.profile.hip=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()});
   updateOnlineStatus();window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);
   var mq=window.matchMedia('(prefers-color-scheme:dark)');function onSchemeChange(e){if(state.theme==='auto'){document.querySelector('meta[name="theme-color"]').content=e.matches?'#000000':'#F2F2F7'}};mq.addEventListener?mq.addEventListener('change',onSchemeChange):mq.addListener(onSchemeChange);onSchemeChange(mq);
   if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除')})}).catch(function(){console.warn('[App] SW注册失败')})}
