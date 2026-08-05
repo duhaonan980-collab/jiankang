@@ -421,9 +421,10 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   <div id="history-page" class="page">
     <div class="page-header"><div class="page-title">历史记录</div></div>
     <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span>体重变化 · <span id="weightChartMonth">本月</span></span><div style="display:flex;align-items:center;gap:6px"><span id="weightChartAllBtn" class="cms-item" onclick="toggleWeightChartAll()" style="font-size:12px;font-weight:600;padding:0 8px;width:auto">📅 从有记录以来</span><div class="chart-mode-switch" id="chartModeSwitch"><span class="cms-item" data-mode="weight" onclick="toggleChartMode('weight')">⚖️ 体重</span><span class="cms-item" data-mode="waist" onclick="toggleChartMode('waist')">📏 腰围</span></div></div></div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span>体重变化 · <span id="weightChartMonth">本月</span></span><div style="display:flex;align-items:center;gap:6px"><span id="weightChartAllBtn" class="cms-item" onclick="toggleWeightChartAll()" style="font-size:12px;font-weight:600;padding:0 8px;width:auto">从有记录以来</span><div class="chart-mode-switch" id="chartModeSwitch"><span class="cms-item" data-mode="weight" onclick="toggleChartMode('weight')">体重</span><span class="cms-item" data-mode="waist" onclick="toggleChartMode('waist')">腰围</span></div></div></div>
       <div class="weight-chart-wrap"><svg class="weight-chart-svg" id="weightChartSvg" viewBox="0 0 320 180" preserveAspectRatio="none"></svg></div>
       <div id="weightChartEmpty" style="display:none;text-align:center;padding:20px;color:var(--text3);font-size:14px">暂无体重记录<br>请在设置页点击「更新」记录体重</div>
+      <div id="weightChartStats" style="display:none;margin-top:6px;padding-top:8px;border-top:0.5px solid var(--card-border)"></div>
     </div>
     <div class="card">
       <div class="card-title">体重月历</div>
@@ -972,7 +973,7 @@ async function deleteFood(id){const foods=state.foodLogs[state.selectedDate]||[]
 function clearTodayLog(){if(!confirm('确定清空当日所有食物记录？'))return;const foods=state.foodLogs[state.selectedDate]||[];foods.forEach(f=>{if(f.hasPhoto)deletePhotoData(f.id)});state.foodLogs[state.selectedDate]=[];saveState();renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已清空')}
 
 /* ========== RENDER ========== */
-function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeeklyChart();renderStatsGrid();renderWeightChart();renderWeightPeriodLabel();updateChartModeUI()}
+function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeeklyChart();renderStatsGrid();renderWeightChart();renderWeightPeriodLabel();updateChartModeUI();updateWeightPeriodNav()}
 function renderBMI(){
   const h=state.profile.height,w=state.profile.weight;
   const bmi=calcBMI(h,w);const info=getBMIInfo(bmi);const c=document.getElementById('bmiCircle');
@@ -1307,8 +1308,16 @@ function toggleWeightChartAll(){
   saveState();
   var btn=document.getElementById('weightChartAllBtn');
   if(btn)btn.classList.toggle('active',state.weightChartAll);
+  updateWeightPeriodNav();
   renderWeightChart();
   renderWeightPeriodLabel();
+}
+function updateWeightPeriodNav(){
+  var btns=document.querySelectorAll('.card .date-nav-btn[onclick*="changeWeightPeriod"]');
+  btns.forEach(function(b){
+    b.style.opacity=state.weightChartAll?'0.3':'1';
+    b.style.pointerEvents=state.weightChartAll?'none':'auto';
+  });
 }
 /* ========== DATA MANAGEMENT ========== */
 function exportData(){const json=JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords},null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='热量营养检测_数据_'+getDateKey(new Date())+'.json';a.click();URL.revokeObjectURL(url);showToast('数据已导出')}
@@ -1326,7 +1335,7 @@ function renderWeightChart(){
     var rec=state.weightRecords[dk];
     var w=typeof rec==='object'?rec.w:rec;
     var ws=typeof rec==='object'?rec.waist:0;
-    allRecords.push({date:dk,weight:w,waist:ws});
+    allRecords.push({date:dk,day:parseInt(dk.split('-')[2]),weight:w,waist:ws});
   });
   allRecords.sort(function(a,b){return a.date.localeCompare(b.date)});
   var records;
@@ -1340,11 +1349,7 @@ function renderWeightChart(){
   }
   var monthLabelEl=document.getElementById('weightChartMonth');
   if(monthLabelEl){
-    if(state.weightChartAll){
-      monthLabelEl.textContent='全部记录';
-    }else{
-      monthLabelEl.textContent=y+'年'+(m+1)+'月';
-    }
+    monthLabelEl.textContent=state.weightChartAll?'全部记录':y+'年'+(m+1)+'月';
   }
   var emptyEl=document.getElementById('weightChartEmpty');
   if(!records.length){
@@ -1359,7 +1364,11 @@ function renderWeightChart(){
   var wMin=Math.min.apply(null,records.map(function(r){return r.weight}))-1;
   var wMax=Math.max.apply(null,records.map(function(r){return r.weight}))+1;
   if(wMin===wMax){wMax+=1;wMin-=1}
-  var xScale=function(i){return padL+(i)/(n-1||1)*chartW};
+  var isAll=state.weightChartAll;
+  var daysInMonth=isAll?0:new Date(y,m+1,0).getDate();
+  var xScale=isAll
+    ? function(i){return padL+(i)/(n-1||1)*chartW}
+    : function(day){return padL+(day-1)/(daysInMonth-1||1)*chartW};
   var yScaleW=function(w){return padT+chartH-(w-wMin)/(wMax-wMin)*chartH};
   var pathD='';
   var dots='';
@@ -1372,6 +1381,18 @@ function renderWeightChart(){
     }
     return false;
   }
+  var valField=isWaist?'waist':'weight';
+  var firstVal=records[0][valField];
+  var lastVal=records[records.length-1][valField];
+  var maxVal=Math.max.apply(null,records.map(function(r){return r[valField]}));
+  var minVal=Math.min.apply(null,records.map(function(r){return r[valField]}));
+  var maxIdx=records.findIndex(function(r){return r[valField]===maxVal});
+  var minIdx=records.findIndex(function(r){return r[valField]===minVal});
+  var labelSet={};
+  labelSet[0]=true;
+  labelSet[records.length-1]=true;
+  labelSet[maxIdx]=true;
+  labelSet[minIdx]=true;
   function addDotLabel(i,v,x,y){
     var w=v.toString().length*6+4;
     if(i>0&&i<records.length-1&&slotOverlap(x,w))return false;
@@ -1381,16 +1402,50 @@ function renderWeightChart(){
     return true;
   }
   records.forEach(function(r,i){
-    var x=xScale(i),y=yScaleW(r.weight);
+    var x=isAll?xScale(i):xScale(r.day);
+    var y=yScaleW(r[valField]);
     pathD+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
-    addDotLabel(i,r.weight,x,y);
+    if(n<=8||labelSet[i])addDotLabel(i,r[valField],x,y);
   });
   var waistRecords=records.filter(function(r){return r.waist>0});
-  if(state.chartMode==='waist'&&waistRecords.length){
-    var wsMin=Math.min.apply(null,waistRecords.map(function(r){return r.waist}))-2;
-    var wsMax=Math.max.apply(null,waistRecords.map(function(r){return r.waist}))+2;
+  var isWaist=state.chartMode==='waist'&&waistRecords.length;
+  var wsMin,wsMax,yScaleWs;
+  if(isWaist){
+    wsMin=Math.min.apply(null,waistRecords.map(function(r){return r.waist}))-2;
+    wsMax=Math.max.apply(null,waistRecords.map(function(r){return r.waist}))+2;
     if(wsMin===wsMax){wsMax+=2;wsMin-=2}
-    var yScaleWs=function(ws){return padT+chartH-(ws-wsMin)/(wsMax-wsMin)*chartH};
+    yScaleWs=function(ws){return padT+chartH-(ws-wsMin)/(wsMax-wsMin)*chartH};
+  }
+  function buildGridLines(){
+    var h='';
+    for(var gi=0;gi<=4;gi++){
+      var gy=padT+chartH*gi/4;
+      var gv=isWaist
+        ? wsMax-(wsMax-wsMin)*gi/4
+        : wMax-(wMax-wMin)*gi/4;
+      var unit=isWaist?'cm':'';
+      h+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y1="'+gy.toFixed(1)+'" stroke="rgba(118,118,128,0.1)" stroke-width="0.5"/><text x="'+(padL-4)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="var(--text3)">'+gv.toFixed(1)+unit+'</text>';
+    }
+    return h;
+  }
+  function buildXLabels(){
+    var h='';
+    if(isAll){
+      var step=Math.max(1,Math.floor(n/7));
+      for(var si=0;si<n;si+=step){
+        var x=xScale(si);
+        var p=records[si].date.split('-');
+        h+='<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="var(--text3)">'+parseInt(p[1])+'/'+parseInt(p[2])+'</text>';
+      }
+    }else{
+      for(var d=1;d<=daysInMonth;d+=Math.ceil(daysInMonth/6)){
+        var x=xScale(d);
+        h+='<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="var(--text3)">'+d+'</text>';
+      }
+    }
+    return h;
+  }
+  if(isWaist){
     var wsPath='',wsDots='';
     var wsSlots=[];
     function wsSlotOverlap(x,w){
@@ -1408,56 +1463,38 @@ function renderWeightChart(){
     }
     waistRecords.forEach(function(r,i){
       var idx=records.indexOf(r);
-      var x=xScale(idx),y=yScaleWs(r.waist);
+      var x=isAll?xScale(idx):xScale(r.day);
+      var y=yScaleWs(r.waist);
       wsPath+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
-      addWsDotLabel(i,r.waist,x,y);
+      if(waistRecords.length<=8||i===0||i===waistRecords.length-1||r.waist===maxVal||r.waist===minVal)addWsDotLabel(i,r.waist,x,y);
     });
-    var wsGrid='';
-    for(var gi=0;gi<=4;gi++){
-      var gy=padT+chartH*gi/4;
-      var gv=wsMax-(wsMax-wsMin)*gi/4;
-      wsGrid+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y1="'+gy.toFixed(1)+'" stroke="rgba(118,118,128,0.1)" stroke-width="0.5"/><text x="'+(padL-4)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="var(--text3)">'+gv.toFixed(1)+'cm</text>';
-    }
-    var xLabels='';
-    if(state.weightChartAll){
-      var step=Math.max(1,Math.floor(n/7));
-      for(var si=0;si<n;si+=step){
-        var x=xScale(si);
-        var parts=records[si].date.split('-');
-        xLabels+='<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="var(--text3)">'+parseInt(parts[1])+'/'+parseInt(parts[2])+'</text>';
-      }
-    }else{
-      var daysInMonth=new Date(y,m+1,0).getDate();
-      for(var d=1;d<=daysInMonth;d+=Math.ceil(daysInMonth/6)){
-        var x=xScale(records.findIndex(function(r){return parseInt(r.date.split('-')[2])>=d}));
-        if(x>padL&&x<W-padR)xLabels+='<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="var(--text3)">'+d+'</text>';
-      }
-    }
-    svg.innerHTML=wsGrid+xLabels+'<path d="'+wsPath+'" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+wsDots;
+    svg.innerHTML=buildGridLines()+buildXLabels()+'<path d="'+wsPath+'" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+wsDots;
   }else{
-    var gridLines='';
-    for(var gi=0;gi<=4;gi++){
-      var gy=padT+chartH*gi/4;
-      var gv=wMax-(wMax-wMin)*gi/4;
-      gridLines+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y1="'+gy.toFixed(1)+'" stroke="rgba(118,118,128,0.1)" stroke-width="0.5"/><text x="'+(padL-4)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="var(--text3)">'+gv.toFixed(1)+'</text>';
-    }
-    var xLabels='';
-    if(state.weightChartAll){
-      var step=Math.max(1,Math.floor(n/7));
-      for(var si=0;si<n;si+=step){
-        var x=xScale(si);
-        var parts=records[si].date.split('-');
-        xLabels+='<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="var(--text3)">'+parseInt(parts[1])+'/'+parseInt(parts[2])+'</text>';
-      }
-    }else{
-      var daysInMonth=new Date(y,m+1,0).getDate();
-      for(var d=1;d<=daysInMonth;d+=Math.ceil(daysInMonth/6)){
-        var x=xScale(records.findIndex(function(r){return parseInt(r.date.split('-')[2])>=d}));
-        if(x>padL&&x<W-padR)xLabels+='<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="var(--text3)">'+d+'</text>';
-      }
-    }
-    svg.innerHTML=gridLines+xLabels+'<path d="'+pathD+'" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots;
+    svg.innerHTML=buildGridLines()+buildXLabels()+'<path d="'+pathD+'" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots;
   }
+  renderWeightStats(records,isWaist);
+}
+function renderWeightStats(records,isWaist){
+  var el=document.getElementById('weightChartStats');
+  if(!el)return;
+  if(!records||records.length<2){el.style.display='none';return}
+  var vf=isWaist?'waist':'weight';
+  var first=records[0][vf],last=records[records.length-1][vf];
+  var vals=records.map(function(r){return r[vf]});
+  var maxV=Math.max.apply(null,vals);
+  var minV=Math.min.apply(null,vals);
+  var avg=vals.reduce(function(a,b){return a+b},0)/vals.length;
+  var delta=last-first;
+  var deltaSign=delta>=0?'+':'';
+  var deltaColor=delta>0?'var(--red)':delta<0?'var(--green)':'var(--text2)';
+  var unit=isWaist?'cm':'kg';
+  el.style.display='block';
+  el.innerHTML='<div class="stats-grid" style="grid-template-columns:repeat(4,1fr);gap:6px">'
+    +'<div class="stat-item"><div class="stat-val" style="color:var(--orange)">'+maxV.toFixed(1)+'</div><div class="stat-label">最高 '+unit+'</div></div>'
+    +'<div class="stat-item"><div class="stat-val" style="color:var(--cyan)">'+minV.toFixed(1)+'</div><div class="stat-label">最低 '+unit+'</div></div>'
+    +'<div class="stat-item"><div class="stat-val" style="color:var(--text)">'+avg.toFixed(1)+'</div><div class="stat-label">平均 '+unit+'</div></div>'
+    +'<div class="stat-item"><div class="stat-val" style="color:'+deltaColor+'">'+deltaSign+delta.toFixed(1)+'</div><div class="stat-label">变化 '+unit+'</div></div>'
+    +'</div>';
 }
 function renderWeightPeriodLabel(){
   var el=document.getElementById('weightPeriodLabel');
@@ -1478,6 +1515,12 @@ function toggleChartMode(mode){
   renderWeightChart();
 }
 function changeWeightPeriod(d){
+  if(state.weightChartAll){
+    state.weightChartAll=false;
+    var btn=document.getElementById('weightChartAllBtn');
+    if(btn)btn.classList.remove('active');
+    updateWeightPeriodNav();
+  }
   state.weightChartMonth+=d;
   if(state.weightChartMonth<0){state.weightChartMonth=11;state.weightChartYear--}
   if(state.weightChartMonth>11){state.weightChartMonth=0;state.weightChartYear++}
