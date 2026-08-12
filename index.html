@@ -1594,13 +1594,33 @@ function selectWeightMonthFromPicker(m){
 
 /* ========== WEIGHT FULL CHART（点折线图 → 全屏大折线图） ========== */
 var _weightRange='all';
+function lockLandscape(){
+  try{
+    var p=document.documentElement.requestFullscreen?document.documentElement.requestFullscreen():null;
+    (p||Promise.resolve()).then(function(){
+      if(screen.orientation&&screen.orientation.lock){
+        screen.orientation.lock('landscape').catch(function(){});
+      }
+    }).catch(function(){});
+  }catch(e){}
+}
+function unlockLandscape(){
+  try{
+    if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();
+    if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();
+  }catch(e){}
+}
 function openWeightFull(){
   _weightRange='all';
   var chips=document.querySelectorAll('.range-chip');chips.forEach(function(c){c.classList.toggle('active',c.dataset.range==='all')});
-  refreshWeightFull();
   document.getElementById('weightFull').classList.add('show');
+  setTimeout(function(){refreshWeightFull()},60);
+  lockLandscape();
 }
-function closeWeightFull(){document.getElementById('weightFull').classList.remove('show')}
+function closeWeightFull(){
+  document.getElementById('weightFull').classList.remove('show');
+  unlockLandscape();
+}
 function setWeightRange(r,btn){
   _weightRange=r;
   var chips=document.querySelectorAll('.range-chip');chips.forEach(function(c){c.classList.toggle('active',c.dataset.range===r)});
@@ -2308,6 +2328,10 @@ async function init(){
   var neckEl=document.getElementById('setNeck');if(neckEl)neckEl.addEventListener('input',function(){state.profile.neck=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()});
   var hipEl=document.getElementById('setHip');if(hipEl)hipEl.addEventListener('input',function(){state.profile.hip=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()});
   updateOnlineStatus();window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);
+  var wfEl=document.getElementById('weightFull');
+  function rerenderFullChart(){if(wfEl&&wfEl.classList.contains('show'))refreshWeightFull()}
+  window.addEventListener('resize',rerenderFullChart);
+  window.addEventListener('orientationchange',rerenderFullChart);
   var mq=window.matchMedia('(prefers-color-scheme:dark)');function onSchemeChange(e){if(state.theme==='auto'){document.querySelector('meta[name="theme-color"]').content=e.matches?'#000000':'#F2F2F7'}};mq.addEventListener?mq.addEventListener('change',onSchemeChange):mq.addListener(onSchemeChange);onSchemeChange(mq);
   if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除')})}).catch(function(){console.warn('[App] SW注册失败')})}
   renderAll();
