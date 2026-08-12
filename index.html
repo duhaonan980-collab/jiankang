@@ -347,9 +347,9 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .weight-full-header{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safe-top) + 10px) 16px 6px;flex-shrink:0;border-bottom:0.5px solid var(--card-border)}
 .weight-full-title{font-size:16px;font-weight:700;letter-spacing:-0.2px}
 .weight-full-close{background:rgba(118,118,128,0.12);border:none;color:var(--blue);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;padding:6px 16px;border-radius:16px}
-/* 全屏折线图：贴边铺满整个窗口（无居中卡片、无大留白） */
-.weight-full-chart-wrap{flex:1;min-height:0;padding-top:6px;padding-bottom:var(--safe-bottom);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
-.weight-full-svg{width:100%;height:100%;display:block}
+/* 全屏折线图：横版布局（宽而扁，无需旋转屏幕），垂直居中 */
+.weight-full-chart-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 12px var(--safe-bottom)}
+.weight-full-svg{display:block;width:100%;height:auto;aspect-ratio:1.85/1}
 /* 顶部 header：单行 —— 标题左 + 右侧(segmented + 关闭)抱团 */
 .weight-full-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px}
 .weight-full-title{font-size:14px;font-weight:700;color:var(--text);flex:none;white-space:nowrap}
@@ -1397,7 +1397,7 @@ function renderWeightChart(){
     return;
   }
   if(emptyEl)emptyEl.style.display='none';
-  var W=320,H=180,padL=42,padR=12,padT=20,padB=22;
+  var W=320,H=180,padL=42,padR=12,padT=26,padB=22;
   var chartW=W-padL-padR,chartH=H-padT-padB;
   var n=records.length;
   var isAll=state.weightChartAll;
@@ -1487,9 +1487,7 @@ function renderWeightChart(){
     var w2=lbl.length*6.5+4;
     if(!slotOverlap(x,w2)){
       slots.push({x1:x-w2/2,x2:x+w2/2});
-      var onEdge=(i===0||i===sN-1);
-      var yOff=onEdge?(y>baselineY-20?16:-15):((i%2===0)?16:-15);
-      html+='<text x="'+x.toFixed(1)+'" y="'+(y+yOff).toFixed(1)+'" text-anchor="middle" font-size="10.5" fill="'+accent+'" font-weight="600">'+lbl+'</text>';
+      html+='<text x="'+x.toFixed(1)+'" y="'+(y-14).toFixed(1)+'" text-anchor="middle" font-size="10.5" fill="var(--text)" font-weight="600">'+lbl+'</text>';
     }
   });
   svg.innerHTML=html;
@@ -1594,33 +1592,13 @@ function selectWeightMonthFromPicker(m){
 
 /* ========== WEIGHT FULL CHART（点折线图 → 全屏大折线图） ========== */
 var _weightRange='all';
-function lockLandscape(){
-  try{
-    var p=document.documentElement.requestFullscreen?document.documentElement.requestFullscreen():null;
-    (p||Promise.resolve()).then(function(){
-      if(screen.orientation&&screen.orientation.lock){
-        screen.orientation.lock('landscape').catch(function(){});
-      }
-    }).catch(function(){});
-  }catch(e){}
-}
-function unlockLandscape(){
-  try{
-    if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();
-    if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();
-  }catch(e){}
-}
 function openWeightFull(){
   _weightRange='all';
   var chips=document.querySelectorAll('.range-chip');chips.forEach(function(c){c.classList.toggle('active',c.dataset.range==='all')});
   document.getElementById('weightFull').classList.add('show');
   setTimeout(function(){refreshWeightFull()},60);
-  lockLandscape();
 }
-function closeWeightFull(){
-  document.getElementById('weightFull').classList.remove('show');
-  unlockLandscape();
-}
+function closeWeightFull(){document.getElementById('weightFull').classList.remove('show')}
 function setWeightRange(r,btn){
   _weightRange=r;
   var chips=document.querySelectorAll('.range-chip');chips.forEach(function(c){c.classList.toggle('active',c.dataset.range===r)});
@@ -1628,15 +1606,50 @@ function setWeightRange(r,btn){
 }
 function refreshWeightFull(){
   var all=getWeightFullRecords();
-  var recs=filterByRange(all,_weightRange);
-  renderWeightFullChart(recs);
+  var range=_weightRange;
+  var recs=(range==='week'||range==='month'||range==='year')?aggregateRecords(all,range):filterByRange(all,range);
+  renderWeightFullChart(recs,range);
   var lbl=document.getElementById('weightRangeLabel');
   if(lbl){
     if(!recs.length){lbl.textContent='该时段暂无记录';return}
     var first=recs[0],last=recs[recs.length-1];
-    var rangeMap={day:'今日 · '+formatDateLabel(first.date),week:'最近 7 天 ('+formatDateLabel(first.date)+' ~ '+formatDateLabel(last.date)+')',month:'最近 30 天 ('+formatDateLabel(first.date)+' ~ '+formatDateLabel(last.date)+')',year:'最近 12 个月 ('+formatDateLabel(first.date)+' ~ '+formatDateLabel(last.date)+')',all:'全部 '+all.length+' 条记录'};
-    lbl.textContent=rangeMap[_weightRange]||('共 '+recs.length+' 条');
+    var rangeMap={
+      day:'今日 · '+formatDateLabel(first.date),
+      week:'按周平均 · '+formatDateLabel(first.date)+' ~ '+formatDateLabel(last.date),
+      month:'按月平均 · '+formatDateLabel(first.date)+' ~ '+formatDateLabel(last.date),
+      year:'按年平均 · '+first.date.slice(0,4)+' ~ '+last.date.slice(0,4),
+      all:'全部 '+all.length+' 条记录'};
+    lbl.textContent=rangeMap[range]||('共 '+recs.length+' 条');
   }
+}
+function aggregateRecords(all,range){
+  var groups={};
+  all.forEach(function(r){
+    var key;
+    if(range==='week'){
+      var d=new Date(r.date+'T00:00:00');
+      var day=(d.getDay()+6)%7;
+      d.setDate(d.getDate()-day);
+      var yy=d.getFullYear(),mm=('0'+(d.getMonth()+1)).slice(-2),dd=('0'+d.getDate()).slice(-2);
+      key=yy+'-'+mm+'-'+dd;
+    }else if(range==='month'){
+      key=r.date.slice(0,7)+'-01';
+    }else{
+      key=r.date.slice(0,4)+'-01-01';
+    }
+    if(!groups[key])groups[key]={sumW:0,n:0,sumWs:0,ns:0,date:key};
+    groups[key].sumW+=r.w;
+    groups[key].n++;
+    if(r.waist>0){groups[key].sumWs+=r.waist;groups[key].ns++;}
+  });
+  return Object.keys(groups).sort().map(function(k){
+    var g=groups[k];
+    return {date:g.date,
+      y:parseInt(g.date.slice(0,4)),m:parseInt(g.date.slice(5,7)),d:parseInt(g.date.slice(8,10)),
+      w:Math.round(g.sumW/g.n*100)/100,
+      waist:g.ns?Math.round(g.sumWs/g.ns*100)/100:0,
+      n:g.n};
+  });
 }
 function filterByRange(recs,r){
   if(!recs.length||r==='all')return recs;
@@ -1662,18 +1675,15 @@ function getWeightFullRecords(){
     .sort(function(a,b){return a.date.localeCompare(b.date)});
   return keys;
 }
-function renderWeightFullChart(recs){
+function renderWeightFullChart(recs,range){
   var svg=document.getElementById('weightFullSvg');
   if(!svg)return;
   if(!recs.length){svg.innerHTML='';return}
   var H=280;
-  var wrap=svg.parentElement;
-  var cw=wrap.clientWidth||480;
-  var ch=wrap.clientHeight||320;
-  var W=Math.round(Math.max(H*0.7,cw/ch*H));
+  var W=Math.round(H*1.85);
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   // 留宽 padding：左右给数值标签，顶部给最高点上方数字，底部给 X 轴
-  var padL=Math.round(W*0.11),padR=Math.round(W*0.14),padT=Math.round(H*0.14),padB=Math.round(H*0.16);
+  var padL=Math.round(W*0.11),padR=Math.round(W*0.16),padT=Math.round(H*0.16),padB=Math.round(H*0.15);
   var chartW=W-padL-padR,chartH=H-padT-padB;
   var n=recs.length;
   var wMin=Math.min.apply(null,recs.map(function(r){return r.w}));
@@ -1697,11 +1707,16 @@ function renderWeightFullChart(recs){
       +'<text x="'+(padL-8)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end" font-size="12" fill="'+axisColor+'" font-weight="400">'+gv.toFixed(1)+'</text>';
   }
   // ② X 轴日期标签（自适应步长，最多 6 个）
+  var years=[];recs.forEach(function(r){if(years.indexOf(r.y)<0)years.push(r.y)});
   var step=Math.max(1,Math.ceil(n/6));
   for(var xi=0;xi<n;xi+=step){
     var x=xScale(xi);
     var r0=recs[xi];
-    html+='<text x="'+x.toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle" font-size="12" fill="'+axisColor+'" font-weight="500">'+(r0.m)+'/'+(r0.d)+'</text>';
+    var lab=''+(r0.m)+'/'+(r0.d);
+    if(range==='year')lab=''+r0.y;
+    else if(range==='month')lab=years.length>1?(('0'+(r0.y%100)).slice(-2))+'/'+r0.m:r0.m+'月';
+    else if(range==='week')lab=(r0.m)+'/'+(r0.d);
+    html+='<text x="'+x.toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle" font-size="13" fill="'+axisColor+'" font-weight="500">'+lab+'</text>';
   }
   // ④ 计算所有点坐标
   var pts=[];
@@ -1740,7 +1755,7 @@ function renderWeightFullChart(recs){
     for(var si=0;si<slots.length;si++){var s=slots[si];if(!(x+w<s.x1||x-w>s.x2))return true}
     return false;
   }
-  // ⑨ 数据点 + 数值标签
+  // ⑨ 数据点 + 数值标签（统一放在点上方，黑色）
   recs.forEach(function(r,i){
     var x=xScale(i),y=yScale(r.w);
     html+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4" fill="#FFFFFF" stroke="'+orange+'" stroke-width="2.5"/>';
@@ -1748,9 +1763,7 @@ function renderWeightFullChart(recs){
     var w2=lbl.length*7+6;
     if(!slotOverlap(x,w2)){
       slots.push({x1:x-w2/2,x2:x+w2/2});
-      var onEdge=(i===0||i===n-1);
-      var yOff=onEdge?(y>baselineY-15?14:-14):((i%2===0)?16:-15);
-      html+='<text x="'+x.toFixed(1)+'" y="'+(y+yOff).toFixed(1)+'" text-anchor="middle" font-size="13" fill="'+orange+'" font-weight="500">'+lbl+'</text>';
+      html+='<text x="'+x.toFixed(1)+'" y="'+(y-16).toFixed(1)+'" text-anchor="middle" font-size="13" fill="var(--text)" font-weight="600">'+lbl+'</text>';
     }
   });
   svg.innerHTML=html;
