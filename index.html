@@ -1426,10 +1426,8 @@ function renderWeightChart(){
   var vals=series.map(function(r){return r[valField]});
   var vMin=Math.min.apply(null,vals);
   var vMax=Math.max.apply(null,vals);
-  // Y 轴整数 kg 刻度（像体重秤：68kg / 69kg / 70kg … 均匀递减）
-  var span=vMax-vMin;
+  // Y 轴整数 kg 刻度（像体重秤：68kg / 69kg / 70kg … 每 1kg 一格，与全屏图一致）
   var stepKG=1;
-  if(span>20)stepKG=5; else if(span>10)stepKG=2;
   var yMin=Math.floor(vMin/stepKG)*stepKG;
   var yMax=Math.ceil(vMax/stepKG)*stepKG;
   if(yMin>=yMax)yMax+=stepKG;
@@ -1799,14 +1797,15 @@ function renderWeightFullChart(recs,range){
   var cw=wrap.clientWidth||480;
   var availH=wrap.clientHeight||Math.round(cw/1.8);
   var n=recs.length;
-  var scrollable=(range==='day'&&n>30)||(range==='week'&&n>30);
-  var H=Math.min(availH,Math.round(cw/1.8));
-  if(H<120)H=120;
+  var scrollable=true; // 所有模式横轴均可横向滚动，保证每个日期标签分开
+  // 用满二级页面可用高度，去掉 cw/1.8 的上限，让网格线垂直间距更大
+  var H=availH;
+  if(H<160)H=Math.max(160,Math.round(cw/1.8));
   // 左右留白：左给 Y 轴数值，右给最右侧标签；padT 留高给多排数值标签
   var padL=44,padR=24,padT=Math.round(H*0.22),padB=Math.round(H*0.13);
   var chartAreaW,colW;
   if(scrollable){
-    colW=cw/30; // 每列宽度：可见约 30 天 / 30 周
+    colW=Math.max(cw/30,72); // 每列至少 72px，保证日期标签水平分开不重叠
     chartAreaW=colW*n;
   }else{
     chartAreaW=Math.max(cw-padL-padR,10);
@@ -1818,14 +1817,12 @@ function renderWeightFullChart(recs,range){
   if(!hasVals.length){svg.innerHTML='';svg.style.width='100%';svg.style.height='100%';return}
   var wMin=Math.min.apply(null,hasVals.map(function(r){return r.w}));
   var wMax=Math.max.apply(null,hasVals.map(function(r){return r.w}));
-  /* 纵轴：整数刻度，自上而下 50/49/48… 自适应步长避免过密或过疏 */
-  var wpad=(wMax-wMin)<1?0.8:(wMax-wMin)*0.18;
-  var yMin=Math.floor(wMin-wpad);
-  var yMax=Math.ceil(wMax+wpad);
-  if(yMin>=yMax){yMin=Math.floor(wMin-1);yMax=Math.ceil(wMax+1)}
-  var ySteps=[1,2,5,10,20,50,100];
-  var yStep=ySteps[ySteps.length-1];
-  for(var ys=0;ys<ySteps.length;ys++){if(Math.ceil((yMax-yMin)/ySteps[ys])<=8){yStep=ySteps[ys];break}}
+  /* 纵轴：固定每 1kg 一格（如 50 / 49 / 48 …），整数刻度自上而下 */
+  var yStep=1;
+  var yPad=(wMax-wMin)<1?1.5:(wMax-wMin)*0.2;
+  var yMin=Math.floor((wMin-yPad)/yStep)*yStep;
+  var yMax=Math.ceil((wMax+yPad)/yStep)*yStep;
+  if(yMin>=yMax){yMin=Math.floor((wMin-yStep)/yStep)*yStep;yMax=Math.ceil((wMax+yStep)/yStep)*yStep}
   function yScale(v){return padT+chartH-(v-yMin)/(yMax-yMin)*chartH}
   function xScale(i){return padL+i*colW+colW/2}
   var gridColor='rgba(118,118,128,0.18)';
@@ -1833,16 +1830,16 @@ function renderWeightFullChart(recs,range){
   var orange='#FF9500';
   var baselineY=padT+chartH;
   var html='';
-  // ① 网格线（Y 轴水平虚线，整数刻度自上而下：50/49/48…）
-  for(var gv=yMax; gv>=yMin; gv-=yStep){
+  // ① 网格线（Y 轴水平虚线，固定每 1kg 一格，自上而下：50/49/48…）
+  for(var gv=yMax; gv>=yMin-1e-6; gv-=yStep){
     var gy=padT+chartH-(gv-yMin)/(yMax-yMin)*chartH;
     html+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(contentW-padR)+'" y2="'+gy.toFixed(1)+'" stroke="'+gridColor+'" stroke-width="1" stroke-dasharray="3 3"/>'
-      +'<text x="'+(padL-8)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end" font-size="12" fill="'+axisColor+'" font-weight="400">'+gv+'kg</text>';
+      +'<text x="'+(padL-8)+'" y="'+(gy+5).toFixed(1)+'" text-anchor="end" font-size="14" fill="'+axisColor+'" font-weight="500">'+gv+'kg</text>';
   }
   // ② X 轴日期标签（详细：含年份；按可见宽度均匀间隔；空月不标）
   var years=[];recs.forEach(function(r){if(r.w!=null&&years.indexOf(r.y)<0)years.push(r.y)});
-  var labelGap=scrollable?Math.max(1,Math.round((cw-padL-padR)/colW/6)):Math.max(1,Math.ceil(n/6));
-  for(var xi=0;xi<n;xi+=labelGap){
+  // X 轴日期标签：每一个有记录的日期都标（空值占位跳过）
+  for(var xi=0;xi<n;xi+=1){
     var r0=recs[xi];if(r0.w==null)continue; /* 空月占位不标 */
     var x=xScale(xi);
     var lab;
