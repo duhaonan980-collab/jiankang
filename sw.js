@@ -4,7 +4,7 @@
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v45';
+const CACHE_VERSION = 'v60';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 

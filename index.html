@@ -1497,7 +1497,7 @@ function renderWeightChart(){
   pts.forEach(function(p,i){
     html+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4" fill="#FFFFFF" stroke="'+accent+'" stroke-width="2.5"/>';
   });
-  html+=buildValueLabels(pts,{fontSize:10.5,charW:6.8,labelColor:'var(--text)',firstGap:16,bandGap:13,maxBands:2,padT:padT,baselineY:baselineY});
+  html+=buildValueLabels(pts,{fontSize:10.5,charW:6.8,labelColor:'var(--text)',firstGap:16,bandGap:13,maxBands:2,extremesOnly:true,padT:padT,baselineY:baselineY});
   svg.innerHTML=html;
   renderWeightStats(records,isWaist);
 }
@@ -1639,7 +1639,7 @@ function refreshWeightFull(){
   if(lbl){
     if(!recs.length){lbl.textContent='该时段暂无记录';return}
     var rangeMap={
-      day:'日记录 · 可见约60天，可左滑查看更早（共'+all.length+'天）',
+      day:'日记录 · 可见约30天，可左滑查看更早（共'+all.length+'天）',
       week:'周平均 · 可见约30周，可左滑查看更早（共'+recs.length+'周）',
       month:'最近 12 个月 · 按月平均',
       year:'按年平均 · 共'+recs.length+'年',
@@ -1730,10 +1730,20 @@ function buildValueLabels(pts,o){
   function blocked(x,y,w,h){for(var si=0;si<slots.length;si++){var s=slots[si];if(x-w/2<s.x2&&x+w/2>s.x1&&y-h/2<s.y2&&y+h/2>s.y1)return true}return false}
   var fs=o.fontSize,cw=o.charW,lc=o.labelColor,gap0=o.firstGap,bg=o.bandGap,mb=o.maxBands,pt=o.padT,base=o.baselineY;
   var parts=[];
+  var ml=o.maxLabels||0;
+  var step=ml?Math.ceil(pts.length/ml):1;
+  var extIdx={min:null,max:null};
+  if(o.extremesOnly){
+    var mn=Infinity,mx=-Infinity;
+    for(var k2=0;k2<pts.length;k2++){if(pts[k2].w==null)continue; if(pts[k2].w<mn)mn=pts[k2].w; if(pts[k2].w>mx)mx=pts[k2].w;}
+    for(var k3=0;k3<pts.length;k3++){if(pts[k3].w==null)continue; if(pts[k3].w===mx&&extIdx.max==null)extIdx.max=k3; if(pts[k3].w===mn&&extIdx.min==null)extIdx.min=k3;}
+  }
   for(var k=0;k<pts.length;k++){
     var p=pts[k];
     var val=(p.w!=null)?p.w.toFixed(2):'';
     if(!val)continue;
+    if(o.extremesOnly && k!==extIdx.min && k!==extIdx.max)continue; /* 只保留极值（最高/最低）两个数字 */
+    if(ml&&k%step!==0&&k!==pts.length-1)continue; /* 主图数字太密：最多标 maxLabels 个，均匀取点 + 末点 */
     var w2=val.length*cw+6,h2=fs+6;
     var side=(k%2===0)?-1:1;
     var placed=false;
@@ -1788,14 +1798,14 @@ function renderWeightFullChart(recs,range){
   var cw=wrap.clientWidth||480;
   var availH=wrap.clientHeight||Math.round(cw/1.8);
   var n=recs.length;
-  var scrollable=(range==='day'&&n>60)||(range==='week'&&n>30);
+  var scrollable=(range==='day'&&n>30)||(range==='week'&&n>30);
   var H=Math.min(availH,Math.round(cw/1.8));
   if(H<120)H=120;
   // 左右留白：左给 Y 轴数值，右给最右侧标签；padT 留高给多排数值标签
   var padL=44,padR=24,padT=Math.round(H*0.22),padB=Math.round(H*0.13);
   var chartAreaW,colW;
   if(scrollable){
-    colW=(range==='day')?cw/60:cw/30; // 每列宽度：可见约 60 天 / 30 周
+    colW=cw/30; // 每列宽度：可见约 30 天 / 30 周
     chartAreaW=colW*n;
   }else{
     chartAreaW=Math.max(cw-padL-padR,10);
