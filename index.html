@@ -352,6 +352,9 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .weight-full-close{background:rgba(118,118,128,0.12);border:none;color:var(--blue);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;padding:6px 16px;border-radius:16px}
 /* 全屏折线图：横版布局；日/周超量时可横向拖动查看更早 */
 .weight-full-chart-wrap{flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:flex-start;padding:0 0 var(--safe-bottom)}
+#weightFullSvg{flex:0 0 auto}
+.wf-yaxis{position:sticky;left:0;flex:0 0 auto;align-self:stretch;width:46px;background:var(--bg);z-index:3;pointer-events:none;overflow:hidden}
+.wf-yaxis-label{position:absolute;right:6px;text-align:right;font-size:14px;font-weight:500;color:var(--text2);line-height:0;transform:translateY(-50%);white-space:nowrap}
 .weight-full-svg{display:block;height:auto;flex:none}
 /* 顶部 header：单行 —— 标题左 + 右侧(segmented + 关闭)抱团 */
 .weight-full-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px}
@@ -1794,6 +1797,9 @@ function renderWeightFullChart(recs,range){
   if(!svg)return;
   if(!recs.length){svg.innerHTML='';svg.style.width='100%';svg.style.height='100%';return}
   var wrap=svg.parentElement;
+  // 固定 Y 轴层：sticky 钉在左侧，横向滚动时不动
+  var yaxis=document.getElementById('weightFullYAxis');
+  if(!yaxis){yaxis=document.createElement('div');yaxis.id='weightFullYAxis';yaxis.className='wf-yaxis';wrap.insertBefore(yaxis,svg);}
   var cw=wrap.clientWidth||480;
   var availH=wrap.clientHeight||Math.round(cw/1.8);
   var n=recs.length;
@@ -1830,12 +1836,14 @@ function renderWeightFullChart(recs,range){
   var orange='#FF9500';
   var baselineY=padT+chartH;
   var html='';
-  // ① 网格线（Y 轴水平虚线，固定每 1kg 一格，自上而下：50/49/48…）
+  // ① 网格线（Y 轴水平虚线，固定每 1kg 一格）；刻度文字改由固定层 wf-yaxis 渲染，不随横滚移动
+  var yAxisHTML='';
   for(var gv=yMax; gv>=yMin-1e-6; gv-=yStep){
     var gy=padT+chartH-(gv-yMin)/(yMax-yMin)*chartH;
-    html+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(contentW-padR)+'" y2="'+gy.toFixed(1)+'" stroke="'+gridColor+'" stroke-width="1" stroke-dasharray="3 3"/>'
-      +'<text x="'+(padL-8)+'" y="'+(gy+5).toFixed(1)+'" text-anchor="end" font-size="14" fill="'+axisColor+'" font-weight="500">'+gv+'kg</text>';
+    html+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(contentW-padR)+'" y2="'+gy.toFixed(1)+'" stroke="'+gridColor+'" stroke-width="1" stroke-dasharray="3 3"/>';
+    yAxisHTML+='<div class="wf-yaxis-label" style="top:'+gy.toFixed(1)+'px">'+gv+'kg</div>';
   }
+  if(yaxis){yaxis.innerHTML=yAxisHTML;yaxis.style.height=H+'px';}
   // ② X 轴日期标签（详细：含年份；按可见宽度均匀间隔；空月不标）
   var years=[];recs.forEach(function(r){if(r.w!=null&&years.indexOf(r.y)<0)years.push(r.y)});
   // X 轴日期标签：每一个有记录的日期都标（空值占位跳过）
