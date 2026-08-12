@@ -1426,22 +1426,23 @@ function renderWeightChart(){
   var vals=series.map(function(r){return r[valField]});
   var vMin=Math.min.apply(null,vals);
   var vMax=Math.max.apply(null,vals);
-  var dps=isWaist?1:0.5;
-  var ypad=(vMax-vMin)<1?1:(vMax-vMin)*0.25;
-  var yMin=Math.floor((vMin-ypad)/dps)*dps;
-  var yMax=Math.ceil((vMax+ypad)/dps)*dps;
-  if(yMin>=yMax)yMax+=dps;
+  // Y 轴整数 kg 刻度（像体重秤：68kg / 69kg / 70kg … 均匀递减）
+  var span=vMax-vMin;
+  var stepKG=1;
+  if(span>20)stepKG=5; else if(span>10)stepKG=2;
+  var yMin=Math.floor(vMin/stepKG)*stepKG;
+  var yMax=Math.ceil(vMax/stepKG)*stepKG;
+  if(yMin>=yMax)yMax+=stepKG;
   function yScale(v){return padT+chartH-(v-yMin)/(yMax-yMin)*chartH}
   var accent=isWaist?'#5AC8FA':'#FF9500';
   var gridColor='rgba(118,118,128,0.18)';
   var axisColor='#999999';
   var baselineY=padT+chartH;
   var html='';
-  for(var gi=0;gi<=4;gi++){
-    var gy=padT+chartH*gi/4;
-    var gv=yMax-(yMax-yMin)*gi/4;
+  for(var gv=yMin; gv<=yMax+1e-6; gv+=stepKG){
+    var gy=yScale(gv);
     html+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="'+gridColor+'" stroke-width="1" stroke-dasharray="3 3"/>'
-      +'<text x="'+(padL-6)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="9" fill="'+axisColor+'" font-weight="400">'+gv.toFixed(1)+'</text>';
+      +'<text x="'+(padL-6)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" font-size="9" fill="'+axisColor+'" font-weight="400">'+Math.round(gv)+(isWaist?'cm':'kg')+'</text>';
   }
   if(isAll){
     var yrs={};records.forEach(function(r){yrs[r.date.slice(0,4)]=1});
@@ -1639,12 +1640,12 @@ function refreshWeightFull(){
   if(lbl){
     if(!recs.length){lbl.textContent='该时段暂无记录';return}
     var rangeMap={
-      day:'日记录 · 可见约30天，可左滑查看更早（共'+all.length+'天）',
-      week:'周平均 · 可见约30周，可左滑查看更早（共'+recs.length+'周）',
+      day:'日记录',
+      week:'周平均',
       month:'最近 12 个月 · 按月平均',
-      year:'按年平均 · 共'+recs.length+'年',
-      all:'全部 '+all.length+' 条记录'};
-    lbl.textContent=rangeMap[range]||('共 '+recs.length+' 条');
+      year:'按年平均',
+      all:'全部记录'};
+    lbl.textContent=rangeMap[range]||'';
   }
 }
 /* 月视图：固定最近 12 个月窗口，无记录月份保留占位（w=null 不画点） */
@@ -1817,9 +1818,14 @@ function renderWeightFullChart(recs,range){
   if(!hasVals.length){svg.innerHTML='';svg.style.width='100%';svg.style.height='100%';return}
   var wMin=Math.min.apply(null,hasVals.map(function(r){return r.w}));
   var wMax=Math.max.apply(null,hasVals.map(function(r){return r.w}));
-  var pad=(wMax-wMin)<2?1:(wMax-wMin)*0.25;
-  var yMin=Math.floor((wMin-pad)*2)/2,yMax=Math.ceil((wMax+pad)*2)/2;
-  if(yMin>=yMax){yMin=Math.floor((wMin-1)*2)/2;yMax=Math.ceil((wMax+1)*2)/2}
+  /* 纵轴：整数刻度，自上而下 50/49/48… 自适应步长避免过密或过疏 */
+  var wpad=(wMax-wMin)<1?0.8:(wMax-wMin)*0.18;
+  var yMin=Math.floor(wMin-wpad);
+  var yMax=Math.ceil(wMax+wpad);
+  if(yMin>=yMax){yMin=Math.floor(wMin-1);yMax=Math.ceil(wMax+1)}
+  var ySteps=[1,2,5,10,20,50,100];
+  var yStep=ySteps[ySteps.length-1];
+  for(var ys=0;ys<ySteps.length;ys++){if(Math.ceil((yMax-yMin)/ySteps[ys])<=8){yStep=ySteps[ys];break}}
   function yScale(v){return padT+chartH-(v-yMin)/(yMax-yMin)*chartH}
   function xScale(i){return padL+i*colW+colW/2}
   var gridColor='rgba(118,118,128,0.18)';
@@ -1827,12 +1833,11 @@ function renderWeightFullChart(recs,range){
   var orange='#FF9500';
   var baselineY=padT+chartH;
   var html='';
-  // ① 网格线（Y 轴水平虚线，5 段 4 线）
-  for(var gi=0;gi<=4;gi++){
-    var gy=padT+chartH*gi/4;
-    var gv=yMax-(yMax-yMin)*gi/4;
+  // ① 网格线（Y 轴水平虚线，整数刻度自上而下：50/49/48…）
+  for(var gv=yMax; gv>=yMin; gv-=yStep){
+    var gy=padT+chartH-(gv-yMin)/(yMax-yMin)*chartH;
     html+='<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(contentW-padR)+'" y2="'+gy.toFixed(1)+'" stroke="'+gridColor+'" stroke-width="1" stroke-dasharray="3 3"/>'
-      +'<text x="'+(padL-8)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end" font-size="12" fill="'+axisColor+'" font-weight="400">'+gv.toFixed(1)+'</text>';
+      +'<text x="'+(padL-8)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end" font-size="12" fill="'+axisColor+'" font-weight="400">'+gv+'kg</text>';
   }
   // ② X 轴日期标签（详细：含年份；按可见宽度均匀间隔；空月不标）
   var years=[];recs.forEach(function(r){if(r.w!=null&&years.indexOf(r.y)<0)years.push(r.y)});
