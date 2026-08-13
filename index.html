@@ -21,8 +21,12 @@
   --tab-bg:rgba(249,249,249,0.8);--tab-bg-solid:rgba(249,249,249,0.96);--tab-border:rgba(0,0,0,0.08);
   --radius:20px;--shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
-  --tab-h:60px;
+  --tab-h:49px;
 }
+/* iPad / 桌面:略大 */
+@media (min-width:768px){:root{--tab-h:52px}}
+@media (min-width:1024px){:root{--tab-h:56px}}
+/* 超窄屏(小手手机/手表):贴准 49px */
 @media(prefers-color-scheme:dark){
   :root:not([data-theme="light"]){--bg:#000000;--card-bg:rgba(28,28,30,0.72);--card-border:rgba(255,255,255,0.08);
     --text:#FFFFFF;--text2:#8E8E93;--text3:#48484A;
@@ -174,15 +178,19 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .recommend-label{font-size:14px;color:var(--text2)}.recommend-val{font-size:22px;font-weight:800;color:var(--blue)}
 .about-text{text-align:center;padding:24px;font-size:13px;color:var(--text3)}
 .about-text .ver{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:4px}
-/* 高斯模糊 tab 栏（不走 glass:无 saturate/contrast/镜面高光，纯模糊 + 实色背景） */
-.tab-bar{position:fixed;left:50%;bottom:calc(10px + var(--safe-bottom));transform:translateX(-50%);width:calc(100% - 24px);max-width:480px;height:var(--tab-h);display:flex;align-items:center;justify-content:space-around;background:var(--bg);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:0.5px solid var(--tab-border);border-radius:24px;box-shadow:0 10px 34px rgba(0,0,0,0.18);z-index:100;overflow:hidden;transition:height .45s cubic-bezier(0.32,0.72,0,1),bottom .45s cubic-bezier(0.32,0.72,0,1),box-shadow .3s ease,border-width .3s ease}
+/* 高斯模糊 tab 栏（不走 glass:纯模糊 + 半透明背景，高度自适应设备） */
+.tab-bar{position:fixed;left:50%;bottom:calc(8px + var(--safe-bottom));transform:translateX(-50%);width:calc(100% - 16px);max-width:480px;height:var(--tab-h);display:flex;align-items:center;justify-content:space-around;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(28px) saturate(140%);-webkit-backdrop-filter:blur(28px) saturate(140%);border:0.5px solid var(--tab-border);border-radius:calc(var(--tab-h) * 0.49);box-shadow:0 6px 24px rgba(0,0,0,0.15);z-index:100;overflow:hidden;transition:height .45s cubic-bezier(0.32,0.72,0,1),bottom .45s cubic-bezier(0.32,0.72,0,1),box-shadow .3s ease,border-width .3s ease}
+/* @supports 调色板不支持 color-mix 时回退到 rgba */
+@supports not (background:color-mix(in srgb,red,blue)){.tab-bar{background:rgba(249,249,249,0.92)}}
+@media (prefers-color-scheme:dark){@supports not (background:color-mix(in srgb,red,blue)){.tab-bar{background:rgba(0,0,0,0.88)}}}
 /* 高 DPR 设备:0.5px 边框渲染为 1 物理像素;低 DPR/老安卓:回退 1px 避免边框"消失" */
 @media (-webkit-max-device-pixel-ratio: 1.5),(max-resolution: 1.5dppx){.tab-bar{border-width:1px}}
-/* 滚动时收窄为 compact 形态,同时图标/字标同步缩放,避免 52px 容器内容过挤 */
-.tab-bar.compact{height:52px;bottom:calc(8px + var(--safe-bottom));box-shadow:0 6px 22px rgba(0,0,0,0.16)}
-.tab-bar.compact .tab-icon svg{width:24px;height:24px}
-.tab-bar.compact .tab-label{font-size:10px}
-.tab-bar.compact{gap:3px}
+/* 滚动时收窄为 compact 形态（各设备都是常规高度的 78%） */
+.tab-bar.compact{height:calc(var(--tab-h) * 0.78);bottom:calc(6px + var(--safe-bottom));box-shadow:0 4px 16px rgba(0,0,0,0.12)}
+.tab-bar.compact .tab-icon svg{width:22px;height:22px}
+.tab-bar.compact .tab-label{font-size:9px}
+.tab-bar.compact{gap:2px}
+/* compact 态尺寸在 .tab-bar.compact 同区下集中定义（避免重复规则） */
 /* tab-item 内部让 tab-content 居中,active::before 改为共享 .tab-indicator */
 .tab-item{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:#8E8E93;transition:color .3s ease;height:100%;z-index:2;-webkit-tap-highlight-color:transparent}
 .tab-item:active{transform:scale(0.96);transition:transform .08s ease-out}
@@ -216,8 +224,9 @@ html.android .tab-indicator{backdrop-filter:blur(16px);-webkit-backdrop-filter:b
   html.ios26 .tab-bar{-webkit-mask-image:linear-gradient(180deg,#000 92%,transparent 100%);mask-image:linear-gradient(180deg,#000 92%,transparent 100%)}
 }
 /* iPadOS 13+ 伪装 Mac:走 iPad 专属分支,视觉与 iOS 26 一致,容器更宽适应大屏 */
-html.ipad .tab-bar{max-width:560px;border-radius:26px}
-html.ipad .tab-bar.compact .tab-label{font-size:11px}
+html.ipad .tab-bar{max-width:560px;border-radius:calc(var(--tab-h) * 0.49)}
+/* iPad/桌面 compact 态字标略大保持可读性 */
+@media (min-width:768px){.tab-bar.compact .tab-label{font-size:10px}}
 /* iOS 26 标记 class（仅作语义标识,样式由默认 .tab-bar 提供,见 JS detectPlatform） */
 html.ios26 .tab-bar{/* iOS 26+ Liquid Glass 默认已生效 */}
 /* 不支持 backdrop-filter：纯色兜底，保证可读性 */
