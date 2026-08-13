@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="热量营养检测">
 <meta name="theme-color" content="#F2F2F7">
 <link rel="icon" type="image/png" href="favicon.png?v=357">
@@ -38,14 +38,14 @@
   --tab-bg:rgba(249,249,249,0.8);--tab-bg-solid:rgba(249,249,249,0.96);--tab-border:rgba(0,0,0,0.08);
   --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);}
 html{height:100%}
-body{min-height:100vh;margin:0;background:var(--bg);overflow-x:hidden;font-family:-apple-system,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;color:var(--text);font-size:16px;line-height:1.4;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+body{min-height:100vh;margin:0;padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);background:var(--bg);overflow-x:hidden;font-family:-apple-system,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;color:var(--text);font-size:16px;line-height:1.4;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
 input,textarea{user-select:text;-webkit-user-select:text}
 ::-webkit-scrollbar{width:0;display:none}
-#app{min-height:100vh;display:flex;flex-direction:column;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+#app{min-height:100vh;display:flex;flex-direction:column}
 .page-area{flex:1;position:relative;overflow:hidden}
 .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--tab-h) + var(--safe-bottom) + 24px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:0}
 .page.active{opacity:1;pointer-events:auto;z-index:1}
-.page-header{padding:calc(var(--safe-top) + 12px) 20px 8px;display:flex;align-items:flex-end;justify-content:space-between}
+.page-header{padding:12px 20px 8px;display:flex;align-items:flex-end;justify-content:space-between}
 .page-title{font-size:34px;font-weight:800;letter-spacing:-0.5px}
 .page-subtitle{font-size:15px;color:var(--text2);margin-top:2px}
 .offline-badge{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(255,59,48,0.12);color:var(--red);display:none}
