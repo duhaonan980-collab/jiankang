@@ -50,7 +50,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .page-subtitle{font-size:15px;color:var(--text2);margin-top:2px}
 .offline-badge{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(255,59,48,0.12);color:var(--red);display:none}
 .offline-badge.show{display:block}
-.card{background:var(--card-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:0.5px solid var(--card-border);border-radius:var(--radius);margin:12px 16px;padding:16px;box-shadow:var(--shadow);animation:cardIn .4s ease both}
+.card{background:var(--card-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:0.5px solid var(--card-border);border-radius:var(--radius);margin:12px 16px;padding:16px;box-shadow:var(--shadow);animation:cardIn .4s ease backwards}
 @keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .card-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
 .bmi-inputs{display:flex;gap:12px;margin-bottom:14px}
@@ -92,12 +92,14 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .calorie-status.deficit{background:rgba(52,199,89,0.12);color:var(--green)}
 .calorie-status.surplus{background:rgba(255,59,48,0.12);color:var(--red)}
 .calorie-status.warn{background:rgba(255,204,0,0.15);color:var(--orange)}
-.card-clickable{cursor:pointer;position:relative}.card-clickable .card-title{display:flex;align-items:center;justify-content:space-between}.card-clickable .card-title::after{content:'›';font-size:18px;color:var(--text3);font-weight:400;transition:color .2s,transform .2s}.card-clickable:active .card-title::after{color:var(--blue);transform:translateX(2px)}
+.card-clickable{cursor:pointer;position:relative;transition:transform .15s ease}.card-clickable:active{transform:scale(0.98)}.card-clickable .card-title{display:flex;align-items:center;justify-content:space-between}.card-clickable .card-title::after{content:'›';font-size:18px;color:var(--text3);font-weight:400;transition:color .2s,transform .2s}.card-clickable:active .card-title::after{color:var(--blue);transform:translateX(2px)}
 .nutri-bar{margin-bottom:10px}.nutri-bar:last-child{margin-bottom:0}
 .nutri-bar-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
 .nutri-bar-name{color:var(--text2)}.nutri-bar-val{font-weight:600}
 .nutri-bar-track{height:6px;background:rgba(118,118,128,0.12);border-radius:3px;overflow:hidden}
 .nutri-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.nutri-over-badge{display:none;font-size:10px;font-weight:600;color:#fff;background:var(--red);padding:1px 5px;border-radius:6px;margin-left:4px;vertical-align:middle}
+.nutri-over-badge.show{display:inline-block}
 .date-nav{display:flex;align-items:center;justify-content:space-between;margin:0 16px 8px}
 .date-nav-btn{width:36px;height:36px;border-radius:50%;border:none;background:rgba(118,118,128,0.1);font-size:18px;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .date-nav-btn:active{background:rgba(118,118,128,0.2)}.date-nav-title{font-size:16px;font-weight:600}
@@ -174,7 +176,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .about-text .ver{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:4px}
 .tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);padding-bottom:var(--safe-bottom);background:var(--tab-bg);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:0.5px solid var(--tab-border);border-radius:20px 20px 0 0;box-shadow:0 -2px 20px rgba(0,0,0,0.05);display:flex;z-index:100;align-items:center;box-sizing:content-box}
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:#8E8E93;transition:color .2s;height:100%}
-.tab-item.active{color:var(--blue)}.tab-icon{font-size:24px;line-height:1}.tab-label{font-size:11px;font-weight:500}
+.tab-item.active{color:var(--blue)}.tab-icon{display:flex;align-items:center;justify-content:center}.tab-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:fill .2s ease,stroke .2s ease}.tab-item.active .tab-icon svg{fill:currentColor}.tab-icon svg .hand{transition:stroke .2s ease}.tab-item.active .tab-icon svg .hand{stroke:var(--bg)}.tab-label{font-size:11px;font-weight:500}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.show{opacity:1;pointer-events:auto}
 .modal-sheet{width:100%;max-width:500px;background:var(--bg);border-radius:24px 24px 0 0;padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));padding-bottom:calc(16px + var(--safe-bottom));max-height:calc(85vh - var(--safe-top));display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(0.32,0.72,0,1)}
@@ -430,14 +432,14 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="card-title">营养素摄入</div>
       <div class="nutri-grid">
         <div class="nutri-col">
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">蛋白质</span><span class="nutri-bar-val" id="proteinVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="proteinBar" style="width:0%;background:var(--green)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">碳水化合物</span><span class="nutri-bar-val" id="carbsVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="carbsBar" style="width:0%;background:var(--orange)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">脂肪</span><span class="nutri-bar-val" id="fatVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fatBar" style="width:0%;background:var(--red)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">蛋白质</span><span class="nutri-over-badge" id="proteinOver">超标</span><span class="nutri-bar-val" id="proteinVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="proteinBar" style="width:0%;background:var(--green)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">碳水化合物</span><span class="nutri-over-badge" id="carbsOver">超标</span><span class="nutri-bar-val" id="carbsVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="carbsBar" style="width:0%;background:var(--orange)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">脂肪</span><span class="nutri-over-badge" id="fatOver">超标</span><span class="nutri-bar-val" id="fatVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fatBar" style="width:0%;background:var(--red)"></div></div></div>
         </div>
         <div class="nutri-col">
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">膳食纤维</span><span class="nutri-bar-val" id="fiberVal">0 / 25g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fiberBar" style="width:0%;background:var(--cyan)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素A</span><span class="nutri-bar-val" id="vitAVal">0 / 800μg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitABar" style="width:0%;background:var(--yellow)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素C</span><span class="nutri-bar-val" id="vitCVal">0 / 100mg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitCBar" style="width:0%;background:var(--purple)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">膳食纤维</span><span class="nutri-over-badge" id="fiberOver">超标</span><span class="nutri-bar-val" id="fiberVal">0 / 25g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fiberBar" style="width:0%;background:var(--cyan)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素A</span><span class="nutri-over-badge" id="vitAOver">超标</span><span class="nutri-bar-val" id="vitAVal">0 / 800μg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitABar" style="width:0%;background:var(--yellow)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素C</span><span class="nutri-over-badge" id="vitCOver">超标</span><span class="nutri-bar-val" id="vitCVal">0 / 100mg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitCBar" style="width:0%;background:var(--purple)"></div></div></div>
         </div>
       </div>
       <div class="nutri-rec" id="nutriRec"></div>
@@ -659,9 +661,9 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   <input type="file" accept="image/*" capture="environment" id="photoInput" style="display:none" onchange="handlePhotoUpload(event)">
 </div>
 <nav class="tab-bar">
-  <div class="tab-item active" data-page="main" onclick="switchPage('main')"><span class="tab-icon">🏠</span><span class="tab-label">首页</span></div>
-  <div class="tab-item" data-page="history" onclick="switchPage('history')"><span class="tab-icon">📋</span><span class="tab-label">历史</span></div>
-  <div class="tab-item" data-page="settings" onclick="switchPage('settings')"><span class="tab-icon">⚙️</span><span class="tab-label">设置</span></div>
+  <div class="tab-item active" data-page="main" onclick="switchPage('main')"><span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M12 3.5l8 6.8V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1v-9.7L12 3.5z"/></svg></span><span class="tab-label">首页</span></div>
+  <div class="tab-item" data-page="history" onclick="switchPage('history')"><span class="tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path class="hand" d="M12 7.5V12l3.2 2"/></svg></span><span class="tab-label">历史</span></div>
+  <div class="tab-item" data-page="settings" onclick="switchPage('settings')"><span class="tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4"/><path d="M12 2.7v2.4M12 18.9v2.4M4.5 4.5l1.7 1.7M17.8 17.8l1.7 1.7M2.7 12h2.4M18.9 12h2.4M4.5 19.5l1.7-1.7M17.8 6.2l1.7-1.7"/></svg></span><span class="tab-label">设置</span></div>
 </nav>
 <script src="foods.js"></script>
 <script src="weight-tips.js"></script>
@@ -1029,11 +1031,32 @@ function clearTodayLog(){if(!confirm('确定清空当日所有食物记录？'))
 
 /* ========== RENDER ========== */
 function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeeklyChart();renderStatsGrid();renderWeightChart();renderWeightPeriodLabel();updateChartModeUI();updateWeightPeriodNav()}
+function animateNumber(el,to,opt){
+  if(!el)return;
+  opt=opt||{};
+  var decimals=opt.decimals!=null?opt.decimals:0;
+  var suffix=opt.suffix||'';
+  var dur=opt.duration||300;
+  var cur=parseFloat(el.getAttribute('data-cur'));
+  if(isNaN(cur))cur=0;
+  if(cur===to){el.textContent=to.toFixed(decimals)+suffix;el.setAttribute('data-cur',to);return}
+  if(el._anim)cancelAnimationFrame(el._anim);
+  var start=null;
+  function frame(ts){
+    if(start==null)start=ts;
+    var p=Math.min(1,(ts-start)/dur);
+    var e=1-Math.pow(1-p,3);
+    var v=cur+(to-cur)*e;
+    el.textContent=v.toFixed(decimals)+suffix;
+    if(p<1){el._anim=requestAnimationFrame(frame)}else{el.setAttribute('data-cur',to);el._anim=null}
+  }
+  el._anim=requestAnimationFrame(frame);
+}
 function renderBMI(){
   const h=state.profile.height,w=state.profile.weight;
   const bmi=calcBMI(h,w);const info=getBMIInfo(bmi);const c=document.getElementById('bmiCircle');
   if(bmi>0){
-    document.getElementById('bmiValue').textContent=bmi.toFixed(1);
+    animateNumber(document.getElementById('bmiValue'),bmi,{decimals:1});
     document.getElementById('bmiLabel').textContent=info.label;c.style.color=info.color;
     document.getElementById('bmiStatus').textContent=info.status;document.getElementById('bmiStatus').style.color=info.color;
     document.getElementById('bmiDesc').textContent=info.desc;
@@ -1043,7 +1066,7 @@ function renderBMI(){
     var fusionOverride=null;
     if(bf!==null&&bf>0){
       var bfLevel=getBFLevel(bf,state.profile.gender);
-      document.getElementById('bfVal').textContent=bf+'%';
+      animateNumber(document.getElementById('bfVal'),bf,{decimals:1,suffix:'%'});
       document.getElementById('bfVal').style.color=bfLevel.color;
       document.getElementById('bfLevel').textContent=bfLevel.label;
       document.getElementById('bfLevel').style.color=bfLevel.color;
@@ -1071,7 +1094,7 @@ function renderCalorieSummary(){
   const foods=getTodayFoods();
   const total=foods.reduce((s,f)=>s+f.cal,0);
   const target=calcTargetCalories();
-  document.getElementById('ringNum').textContent=total;
+  animateNumber(document.getElementById('ringNum'),total,{decimals:0});
   document.getElementById('consumedVal').textContent=total+' kcal';
   document.getElementById('targetVal').textContent=target+' kcal';
   const circumference=2*Math.PI*42;
@@ -1083,17 +1106,21 @@ function renderCalorieSummary(){
   const statusEl=document.getElementById('calorieStatus');
   const textEl=document.getElementById('calorieStatusText');
   if(total===0){
+    ringEl.style.stroke='var(--blue)';
     statusEl.className='calorie-status deficit';
     textEl.textContent='还未摄入食物';
   }else if(total<target*0.9){
+    ringEl.style.stroke='var(--green)';
     statusEl.className='calorie-status deficit';
-    textEl.textContent='热量缺口 '+(-diff)+' kcal';
+    textEl.textContent='↓ 热量缺口 '+(-diff)+' kcal';
   }else if(total<=target*1.1){
+    ringEl.style.stroke='var(--orange)';
     statusEl.className='calorie-status warn';
     textEl.textContent='热量平衡';
   }else{
+    ringEl.style.stroke='var(--red)';
     statusEl.className='calorie-status surplus';
-    textEl.textContent='热量盈余 '+diff+' kcal';
+    textEl.textContent='↑ 热量盈余 '+diff+' kcal';
   }
 }
 function renderNutrition(){
@@ -1103,18 +1130,22 @@ function renderNutrition(){
   foods.forEach(function(f){
     tp+=f.p||0;tc+=f.c||0;tf+=f.f||0;tfi+=f.fi||0;tva+=f.va||0;tvc+=f.vc||0;
   });
-  document.getElementById('proteinVal').textContent=tp.toFixed(1)+' / '+t.p+'g';
-  document.getElementById('proteinBar').style.width=Math.min(100,tp/t.p*100)+'%';
-  document.getElementById('carbsVal').textContent=tc.toFixed(1)+' / '+t.c+'g';
-  document.getElementById('carbsBar').style.width=Math.min(100,tc/t.c*100)+'%';
-  document.getElementById('fatVal').textContent=tf.toFixed(1)+' / '+t.f+'g';
-  document.getElementById('fatBar').style.width=Math.min(100,tf/t.f*100)+'%';
-  document.getElementById('fiberVal').textContent=tfi.toFixed(1)+' / '+t.fiber+'g';
-  document.getElementById('fiberBar').style.width=Math.min(100,tfi/t.fiber*100)+'%';
-  document.getElementById('vitAVal').textContent=tva.toFixed(0)+' / '+t.va+'μg';
-  document.getElementById('vitABar').style.width=Math.min(100,tva/t.va*100)+'%';
-  document.getElementById('vitCVal').textContent=tvc.toFixed(0)+' / '+t.vc+'mg';
-  document.getElementById('vitCBar').style.width=Math.min(100,tvc/t.vc*100)+'%';
+  function setNutri(valId,barId,overId,baseColor,consumed,target,unit,decimals,overRatio){
+    var valEl=document.getElementById(valId),barEl=document.getElementById(barId),overEl=document.getElementById(overId);
+    var ratio=target>0?consumed/target:0;
+    var over=target>0&&ratio>overRatio;
+    valEl.textContent=consumed.toFixed(decimals)+' / '+target+unit;
+    valEl.style.color=over?'var(--red)':'';
+    barEl.style.background=over?'var(--red)':baseColor;
+    barEl.style.width=Math.min(100,ratio*100)+'%';
+    if(overEl)overEl.classList.toggle('show',over);
+  }
+  setNutri('proteinVal','proteinBar','proteinOver','var(--green)',tp,t.p,'g',1,1.3);
+  setNutri('carbsVal','carbsBar','carbsOver','var(--orange)',tc,t.c,'g',1,1.15);
+  setNutri('fatVal','fatBar','fatOver','var(--red)',tf,t.f,'g',1,1.15);
+  setNutri('fiberVal','fiberBar','fiberOver','var(--cyan)',tfi,t.fiber,'g',1,1.3);
+  setNutri('vitAVal','vitABar','vitAOver','var(--yellow)',tva,t.va,'μg',0,1.5);
+  setNutri('vitCVal','vitCBar','vitCOver','var(--purple)',tvc,t.vc,'mg',0,1.5);
   /* 动态营养建议 — 已摄入≥90%时不提示 */
   var totalConsumed=foods.reduce(function(s,f){return s+(f.cal||0)},0);
   var target=calcTargetCalories();
