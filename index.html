@@ -1847,14 +1847,18 @@ function renderWeightFullChart(recs,range){
   // ② X 轴日期标签（详细：含年份；按可见宽度均匀间隔；空月不标）
   var years=[];recs.forEach(function(r){if(r.w!=null&&years.indexOf(r.y)<0)years.push(r.y)});
   // X 轴日期标签：每一个有记录的日期都标（空值占位跳过）
+  // 年月日 → 分两行：月日在上面，年在下面
   for(var xi=0;xi<n;xi+=1){
     var r0=recs[xi];if(r0.w==null)continue; /* 空月占位不标 */
     var x=xScale(xi);
-    var lab;
-    if(range==='year')lab=''+r0.y;
-    else if(range==='month')lab=r0.y+'/'+r0.m;
-    else lab=r0.y+'/'+r0.m+'/'+r0.d;
-    html+='<text x="'+x.toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" font-size="12" fill="'+axisColor+'" font-weight="500">'+lab+'</text>';
+    if(range==='year'){
+      html+='<text x="'+x.toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" font-size="12" fill="'+axisColor+'" font-weight="500">'+r0.y+'</text>';
+    }else if(range==='month'){
+      html+='<text x="'+x.toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" font-size="12" fill="'+axisColor+'" font-weight="500">'+r0.y+'/'+r0.m+'</text>';
+    }else{
+      html+='<text x="'+x.toFixed(1)+'" y="'+(H-18)+'" text-anchor="middle" font-size="12" fill="'+axisColor+'" font-weight="500">'+r0.m+'/'+r0.d+'</text>';
+      html+='<text x="'+x.toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="10" fill="'+axisColor+'" font-weight="500" opacity="0.8">'+r0.y+'</text>';
+    }
   }
   // ④ 计算所有点坐标（跳过空月占位）
   var pts=[];
