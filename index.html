@@ -174,39 +174,43 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .recommend-label{font-size:14px;color:var(--text2)}.recommend-val{font-size:22px;font-weight:800;color:var(--blue)}
 .about-text{text-align:center;padding:24px;font-size:13px;color:var(--text3)}
 .about-text .ver{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:4px}
-/* iOS 26 Liquid Glass 悬浮玻璃 tab 栏 */
-.tab-bar{position:fixed;left:50%;bottom:calc(10px + var(--safe-bottom));transform:translateX(-50%);width:calc(100% - 24px);max-width:480px;height:var(--tab-h);display:flex;align-items:center;justify-content:space-around;background:var(--tab-bg);backdrop-filter:blur(30px) saturate(180%) contrast(105%);-webkit-backdrop-filter:blur(30px) saturate(180%) contrast(105%);border:0.5px solid var(--tab-border);border-radius:24px;box-shadow:0 10px 34px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(0,0,0,0.05);z-index:100;overflow:hidden;transition:height .3s ease,bottom .3s ease,box-shadow .3s ease,border-width .3s ease}
+/* 高斯模糊 tab 栏（不走 glass:无 saturate/contrast/镜面高光，纯模糊 + 实色背景） */
+.tab-bar{position:fixed;left:50%;bottom:calc(10px + var(--safe-bottom));transform:translateX(-50%);width:calc(100% - 24px);max-width:480px;height:var(--tab-h);display:flex;align-items:center;justify-content:space-around;background:var(--bg);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:0.5px solid var(--tab-border);border-radius:24px;box-shadow:0 10px 34px rgba(0,0,0,0.18);z-index:100;overflow:hidden;transition:height .45s cubic-bezier(0.32,0.72,0,1),bottom .45s cubic-bezier(0.32,0.72,0,1),box-shadow .3s ease,border-width .3s ease}
 /* 高 DPR 设备:0.5px 边框渲染为 1 物理像素;低 DPR/老安卓:回退 1px 避免边框"消失" */
 @media (-webkit-max-device-pixel-ratio: 1.5),(max-resolution: 1.5dppx){.tab-bar{border-width:1px}}
-/* 玻璃顶部高光折射（Liquid Glass 标志性镜面边） */
-.tab-bar::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,0.4),rgba(255,255,255,0) 26%);pointer-events:none;z-index:1}
 /* 滚动时收窄为 compact 形态,同时图标/字标同步缩放,避免 52px 容器内容过挤 */
-.tab-bar.compact{height:52px;bottom:calc(8px + var(--safe-bottom));box-shadow:0 6px 22px rgba(0,0,0,0.16),inset 0 1px 0 rgba(255,255,255,0.5),inset 0 -1px 0 rgba(0,0,0,0.05)}
+.tab-bar.compact{height:52px;bottom:calc(8px + var(--safe-bottom));box-shadow:0 6px 22px rgba(0,0,0,0.16)}
 .tab-bar.compact .tab-icon svg{width:24px;height:24px}
 .tab-bar.compact .tab-label{font-size:10px}
 .tab-bar.compact{gap:3px}
 /* tab-item 内部让 tab-content 居中,active::before 改为共享 .tab-indicator */
-.tab-item{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:#8E8E93;transition:color .22s;height:100%;z-index:2}
-.tab-item:active{transform:scale(0.92)}
+.tab-item{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:#8E8E93;transition:color .3s ease;height:100%;z-index:2;-webkit-tap-highlight-color:transparent}
+.tab-item:active{transform:scale(0.96);transition:transform .08s ease-out}
+/* active tab 不再放大图标（indicator 填充整个 tab-item，层级已经够清晰） */
 .tab-item.active{color:var(--blue)}
-/* 共享玻璃滑块指示器（由 JS 控制 translateX 滑动，避免每项独立 ::before 的"瞬移"） */
-.tab-indicator{position:absolute;top:50%;left:0;transform:translate(var(--ind-x,0),-50%);width:var(--ind-w,54px);height:var(--ind-h,38px);background:linear-gradient(180deg,rgba(255,255,255,0.18),rgba(120,120,128,0.22));backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);border-radius:14px;box-shadow:inset 0 0.5px 0 rgba(255,255,255,0.5);z-index:1;transition:transform .35s cubic-bezier(0.32,0.72,0,1),width .3s ease,height .3s ease,border-radius .3s ease;pointer-events:none;will-change:transform}
-.tab-icon{position:relative;display:flex;align-items:center;justify-content:center;transition:transform .22s;z-index:2}
-.tab-icon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:fill .25s ease,stroke .25s ease}
+/* 共享 tab-indicator 高斯模糊滑块
+   完全填充 active.tab-item（三块分割:首页/历史/设置），看起来填满、不小。
+   使用 iOS 26 spring 滑动曲线：cubic-bezier(0.34, 1.4, 0.64, 1) 轻微过冲回弹 */
+.tab-indicator{position:absolute;top:0;left:0;width:0;height:0;background:rgba(118,118,128,0.18);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,0.06);z-index:1;--ind-scale:1;transform:translate3d(0,0,0) scale(var(--ind-scale));transition:transform .55s cubic-bezier(0.34,1.4,0.64,1),width .4s cubic-bezier(0.34,1.4,0.64,1),height .4s cubic-bezier(0.34,1.4,0.64,1),border-radius .4s cubic-bezier(0.34,1.4,0.64,1),opacity .25s ease;pointer-events:none;will-change:transform,width,height}
+/* 滑动 ghost（中间帧）：复制主滑块到当前位置，0.35s 渐隐后删除 */
+.tab-indicator-ghost{position:absolute;top:0;left:0;background:rgba(118,118,128,0.18);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,0.06);pointer-events:none;opacity:.6;transition:opacity .35s ease-out;z-index:1}
+/* compact 态下滑块更紧贴 icon，padding 自动减少 */
+/* compact 态下 indicator 跟着 tab-item 一起缩小（padding 保持 0） */
+.tab-bar.compact .tab-indicator{padding:0}
+.tab-icon{position:relative;display:flex;align-items:center;justify-content:center;transition:transform .3s ease;z-index:2}
+.tab-icon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:fill .3s ease,stroke .3s ease}
 .tab-item.active .tab-icon svg{fill:currentColor}
-.tab-icon svg .hand{transition:stroke .25s ease}
+.tab-icon svg .hand{transition:stroke .3s ease}
 .tab-item.active .tab-icon svg .hand{stroke:var(--bg)}
-.tab-label{font-size:11px;font-weight:600;letter-spacing:.2px}
-/* 平台差异化玻璃参数（由 JS 给 <html> 打 class） */
-/* iOS 26 之前：saturate/contrast 会让旧 Safari 玻璃发灰，降饱和保通透 */
-html.ios-old .tab-bar{backdrop-filter:blur(28px) saturate(120%);-webkit-backdrop-filter:blur(28px) saturate(120%)}
-html.ios-old .tab-indicator{backdrop-filter:blur(10px) saturate(120%);-webkit-backdrop-filter:blur(10px) saturate(120%)}
-/* 安卓：Chrome/WebView 对 saturate/contrast 支持不稳定，玻璃用纯 blur + 轻增强，避免偏色/发雾 */
-html.android .tab-bar{backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);background:var(--tab-bg)}
-html.android .tab-indicator{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-html.android .tab-bar{border-radius:22px}
-/* 老安卓(Chrome <76):-webkit-backdrop-filter saturate 不识别,降级到标准 blur */
-html.android.old .tab-bar{-webkit-backdrop-filter:blur(24px) saturate(100%);backdrop-filter:blur(24px) saturate(100%)}
+.tab-label{font-size:11px;font-weight:600;letter-spacing:.2px;transition:font-weight .3s ease}
+.tab-item.active .tab-label{font-weight:700}
+/* 平台差异化参数（由 JS 给 <html> 打 class） */
+/* 旧版 Safari:高模糊值性能差,降一档 */
+html.ios-old .tab-bar{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+html.ios-old .tab-indicator{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+/* 安卓:保持纯 blur,无需额外调整 */
+html.android .tab-bar{backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px}
+html.android .tab-indicator{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 /* iOS 26+ 边缘 mask 渐隐（不挡底层背景,有 mask 支持时启用） */
 @supports (mask-image:linear-gradient(#000,#000)) or (-webkit-mask-image:linear-gradient(#000,#000)){
   html.ios26 .tab-bar{-webkit-mask-image:linear-gradient(180deg,#000 92%,transparent 100%);mask-image:linear-gradient(180deg,#000 92%,transparent 100%)}
@@ -217,8 +221,8 @@ html.ipad .tab-bar.compact .tab-label{font-size:11px}
 /* iOS 26 标记 class（仅作语义标识,样式由默认 .tab-bar 提供,见 JS detectPlatform） */
 html.ios26 .tab-bar{/* iOS 26+ Liquid Glass 默认已生效 */}
 /* 不支持 backdrop-filter：纯色兜底，保证可读性 */
-html.no-backdrop .tab-bar{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--tab-bg-solid)}
-html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(120,120,128,0.3)}
+html.no-backdrop .tab-bar{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
+html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(118,118,128,0.2)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.show{opacity:1;pointer-events:auto}
 .modal-sheet{width:100%;max-width:500px;background:var(--bg);border-radius:24px 24px 0 0;padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));padding-bottom:calc(16px + var(--safe-bottom));max-height:calc(85vh - var(--safe-top));display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(0.32,0.72,0,1)}
@@ -2277,46 +2281,76 @@ function openCalorieBreakdown(){
   showModal('calorieModal');
 }
 
-/* 共享 tab-indicator 平滑滑动到当前 active 项 */
+/* 滑动 ghost 中间帧：在原位置克隆一个 indicator，0.35s 渐隐后删除
+   效果：主 indicator 飞向目标，原位置有"中间帧"渐隐轨迹 */
+var _indX=0,_indY=0,_indW=0,_indH=0;
+function spawnGhost(bar,fromX,fromY,fromW,fromH){
+  if(!bar||fromW===0)return;
+  var ghost=document.createElement('div');
+  ghost.className='tab-indicator-ghost';
+  ghost.style.width=fromW+'px';
+  ghost.style.height=fromH+'px';
+  ghost.style.transform='translate3d('+fromX+'px,'+fromY+'px,0)';
+  bar.appendChild(ghost);
+  /* 下帧启动渐隐（去掉 transform 0s，避免干扰） */
+  requestAnimationFrame(function(){
+    ghost.style.opacity='0';
+    setTimeout(function(){if(ghost.parentNode)ghost.parentNode.removeChild(ghost)},400);
+  });
+}
+
+/* 共享 tab-indicator 平滑滑动到当前 active 项
+   核心思路：完全填充 active.tab-item，让首页/历史/设置被"切割"成三块。
+   动画分三阶段：
+   1) 原位克隆 ghost（中间帧）
+   2) ghost 在原位 0.35s 渐隐
+   3) 主 indicator 用 spring 滑动到新位置
+   transform 拆为 translate3d + scale(var(--ind-scale))，避免 click handler 覆盖 translate。 */
 function updateTabIndicator(animate){
   var bar=document.querySelector('.tab-bar');if(!bar)return;
   var ind=bar.querySelector('.tab-indicator');if(!ind)return;
   var active=bar.querySelector('.tab-item.active');if(!active)return;
-  var icon=active.querySelector('.tab-icon');if(!icon)return;
   var barRect=bar.getBoundingClientRect();
-  var iconRect=icon.getBoundingClientRect();
-  /* padding 根据屏幕密度/视口宽度动态选择：
-     - 窄屏(手机 <=480):padding 14x10,贴合 iOS 原生手感
-     - 宽屏(桌面/iPad >480):padding 20x14,玻璃片更明显，避免桌面尺寸下看起来过小
-     - 超高 DPR(>=2.5,Retina 高密度):额外补 +3px X / +2px Y,避免物理像素下视觉缩水 */
-  var isWide=Math.min(window.innerWidth,window.innerHeight)>480;
-  var dpr=window.devicePixelRatio||1;
-  var dprBonus=dpr>=2.5?3:(dpr>=2?2:0);
-  var padYBonus=dpr>=2.5?2:(dpr>=2?1:0);
-  var padX=isWide?20+dprBonus:14+dprBonus;
-  var padY=isWide?14+padYBonus:10+padYBonus;
-  var w=Math.round(iconRect.width+padX*2);
-  var h=Math.round(iconRect.height+padY*2);
-  var x=Math.round((iconRect.left+iconRect.width/2)-(barRect.left+w/2));
-  var y=Math.round((iconRect.top+iconRect.height/2)-(barRect.top+h/2));
-  /* compact 态下收紧 padding；DPR 补偿同样减半避免过度紧凑 */
-  if(bar.classList.contains('compact')){
-    padX=(isWide?16:11)+Math.round(dprBonus*0.6);
-    padY=(isWide?10:7)+Math.round(padYBonus*0.6);
-    w=Math.round(iconRect.width+padX*2);
-    h=Math.round(iconRect.height+padY*2);
-    x=Math.round((iconRect.left+iconRect.width/2)-(barRect.left+w/2));
-    y=Math.round((iconRect.top+iconRect.height/2)-(barRect.top+h/2));
+  var activeRect=active.getBoundingClientRect();
+  var gap=2;
+  var w=Math.round(activeRect.width-gap*2);
+  var h=Math.round(activeRect.height-gap*2);
+  var x=Math.round(activeRect.left-barRect.left+gap);
+  var y=Math.round(activeRect.top-barRect.top+gap);
+  if(animate===false){
+    var prevT=ind.style.transition;
+    ind.style.transition='none';
+    ind.style.width=w+'px';
+    ind.style.height=h+'px';
+    ind.style.transform='translate3d('+x+'px,'+y+'px,0) scale(var(--ind-scale,1))';
+    ind.style.borderRadius=Math.round((h*0.3)+12)+'px';
+    ind.offsetHeight;
+    requestAnimationFrame(function(){ind.style.transition=prevT});
+    _indX=x;_indY=y;_indW=w;_indH=h;
+    return;
   }
-  /* 首次/尺寸变化时无动画 */
-  if(animate===false){ind.style.transition='none';requestAnimationFrame(function(){ind.style.transition=''})}
-  ind.style.setProperty('--ind-w',w+'px');
-  ind.style.setProperty('--ind-h',h+'px');
-  ind.style.setProperty('--ind-x',x+'px');
-  ind.style.transform='translate('+x+'px,'+y+'px)';
-  /* border-radius 跟高度联动，避免方块感；宽屏下稍减让边缘更接近真 glass */
-  var radiusRatio=isWide?0.38:0.42;
-  ind.style.borderRadius=Math.round(h*radiusRatio)+'px';
+  /* 动画模式：
+     1) 立即在原位置生成 ghost（中间帧）
+     2) 立即将 indicator 移到新位置（不带动画，瞬间）
+     3) 下一帧给 indicator 加上 transition，使其 spring 滑动 */
+  if(_indW>0&&_indH>0){
+    spawnGhost(bar,_indX,_indY,_indW,_indH);
+  }
+  /* 冻结主 indicator 到当前位置 */
+  ind.style.transition='none';
+  ind.style.width=_indW||w+'px';
+  ind.style.height=_indH||h+'px';
+  ind.style.transform='translate3d('+(_indX||x)+'px,'+(_indY||y)+'px,0) scale(var(--ind-scale,1))';
+  ind.offsetHeight;
+  _indX=x;_indY=y;_indW=w;_indH=h;
+  /* 下一帧：加 transition，让 indicator 从原位 spring 到新位（中间帧 ghost 同时在原位渐隐） */
+  requestAnimationFrame(function(){
+    ind.style.transition='transform .55s cubic-bezier(0.34,1.4,0.64,1),width .4s cubic-bezier(0.34,1.4,0.64,1),height .4s cubic-bezier(0.34,1.4,0.64,1),border-radius .4s cubic-bezier(0.34,1.4,0.64,1),opacity .25s ease';
+    ind.style.width=w+'px';
+    ind.style.height=h+'px';
+    ind.style.transform='translate3d('+x+'px,'+y+'px,0) scale(var(--ind-scale,1))';
+    ind.style.borderRadius=Math.round((h*0.3)+12)+'px';
+  });
 }
 function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');updateTabIndicator();if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
@@ -2659,7 +2693,7 @@ async function init(){
   var mq=window.matchMedia('(prefers-color-scheme:dark)');function onSchemeChange(e){if(state.theme==='auto'){document.querySelector('meta[name="theme-color"]').content=e.matches?'#000000':'#F2F2F7'}};mq.addEventListener?mq.addEventListener('change',onSchemeChange):mq.addListener(onSchemeChange);onSchemeChange(mq);
   /* iOS 26 风格：页面下滑时 tab 栏收窄为 compact 玻璃形态 */
   var tabBar=document.querySelector('.tab-bar');var _tabT=0;
-  document.querySelectorAll('.page').forEach(function(pg){pg.addEventListener('scroll',function(){var y=pg.scrollTop;if((y>10)!==(tabBar.classList.contains('compact'))){clearTimeout(_tabT);_tabT=setTimeout(function(){tabBar.classList.toggle('compact',y>10);updateTabIndicator()},80)}})});
+  document.querySelectorAll('.page').forEach(function(pg){pg.addEventListener('scroll',function(){var y=pg.scrollTop;if((y>10)!==(tabBar.classList.contains('compact'))){clearTimeout(_tabT);_tabT=setTimeout(function(){tabBar.classList.toggle('compact',y>10);/* 嵌套两层 rAF：等 bar 高度 transition 启动后再算 indicator */requestAnimationFrame(function(){requestAnimationFrame(updateTabIndicator)})},80)}})});
   /* tab-indicator 初始化 + 跟随尺寸/字体加载变化自适应 */
   function initTabIndicator(){updateTabIndicator(false)}
   if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initTabIndicator,0)}else{document.addEventListener('DOMContentLoaded',initTabIndicator)}
@@ -2668,12 +2702,27 @@ async function init(){
   /* 容器尺寸变化（横竖屏/窗口）时重算 */
   if(typeof ResizeObserver!=='undefined'){new ResizeObserver(function(){updateTabIndicator(false)}).observe(tabBar)}else{window.addEventListener('resize',function(){updateTabIndicator(false)})}
   /* 点击 tab-item 时先预滑动 indicator（提前一拍获得"点击立即响应"感） */
-  tabBar.addEventListener('click',function(e){var t=e.target.closest('.tab-item');if(t&&!t.classList.contains('active')){var i=tabBar.querySelector('.tab-indicator');if(i){var icon=t.querySelector('.tab-icon');if(icon){var b=tabBar.getBoundingClientRect(),r=icon.getBoundingClientRect();i.style.transform='translate('+Math.round((r.left+r.width/2)-(b.left+r.width/2))+ 'px,-50%)'}}setTimeout(updateTabIndicator,0)}})
+  tabBar.addEventListener('click',function(e){
+    var t=e.target.closest('.tab-item');
+    if(!t||t.classList.contains('active'))return;
+    var i=tabBar.querySelector('.tab-indicator');
+    if(!i)return;
+    /* iOS 26 原生点击反馈：
+       1) 点击瞬间 --ind-scale 收到 0.92，滑块“按下”
+       2) 下一帧 updateTabIndicator（spring 滑动到目标 + 尺寸同步），transform:translate3d 会重新包含 scale
+       3) 下帧 --ind-scale 恢复 1，spring 会带动滑块“弹回” */
+    i.style.setProperty('--ind-scale','0.92');
+    requestAnimationFrame(function(){
+      updateTabIndicator(true);
+      requestAnimationFrame(function(){
+        i.style.setProperty('--ind-scale','1');
+      });
+    });
+  });
   if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除')})}).catch(function(){console.warn('[App] SW注册失败')})}
   renderAll();
-  /* renderAll 完成后图标/字标已稳定在 DOM，重新计算 tab-indicator 位置 */
-  setTimeout(function(){updateTabIndicator(false)},0);
-  setTimeout(function(){updateTabIndicator()},60);
+  /* renderAll 完成后 DOM 稳定，重新计算 tab-indicator */
+  requestAnimationFrame(function(){updateTabIndicator(false)});
   generateIcon();
   if(!state.profile.height&&!state.profile.weight)setTimeout(()=>showToast('请在设置填写身高体重开始使用'),500)
 }
