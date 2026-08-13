@@ -23,7 +23,6 @@
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
   --tab-h:49px;
 }
-/* iPad / 桌面:一样 49px,主流标准统一 */
 @media(prefers-color-scheme:dark){
   :root:not([data-theme="light"]){--bg:#000000;--card-bg:rgba(28,28,30,0.72);--card-border:rgba(255,255,255,0.08);
     --text:#FFFFFF;--text2:#8E8E93;--text3:#48484A;
@@ -138,7 +137,6 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .info-modal-item:last-child{border-bottom:none}
 .info-modal-item-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
 .info-modal-item-desc{font-size:13px;color:var(--text2);line-height:1.5}
-/* 热量详情弹窗 */
 .cal-macro-grid{display:flex;align-items:center;gap:12px;margin-top:6px}
 .cal-macro-donut{flex-shrink:0}
 .cal-breakdown-macros{flex:1;min-width:0}
@@ -155,7 +153,6 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .cal-status-icon{font-size:20px;flex-shrink:0;margin-top:1px}
 .cal-status-title{font-size:15px;font-weight:700;margin-bottom:2px}
 .cal-status-desc{font-size:13px;line-height:1.5;color:var(--text2)}
-/* BMI 弹窗 */
 .bmi-comp-bar{margin:6px 0}
 .bmi-comp-bar-track{height:10px;background:rgba(118,118,128,0.12);border-radius:5px;overflow:hidden}
 .bmi-comp-bar-fill{height:100%;border-radius:5px;transition:width .5s ease}
@@ -178,18 +175,14 @@ input,textarea{user-select:text;-webkit-user-select:text}
 /* 胶囊形 tab 栏：浮在底部居中，带圆角（iOS 主流风格）
    位置：小白条上方，水平居中,最大宽度 480px（手机）*/
 .tab-bar{position:fixed;left:50%;bottom:calc(8px + var(--safe-bottom));transform:translateX(-50%);width:calc(100% - 24px);max-width:480px;height:var(--tab-h);padding-bottom:0;display:flex;align-items:center;justify-content:space-around;background:var(--bg);border:0.5px solid var(--tab-border);border-radius:calc(var(--tab-h) * 0.49);z-index:100;transition:none;box-shadow:0 2px 12px rgba(0,0,0,0.08)}
-/* tab-item 内部让 tab-content 居中,active::before 改为共享 .tab-indicator */
 .tab-item{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:#8E8E93;transition:color .3s ease;height:100%;z-index:2;-webkit-tap-highlight-color:transparent}
 .tab-item:active{transform:scale(0.96);transition:transform .08s ease-out}
-/* active tab 不再放大图标（indicator 填充整个 tab-item，层级已经够清晰） */
 .tab-item.active{color:var(--blue)}
 /* 共享 tab-indicator 高斯模糊滑块
    完全填充 active.tab-item（三块分割:首页/历史/设置），看起来填满、不小。
    使用 iOS 26 spring 滑动曲线：cubic-bezier(0.34, 1.4, 0.64, 1) 轻微过冲回弹 */
 .tab-indicator{position:absolute;top:0;left:0;width:0;height:0;background:rgba(118,118,128,0.18);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,0.06);z-index:1;--ind-scale:1;transform:translate3d(0,0,0) scale(var(--ind-scale));transition:transform .55s cubic-bezier(0.34,1.4,0.64,1),width .4s cubic-bezier(0.34,1.4,0.64,1),height .4s cubic-bezier(0.34,1.4,0.64,1),border-radius .4s cubic-bezier(0.34,1.4,0.64,1),opacity .25s ease;pointer-events:none;will-change:transform,width,height}
-/* 滑动 ghost（中间帧）：复制主滑块到当前位置，0.35s 渐隐后删除 */
 .tab-indicator-ghost{position:absolute;top:0;left:0;background:rgba(118,118,128,0.18);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,0.06);pointer-events:none;opacity:.6;transition:opacity .35s ease-out;z-index:1}
-/* (compact 态已取消：tab 栏固定高度不再收缩) */
 .tab-icon{position:relative;display:flex;align-items:center;justify-content:center;transition:transform .3s ease;z-index:2}
 .tab-icon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:fill .3s ease,stroke .3s ease}
 .tab-item.active .tab-icon svg{fill:currentColor}
@@ -197,25 +190,17 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .tab-item.active .tab-icon svg .hand{stroke:var(--bg)}
 .tab-label{font-size:11px;font-weight:600;letter-spacing:.2px;transition:font-weight .3s ease}
 .tab-item.active .tab-label{font-weight:700}
-/* 平台差异化参数（由 JS 给 <html> 打 class） */
-/* 旧版 Safari:高模糊值性能差,降一档 */
 html.ios-old .tab-bar{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 html.ios-old .tab-indicator{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-/* 安卓:保持纯 blur,无需额外调整 */
 html.android .tab-bar{backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px}
 html.android .tab-indicator{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-/* iOS 26+ 边缘 mask 渐隐（不挡底层背景,有 mask 支持时启用） */
 @supports (mask-image:linear-gradient(#000,#000)) or (-webkit-mask-image:linear-gradient(#000,#000)){
   html.ios26 .tab-bar{-webkit-mask-image:linear-gradient(180deg,#000 92%,transparent 100%);mask-image:linear-gradient(180deg,#000 92%,transparent 100%)}
 }
-/* iPadOS 13+ 伪装 Mac:走 iPad 专属分支,视觉与 iOS 26 一致,容器更宽适应大屏 */
 html.ipad .tab-bar{max-width:560px;border-radius:calc(var(--tab-h) * 0.49)}
 html.android .tab-bar{border-radius:calc(var(--tab-h) * 0.45)}
-/* iPad/桌面 字标略大保持可读性 */
 @media (min-width:768px){.tab-label{font-size:12px}}
-/* iOS 26 标记 class（仅作语义标识,样式由默认 .tab-bar 提供,见 JS detectPlatform） */
 html.ios26 .tab-bar{/* iOS 26+ Liquid Glass 默认已生效 */}
-/* 不支持 backdrop-filter：纯色兜底，保证可读性 */
 html.no-backdrop .tab-bar{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
 html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(118,118,128,0.2)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
@@ -263,7 +248,6 @@ html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:non
 .loading-text{color:#fff;font-size:16px;font-weight:600}
 .toast{position:fixed;bottom:calc(var(--tab-h) + var(--safe-bottom) + 24px);left:50%;transform:translateX(-50%) translateY(100px);background:rgba(0,0,0,0.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;padding:10px 24px;border-radius:20px;font-size:14px;font-weight:600;z-index:400;opacity:0;transition:all .3s;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* Calendar */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .cal-title{font-size:18px;font-weight:700}
 .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:16px}
@@ -281,12 +265,10 @@ html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:non
 .cal-stat-val{font-size:16px;font-weight:800}.cal-stat-label{font-size:11px;color:var(--text2)}
 .cal-detail-title{font-size:15px;font-weight:600;margin-bottom:8px;padding:0 4px}
 .photo-modal-img{width:100%;border-radius:16px;margin-bottom:12px}
-/* Nutrient two-column grid */
 .nutri-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .nutri-col{display:flex;flex-direction:column;gap:10px}
 .nutri-rec{margin-top:10px;padding:10px 12px;background:rgba(0,122,255,0.06);border-radius:10px;font-size:13px;color:var(--text2);line-height:1.6}
 .nutri-rec strong{color:var(--blue);font-weight:700}
-/* Nutrition Breakdown Modal */
 .nutri-breakdown-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding:4px 0;-webkit-overflow-scrolling:touch}
 .nutri-breakdown-tab{white-space:nowrap;padding:8px 14px;border-radius:10px;border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(118,118,128,0.1);color:var(--text);transition:all .2s}
 .nutri-breakdown-tab.active{background:var(--blue);color:#fff}
@@ -305,14 +287,12 @@ html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:non
 .nbd-empty .nbd-emoji{font-size:40px;display:block;margin-bottom:8px}
 .nbd-total{text-align:center;font-size:13px;color:var(--text2);margin:4px 0 12px;padding:6px 12px;background:rgba(118,118,128,0.06);border-radius:8px}
 .nbd-header-label{display:flex;justify-content:space-between;padding:0 4px;margin-bottom:8px;font-size:12px;color:var(--text3);font-weight:600}
-/* Weight reference */
 .weight-ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .weight-ref-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(118,118,128,0.06);border-radius:10px}
 .weight-ref-icon{font-size:20px;flex-shrink:0}
 .weight-ref-info{flex:1;min-width:0}
 .weight-ref-name{font-size:13px;font-weight:600}
 .weight-ref-val{font-size:12px;color:var(--text2)}
-/* Weight chart */
 .weight-chart-wrap{position:relative;height:180px;margin:8px 0}
 .weight-chart-svg{width:100%;height:100%}
 .weight-month-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
@@ -325,25 +305,20 @@ html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:non
 .weight-input-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 16px}
 .weight-input-row .weight-update-input{width:120px;text-align:center;margin:0}
 .weight-input-row .weight-unit{font-size:20px;font-weight:600;color:var(--text2)}
-/* Update button */
 .update-btn{width:calc(100% - 32px);border:none;border-radius:14px;padding:14px;font-size:17px;font-weight:600;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:transform .1s;background:var(--blue);color:#fff;margin:12px 16px}
 .update-btn:active{transform:scale(0.97)}
-/* Weight input in modal */
 .weight-update-input{width:100%;background:rgba(118,118,128,0.08);border:none;border-radius:12px;padding:12px 14px;font-size:17px;font-weight:600;color:var(--text);font-family:inherit;outline:none;text-align:center;margin:8px 0}
 .amount-tip{font-size:12px;color:var(--text2);text-align:center;margin:8px 0;padding:8px 12px;background:rgba(118,118,128,0.06);border-radius:10px;line-height:1.5}
-/* iOS Toggle */
 .ios-toggle{position:relative;width:51px;height:31px;flex-shrink:0;cursor:pointer}
 .ios-toggle input{opacity:0;width:0;height:0;position:absolute}
 .ios-toggle-track{position:absolute;inset:0;background:rgba(120,120,128,0.32);border-radius:31px;transition:background .3s}
 .ios-toggle-thumb{position:absolute;top:2px;left:2px;width:27px;height:27px;background:#fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.2);transition:transform .3s}
 .ios-toggle input:checked+.ios-toggle-track{background:var(--green)}
 .ios-toggle input:checked+.ios-toggle-track .ios-toggle-thumb{transform:translateX(20px)}
-/* App Lock */
 .applock-section{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
 .applock-label{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600}
 .applock-icon{font-size:20px}
 .applock-desc{font-size:13px;color:var(--text2);padding:0 16px 10px;line-height:1.5}
-/* Pattern Lock */
 .lock-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(var(--safe-top) + 40px) 20px calc(var(--safe-bottom) + 40px);opacity:0;pointer-events:none;transition:opacity .3s}
 .lock-screen.show{opacity:1;pointer-events:auto}
 .lock-icon-big{font-size:64px;margin-bottom:16px}
@@ -360,7 +335,6 @@ html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:non
 .lock-footer{margin-top:40px;text-align:center}
 .lock-footer-btn{font-size:15px;color:var(--blue);background:none;border:none;font-family:inherit;cursor:pointer;padding:8px 20px}
 .lock-footer-btn:active{opacity:.6}
-/* Settings: collapsible panels */
 .collapsible{overflow:hidden;max-height:0;transition:max-height .45s ease}
 .collapsible.open{max-height:600px}
 .collapsible-inner{padding:12px 16px;border-top:0.5px solid var(--card-border)}
@@ -384,32 +358,26 @@ html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:non
 .bf-field input:focus{background:rgba(0,122,255,0.08);box-shadow:0 0 0 2px rgba(0,122,255,0.2)}
 .bf-hint{font-size:12px;color:var(--text2);background:rgba(118,118,128,0.06);border-radius:8px;padding:8px 12px;margin:8px 0;line-height:1.5}
 .goal-tip{padding:6px 10px;margin-top:6px;border-radius:8px;font-size:12px;line-height:1.5;background:rgba(0,122,255,0.08);color:var(--text2)}
-/* Weight full record overlay */
 .weight-full{position:fixed;inset:0;z-index:260;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .3s}
 .weight-full.show{opacity:1;pointer-events:auto}
 .weight-full-stage{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;transition:transform .25s}
-/* 横版：整页按横屏布局制作。竖屏时旋转 90°，转动手机即为全屏横屏 */
 .weight-full.rotate .weight-full-stage{inset:auto;left:0;top:100%;width:100vh;height:100vw;transform:rotate(90deg);transform-origin:0 0}
 .weight-full-header{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safe-top) + 10px) 16px 6px;flex-shrink:0;border-bottom:0.5px solid var(--card-border)}
 .weight-full-title{font-size:16px;font-weight:700;letter-spacing:-0.2px}
 .weight-full-close{background:rgba(118,118,128,0.12);border:none;color:var(--blue);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;padding:6px 16px;border-radius:16px}
-/* 全屏折线图：横版布局；日/周超量时可横向拖动查看更早 */
 .weight-full-chart-wrap{flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:flex-start;padding:0 0 var(--safe-bottom)}
 #weightFullSvg{flex:0 0 auto}
 .wf-yaxis{position:sticky;left:0;flex:0 0 auto;align-self:stretch;width:46px;background:var(--bg);z-index:3;pointer-events:none;overflow:hidden}
 .wf-yaxis-label{position:absolute;right:6px;text-align:right;font-size:14px;font-weight:500;color:var(--text2);line-height:0;transform:translateY(-50%);white-space:nowrap}
 .weight-full-svg{display:block;height:auto;flex:none}
-/* 顶部 header：单行 —— 标题左 + 右侧(segmented + 关闭)抱团 */
 .weight-full-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px}
 .weight-full-title{font-size:14px;font-weight:700;color:var(--text);flex:none;white-space:nowrap}
 .header-right{flex:none;display:flex;align-items:center;gap:8px}
 .weight-full-close{padding:4px 10px;border-radius:11px;background:rgba(118,118,128,0.12);color:var(--text);font-size:12px;font-weight:500;border:none;font-family:inherit;cursor:pointer;flex:none;white-space:nowrap}
-/* 日 / 周 / 月 / 年 / 全部 —— 固定宽度 + 紧凑，靠右 */
 .range-chip-group{display:flex;gap:0;background:rgba(118,118,128,0.12);border-radius:12px;padding:2px;width:220px;flex:none}
 .range-chip{flex:1;border:none;background:transparent;padding:5px 0;border-radius:9px;font-size:12px;font-weight:500;font-family:inherit;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent;text-align:center;min-width:0}
 .range-chip.active{background:#FFFFFF;color:var(--text);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,0.10)}
 .weight-range-label{font-size:12px;color:var(--text2);text-align:center;margin:0 16px 6px}
-/* 窄屏（竖屏手机）：header 改两行 —— 第一行标题+关闭，第二行 segmented 铺满；解决 iPhone 393px 关闭/chip 被挤出屏外（2026-08-12 用户反馈）。必须放在基础规则之后，否则 cascade 被基础 width:220px/flex:none 覆盖 */
 @media (max-width:600px){
   .weight-full-header{flex-wrap:wrap; row-gap:10px; column-gap:10px}
   .weight-full-title{flex:0 1 auto; min-width:0}
@@ -421,7 +389,6 @@ html.no-backdrop .tab-indicator{backdrop-filter:none;-webkit-backdrop-filter:non
 </head>
 <body>
 <script>
-// PWA 自检：检测到新版 Service Worker 静默激活
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   navigator.serviceWorker.register('./sw.js').then(reg=>{
     reg.addEventListener('updatefound',()=>{
@@ -635,7 +602,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="cat-filter" id="catFilter"></div><div class="search-results" id="searchResults"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:0">关闭</button></div></div></div></div></div>
 
-
   <div class="modal-overlay" id="calendarModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">历史记录</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div><div class="calendar-grid" id="calGrid"></div><div class="cal-stats" id="calStats"></div><div id="calDetail"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeCalendarModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div></div></div></div>
 
   <div class="modal-overlay" id="photoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><img class="photo-modal-img" id="photoModalImg" alt=""><div id="photoModalInfo" style="text-align:center;margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closePhotoModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button></div></div></div></div></div>
@@ -655,7 +621,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   <!-- ===== CALORIE BREAKDOWN MODAL ===== -->
   <div class="modal-overlay" id="calorieModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">热量详情</div><div id="calorieBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">暂无数据</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('calorieModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
-  
+
   <div class="weight-full" id="weightFull">
     <div class="weight-full-stage">
       <div class="weight-full-header">
@@ -710,7 +676,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 <script src="foods.js"></script>
 <script src="weight-tips.js"></script>
 <script>
-/* ========== STATE ========== */
 let state = {
   profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',activity:'low',goal:'lose'},
   foodLogs:{}, weightRecords:{},
@@ -725,27 +690,21 @@ let state = {
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
 let photoDB=null;
 
-/* ========== INDEXEDDB (PHOTO STORAGE) ========== */
 function initPhotoDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open('CalorieApp',1);r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains('photos'))db.createObjectStore('photos',{keyPath:'id'})};r.onsuccess=e=>{photoDB=e.target.result;resolve()};r.onerror=()=>resolve()})}
 function savePhoto(id,data){if(!photoDB)return;return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readwrite');tx.objectStore('photos').put({id,data});tx.oncomplete=resolve;tx.onerror=resolve})}
 function getPhoto(id){if(!photoDB)return Promise.resolve(null);return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readonly');const req=tx.objectStore('photos').get(id);req.onsuccess=()=>resolve(req.result?req.result.data:null);req.onerror=()=>resolve(null)})}
 function deletePhotoData(id){if(!photoDB)return;return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readwrite');tx.objectStore('photos').delete(id);tx.oncomplete=resolve;tx.onerror=resolve})}
 function clearAllPhotoData(){if(!photoDB)return;return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readwrite');tx.objectStore('photos').clear();tx.oncomplete=resolve;tx.onerror=resolve})}
 
-/* ========== STORAGE ========== */
 function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode}))}catch(e){showToast('存储失败')}}
 function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';/* 兼容旧版 weightRecords: 数字 → {w,waist} */
 Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto'}}catch(e){console.error(e)}}
 
-/* ========== DATE ========== */
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function formatDateLabel(k){const t=getDateKey(new Date());if(k===t)return '今天';if(k===getDateKey(new Date(Date.now()-86400000)))return '昨天';const[y,m,dd]=k.split('-');return parseInt(m)+'月'+parseInt(dd)+'日'}
 function getTodayFoods(){return state.foodLogs[state.selectedDate]||[]}
 
-/* ========== CALC ========== */
-/* ========== NUTRITION ALGORITHM v2 (Mifflin-St Jeor + CalcWeight + 保护机制) ========== */
 function calcBMI(h,w){if(!h||!w)return 0;return w/((h/100)**2)}
-/* BMI 策略引擎 — 配置驱动，替代硬编码 if-else */
 const BMI_POLICY=[
   {range:[0,15.0],level:'extremely_low',bmiLevel:1,label:'极重度消瘦',status:'体重严重低于健康范围',color:'var(--red)',severity:'critical',
     allowedGoals:['gain'],lockedGoals:['lose','maintain'],recGoal:'gain',recActivity:'normal',
@@ -784,11 +743,8 @@ function getBMIInfo(b){
   const p=getBMIPolicy(b);if(!p)return{label:'--',status:'--',color:'var(--text3)',desc:'',severity:'none',lockedGoals:[],recGoal:'',bmiLevel:0};
   return{label:p.label,status:p.status,color:p.color,desc:p.msg,severity:p.severity,lockedGoals:p.lockedGoals,recGoal:p.recGoal,allowedGoals:p.allowedGoals,recActivity:p.recActivity,bmiLevel:p.bmiLevel};
 }
-/* ① 基础代谢 BMR — Mifflin-St Jeor */
 function calcBMR(p){if(!p.height||!p.weight||!p.age)return 0;const b=10*p.weight+6.25*p.height-5*p.age;return p.gender==='male'?b+5:b-161}
-/* ② 每日总消耗 TDEE */
 function calcTDEE(p){const b=calcBMR(p);if(!b)return 0;const f={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};return b*(f[p.activity]||1.2)}
-/* ③ 每日推荐热量 E — 含基础代谢保护 */
 function calcTargetCalories(){
  const tdee=calcTDEE(state.profile);if(!tdee)return 0;
  const bmr=calcBMR(state.profile);
@@ -799,22 +755,12 @@ function calcTargetCalories(){
  else{e=tdee}
  return Math.round(e);
 }
-/* ⑤ CalcWeight — 计算体重基数（超重及以上使用调整体重） */
 function calcCalcWeight(p){
   const bmi=calcBMI(p.height,p.weight);if(!bmi)return p.weight||60;
   if(bmi<24.0)return p.weight||60; // 正常及偏瘦直接用实际体重
   var ideal=(p.height-100)*0.9;
   return ideal+0.25*((p.weight||60)-ideal);
 }
-/* ⑥⑦⑧⑨ 完整营养素计算 */
-/* ========== 体脂率计算系统 ========== */
-/* ① BMI基础模型: BF_BMI = 1.2×BMI + 0.23×age - 10.8×sex - 5.4 */
-/* ② 腿围修正: BF_WC = 0.6×(waistRatio - 45) */
-/* ③ 活动量修正: low+2 / normal+0 / medium-1 / high-2 / extreme-3 */
-/* ④ 最终: BodyFat% = BF_BMI + BF_WC + ActivityModifier, clamp [3,45] */
-/* ========== Body Fat 算法引擎 ========== */
-/* ① U.S. Navy 法 */
-/* 注意：腰围 UI 已去掉，保留算法用于已有数据的兼容。无腰围时返回 null 自动降级。 */
 function calcBodyFatNavy(p){
   if(!p.height||!p.weight)return null;
   if(!p.neck)return null; /* 颈围必填 */
@@ -822,14 +768,12 @@ function calcBodyFatNavy(p){
   const h=p.height; const n=p.neck; const w=p.waist||0;
   const isMale=p.gender==='male';
   if(isMale){
-    /* 男性: BF=86.010×log10(waist-neck) - 70.041×log10(height) + 36.76 */
     if(!w||!n)return null;
     const d1=Math.log10(w-n); const d2=Math.log10(h);
     let bf=86.010*d1 - 70.041*d2 + 36.76;
     bf=Math.max(3,Math.min(45,bf));
     return Math.round(bf*10)/10;
   }else{
-    /* 女性: BF=163.205×log10(waist+hip-neck) - 97.684×log10(height) - 78.387 */
     const hi=p.hip||0;
     if(!w||!hi||!n)return null;
     const d1=Math.log10(w+hi-n); const d2=Math.log10(h);
@@ -838,7 +782,6 @@ function calcBodyFatNavy(p){
     return Math.round(bf*10)/10;
   }
 }
-/* ② BMI 估算法（不含腰围/活动量修正） */
 function calcBodyFatBMI(p){
   if(!p.height||!p.weight||!p.age)return null;
   const bmi=calcBMI(p.height,p.weight);if(!bmi)return null;
@@ -847,7 +790,6 @@ function calcBodyFatBMI(p){
   bf=Math.max(3,Math.min(45,bf));
   return Math.round(bf*10)/10;
 }
-/* ③ 混合法（原算法：BMI+腰围+活动量） */
 function calcBodyFatHybrid(p){
   if(!p.height||!p.weight||!p.age)return null;
   const bmi=calcBMI(p.height,p.weight);if(!bmi)return null;
@@ -861,7 +803,6 @@ function calcBodyFatHybrid(p){
   bf=Math.max(3,Math.min(45,bf));
   return Math.round(bf*10)/10;
 }
-/* ④ 全部算法结果 */
 function calcBodyFatAll(p){
   return{
     navy:calcBodyFatNavy(p),
@@ -869,18 +810,15 @@ function calcBodyFatAll(p){
     bmi:calcBodyFatBMI(p)
   };
 }
-/* 默认体脂计算（按 bfMethod 自动选择最佳） */
 function calcBodyFat(p){
   const m=p.bfMethod||'auto';
   if(m==='navy'){const v=calcBodyFatNavy(p);if(v!==null)return v}
   if(m==='hybrid'){const v=calcBodyFatHybrid(p);if(v!==null)return v}
   if(m==='bmi'){const v=calcBodyFatBMI(p);if(v!==null)return v}
-  /* auto: Navy > 混合 > BMI */
   var v=calcBodyFatNavy(p);if(v!==null)return v;
   v=calcBodyFatHybrid(p);if(v!==null)return v;
   return calcBodyFatBMI(p);
 }
-/* 体脂等级表 */
 const BF_LEVELS_MALE=[
   {range:[0,6],label:'极低',color:'var(--red)',severity:'warning'},
   {range:[6,14],label:'运动员',color:'var(--green)',severity:'success'},
@@ -903,7 +841,6 @@ function getBFLevel(bf,gender){
   const l=levels.find(p=>bf>=p.range[0]&&bf<p.range[1]);
   return l||{label:'--',color:'var(--text3)',severity:'none'};
 }
-/* BMI+体脂融合判断 */
 function getFusionType(bmi,bf,bmiOk,bfOk,gender){
   gender=gender||'male';
   var bfLow=gender==='male'?bf<14:bf<21;
@@ -925,18 +862,15 @@ function calcNutritionTargets(){
   var e=calcTargetCalories();
   if(!e)return{p:0,c:0,f:0,fiber:25,va:800,vc:100,calories:0};
   var p=state.profile,cw=calcCalcWeight(p),goal=p.goal||'maintain',isMale=p.gender==='male';
-  /* ⑥ 蛋白质 — 减脂/增肌期 2.0g/kg，其他 1.6g/kg，年龄系数补偿（30岁以上肌肉合成效率下降） */
   var age=p.age||25;
   var ageFactor=1+Math.max(0,(age-30)*0.006); /* 30岁后每年+0.6%，60岁时约1.18倍 */
   var protein=((goal==='lose'||goal==='gain')?cw*2.0:cw*1.6)*ageFactor;
   var proteinKcal=protein*4;
-  /* ⑦ 脂肪 — 按总热量百分比分配（减脂期略高提升饱腹感，增肌期略低为碳水让路） */
   var fatPct={buddha:0.25,lose:0.28,maintain:0.25,gain:0.22}[goal]||0.25;
   var fat=Math.round(e*fatPct/9);
   var fatMin=Math.round(cw*0.8);
   if(fat<fatMin)fat=fatMin;
   var fatKcal=fat*9;
-  /* ⑧ 碳水 — 剩余热量 + 最低保护，不足时从脂肪借 */
   var carb=Math.round((e-proteinKcal-fatKcal)/4);
   var carbMin=isMale?120:100;
   if(carb<carbMin){
@@ -944,14 +878,10 @@ function calcNutritionTargets(){
     fat=Math.max(Math.round(cw*0.6), fat-Math.ceil(neededKcal/9));
     carb=carbMin;
   }
-  /* ⑨ 微量营养素 */
   var fiber=Math.max(25,14*e/1000);
-  /* ⑩ 统一取整输出 */
   return{p:Math.round(protein),c:Math.round(carb),f:Math.round(fat),fiber:Math.round(fiber),va:isMale?800:700,vc:100,calories:e};
 }
 
-
-/* ========== CAMERA ========== */
 function resizeImage(url,maxSize,quality,cb){
   const img=new Image();img.onload=function(){
     let w=img.width,h=img.height;
@@ -960,7 +890,6 @@ function resizeImage(url,maxSize,quality,cb){
   };img.src=url
 }
 
-/* ========== AMOUNT MODAL ========== */
 function openAmountModal(food){
   state.pendingFood=food;
   document.getElementById('amountIcon').textContent=food.icon;
@@ -994,7 +923,6 @@ function confirmAddFood(){
 }
 function closeAmountModal(){hideModal('amountModal');state.tempPhoto=null}
 
-/* ========== SEARCH MODAL ========== */
 function openSearchModal(){document.getElementById('searchInput').value='';state.currentCat='all';renderCatFilter();searchFood();showModal('searchModal')}
 function closeSearchModal(){hideModal('searchModal')}
 function renderCatFilter(){const cats=['all','主食','肉类','蔬菜','水果','饮料','零食','菜肴','原料'];document.getElementById('catFilter').innerHTML=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('')}
@@ -1009,7 +937,6 @@ function searchFood(){
 }
 function selectSearchFood(name){closeSearchModal();const f=FOOD_DB.find(x=>x.name===name);if(f)openAmountModal(f)}
 
-/* ========== PHOTO MODAL ========== */
 async function viewPhoto(id){
   const photo=await getPhoto(id);if(!photo)return;
   const foods=getTodayFoods();const f=foods.find(x=>x.id===id);
@@ -1019,7 +946,6 @@ async function viewPhoto(id){
 }
 function closePhotoModal(){hideModal('photoModal')}
 
-/* ========== CALENDAR MODAL ========== */
 function openCalendarModal(){calYear=new Date().getFullYear();calMonth=new Date().getMonth();calSelectedDate=state.selectedDate;renderCalendar();showModal('calendarModal')}
 function closeCalendarModal(){hideModal('calendarModal')}
 function changeCalMonth(d){calMonth+=d;if(calMonth<0){calMonth=11;calYear--}if(calMonth>11){calMonth=0;calYear++}renderCalendar()}
@@ -1066,12 +992,10 @@ function renderCalDetail(){
 }
 function jumpToDate(dk){closeCalendarModal();state.selectedDate=dk;renderFoodLog();renderCalorieSummary();renderNutrition()}
 
-/* ========== FOOD LOG ========== */
 function changeDate(d){const dt=new Date(state.selectedDate);dt.setDate(dt.getDate()+d);state.selectedDate=getDateKey(dt);renderFoodLog();renderCalorieSummary();renderNutrition()}
 async function deleteFood(id){const foods=state.foodLogs[state.selectedDate]||[];state.foodLogs[state.selectedDate]=foods.filter(f=>f.id!==id);saveState();await deletePhotoData(id);renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已删除')}
 function clearTodayLog(){if(!confirm('确定清空当日所有食物记录？'))return;const foods=state.foodLogs[state.selectedDate]||[];foods.forEach(f=>{if(f.hasPhoto)deletePhotoData(f.id)});state.foodLogs[state.selectedDate]=[];saveState();renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已清空')}
 
-/* ========== RENDER ========== */
 function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeeklyChart();renderStatsGrid();renderWeightChart();renderWeightPeriodLabel();updateChartModeUI();updateWeightPeriodNav()}
 function animateNumber(el,to,opt){
   if(!el)return;
@@ -1102,7 +1026,6 @@ function renderBMI(){
     document.getElementById('bmiLabel').textContent=info.label;c.style.color=info.color;
     document.getElementById('bmiStatus').textContent=info.status;document.getElementById('bmiStatus').style.color=info.color;
     document.getElementById('bmiDesc').textContent=info.desc;
-    /* 体脂率显示 */
     var bf=calcBodyFat(state.profile);
     var bfRow=document.getElementById('bodyfatRow');
     var fusionOverride=null;
@@ -1113,16 +1036,13 @@ function renderBMI(){
       document.getElementById('bfLevel').textContent=bfLevel.label;
       document.getElementById('bfLevel').style.color=bfLevel.color;
       document.getElementById('bfLevel').style.background=bfLevel.color.startsWith('var')?'rgba(118,118,128,0.08)':'';
-      /* 融合判断（仅影响目标锁定，不显示标签） */
       var bmiOk=bmi>=18.5&&bmi<25.0;
       var bfOk=state.profile.gender==='male'?(bf>=14&&bf<25):(bf>=21&&bf<32);
       var fusion=getFusionType(bmi,bf,bmiOk,bfOk,state.profile.gender);
       bfRow.style.display='flex';
-      /* 肌肉型体型：BMI偏高但体脂正常 → 解锁维持和增肌 */
       if(fusion.type==='muscular'){
         fusionOverride={lockedGoals:info.lockedGoals.filter(g=>g!=='maintain'&&g!=='gain'),recGoal:'maintain'};
       }
-      /* 隐性肥胖：BMI正常但体脂偏高 → 锁定增肌 */
       if(fusion.type==='hidden_obesity'){
         fusionOverride={lockedGoals:[].concat(info.lockedGoals,['gain']),recGoal:'lose'};
       }
@@ -1188,7 +1108,6 @@ function renderNutrition(){
   setNutri('fiberVal','fiberBar','fiberOver','var(--cyan)',tfi,t.fiber,'g',1,1.3);
   setNutri('vitAVal','vitABar','vitAOver','var(--yellow)',tva,t.va,'μg',0,1.5);
   setNutri('vitCVal','vitCBar','vitCOver','var(--purple)',tvc,t.vc,'mg',0,1.5);
-  /* 动态营养建议 — 已摄入≥90%时不提示 */
   var totalConsumed=foods.reduce(function(s,f){return s+(f.cal||0)},0);
   var target=calcTargetCalories();
   if(totalConsumed>0&&target>0&&totalConsumed/target>=0.9){
@@ -1242,37 +1161,28 @@ async function loadPhotosForContainer(container,foods){
   for(const f of foods){
     if(f.hasPhoto){const photo=await getPhoto(f.id);if(photo){const el=container.querySelector('[data-food-id="'+f.id+'"] .food-photo');if(el){el.style.backgroundImage='url('+photo+')';el.style.backgroundSize='cover';el.innerHTML=''}}}}
 }
-   //高亮
 function renderSettings(){
   document.getElementById('setHeight').value=state.profile.height||'';
   document.getElementById('setWeight').value=state.profile.weight||'';
   document.getElementById('setAge').value=state.profile.age||'';
   document.querySelectorAll('#genderControl .seg-item, [data-gender]').forEach(el=>el.classList.toggle('active',el.dataset.gender===state.profile.gender));
-  /* 身体测量字段 */
   var waistEl=document.getElementById('setWaist');if(waistEl)waistEl.value=state.profile.waist||'';
   var neckEl=document.getElementById('setNeck');if(neckEl)neckEl.value=state.profile.neck||'';
   var hipEl=document.getElementById('setHip');if(hipEl)hipEl.value=state.profile.hip||'';
-  /* 臀区仅女性显示 */
   var hipField=document.getElementById('hipField');
   if(hipField)hipField.style.display=state.profile.gender==='female'?'block':'none';
-  /* 算法选择 */
   document.querySelectorAll('#bfMethodControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.method===state.profile.bfMethod));
-  /* 算法对比 */
-  /* 恢复折叠状态 */
   var bfEl=document.getElementById('bfMeasure');
   if(bfEl){bfEl.classList.toggle('open',!!state.profile._bfOpen);document.getElementById('bfExpandLabel').textContent=state.profile._bfOpen?'▲ 收起':'▼ 展开'}
   var goalEl=document.getElementById('goalSection');
   if(goalEl){goalEl.classList.toggle('open',!!state.profile._goalOpen);document.getElementById('goalExpandLabel').textContent=state.profile._goalOpen?'▲':'▼'}
   renderBFCompare();
-  /* 活动量 + 目标 */
   document.querySelectorAll('#activityControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.act===state.profile.activity));
   document.querySelectorAll('#goalControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.goal===state.profile.goal));
   document.querySelectorAll('#themeControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.theme===state.theme));
-  /* 推荐热量 badge */
   var cal=calcTargetCalories();
   var badge=document.getElementById('goalCalBadge');
   if(badge)badge.textContent=cal>0?cal+' kcal/日':'--';
-  /* BMI 约束层 */
   const bmi=calcBMI(state.profile.height,state.profile.weight);
   const bmiInfo=getBMIInfo(bmi);
   var finalInfo=bmiInfo;
@@ -1291,13 +1201,11 @@ function renderSettings(){
     }
   }
   applyUIConstraints(finalInfo);
-  /* 应用锁 */
   var lockToggle=document.getElementById('appLockToggle');
   if(lockToggle)lockToggle.checked=state.appLock.enabled;
   var lockDesc=document.getElementById('appLockDesc');
   if(lockDesc){if(state.appLock.enabled){lockDesc.textContent='已启用图案解锁，每次打开应用需绘制图案验证身份'}else{lockDesc.textContent='开启后每次打开应用需要绘制图案验证身份，保护你的隐私数据'}}
 }
-/* 渲染体脂算法对比 */
 function renderBFCompare(){
   var all=calcBodyFatAll(state.profile);
   var nEl=document.getElementById('bfNavyVal');
@@ -1306,10 +1214,8 @@ function renderBFCompare(){
   if(nEl)nEl.textContent=all.navy!==null?all.navy+'%':'--';
   if(hEl)hEl.textContent=all.hybrid!==null?all.hybrid+'%':'--';
   if(bEl)bEl.textContent=all.bmi!==null?all.bmi+'%':'--';
-  /* 高亮当前选中的算法 */
   var activeMethod=state.profile.bfMethod||'auto';
   if(activeMethod==='auto'){
-    /* 选精度最高的 */
     if(all.navy!==null)activeMethod='navy';
     else if(all.hybrid!==null)activeMethod='hybrid';
     else activeMethod='bmi';
@@ -1322,33 +1228,27 @@ function renderBFCompare(){
     else if(activeMethod==='bmi'&&items[2])items[2].classList.add('active');
   }
 }
-/* ========== BMI UI 约束引擎 ========== */
 function applyUIConstraints(info){
   if(!info)return;
-  /* 锁定/禁用不允许的目标按钮 */
   document.querySelectorAll('#goalControl .seg-item').forEach(function(el){
     var goal=el.dataset.goal;
     var locked=info.lockedGoals&&info.lockedGoals.indexOf(goal)>=0;
     el.classList.toggle('disabled',locked);
     el.classList.toggle('recommended',info.recGoal===goal&&!locked);
-    /* 如果当前选中的目标被锁定，强制切换到推荐目标 */
     if(locked&&state.profile.goal===goal&&info.recGoal){
       state.profile.goal=info.recGoal;
       saveState();
     }
   });
-  /* 更新激活态 */
   document.querySelectorAll('#goalControl .seg-item').forEach(function(el){
     el.classList.toggle('active',el.dataset.goal===state.profile.goal);
   });
-  /* 推荐活动量 */
   if(info.recActivity){
     document.querySelectorAll('#activityControl .seg-item').forEach(function(el){
       el.classList.toggle('disabled',false);
       el.classList.toggle('recommended',el.dataset.act===info.recActivity);
     });
   }
-  /* 目标提示 */
   var goalTip=document.getElementById('goalTip');
   if(goalTip){
     var bmi=calcBMI(state.profile.height,state.profile.weight);
@@ -1364,7 +1264,6 @@ function applyUIConstraints(info){
       goalTip.textContent=parts.join(' · ');
     }
   }
-  /* 记录推荐信息到 DOM 供调试 */
   var goalCtrl=document.getElementById('goalControl');
   if(goalCtrl)goalCtrl.dataset.bmiLevel=(info.bmiLevel||0);
 }
@@ -1402,7 +1301,6 @@ function renderStatsGrid(){
   document.getElementById('statsGrid').innerHTML='<div class="stat-item"><div class="stat-val">'+weekAvg+'</div><div class="stat-label">本周日均热量</div></div><div class="stat-item"><div class="stat-val">'+streak+'</div><div class="stat-label">连续记录天数</div></div><div class="stat-item"><div class="stat-val">'+total+'</div><div class="stat-label">总记录天数</div></div><div class="stat-item"><div class="stat-val" style="font-size:16px">'+mostEaten+'</div><div class="stat-label">最常吃食物</div></div>'
 }
 
-/* ========== SETTINGS HANDLERS ========== */
 function setBFMethod(m){state.profile.bfMethod=m;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
 function setGender(g){state.profile.gender=g;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
 function setActivity(a){state.profile.activity=a;saveState();renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart()}
@@ -1447,13 +1345,11 @@ function updateWeightPeriodNav(){
     b.style.pointerEvents=state.weightChartAll?'none':'auto';
   });
 }
-/* ========== DATA MANAGEMENT ========== */
 function exportData(){const json=JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords},null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='热量营养检测_数据_'+getDateKey(new Date())+'.json';a.click();URL.revokeObjectURL(url);showToast('数据已导出')}
 function importData(){const input=document.createElement('input');input.type='file';input.accept='.json';input.onchange=function(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=function(ev){try{const d=JSON.parse(ev.target.result);state.profile=d.profile||state.profile;if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0}});saveState();renderAll();showToast('数据已导入')}catch(err){showToast('导入失败: 文件格式错误')}};reader.readAsText(f)};input.click()}
 async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');await clearAllPhotoData();state={profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,currentCat:'all',tempPhoto:null,theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),weightChartAll:false,chartMode:'weight',appLock:{enabled:false,method:'pattern',pattern:[]}};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
 async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？食物记录不会被删除。'))return;await clearAllPhotoData();Object.values(state.foodLogs).forEach(foods=>foods.forEach(f=>f.hasPhoto=false));saveState();renderAll();if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({type:'CLEAR_PHOTO_CACHE'})}showToast('照片缓存已清除')}
 
-/* ========== WEIGHT TRACKING ========== */
 function renderWeightChart(){
   var svg=document.getElementById('weightChartSvg');
   if(!svg)return;
@@ -1502,7 +1398,6 @@ function renderWeightChart(){
   var vals=series.map(function(r){return r[valField]});
   var vMin=Math.min.apply(null,vals);
   var vMax=Math.max.apply(null,vals);
-  // Y 轴整数 kg 刻度（像体重秤：68kg / 69kg / 70kg … 每 1kg 一格，与全屏图一致）
   var stepKG=1;
   var yMin=Math.floor(vMin/stepKG)*stepKG;
   var yMax=Math.ceil(vMax/stepKG)*stepKG;
@@ -1529,7 +1424,6 @@ function renderWeightChart(){
       html+='<text x="'+xa.toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9" fill="'+axisColor+'" font-weight="500">'+lab+'</text>';
     }
   }else{
-    /* 只显示有记录的日期，避免整月日历标签和稀疏数据点对不上 */
     var recDays=[];records.forEach(function(r){if(recDays.indexOf(r.day)<0)recDays.push(r.day)});
     recDays.sort(function(a,b){return a-b});
     var stepD=Math.max(1,Math.ceil(recDays.length/6));
@@ -1673,7 +1567,6 @@ function selectWeightMonthFromPicker(m){
   renderWeightChart();renderWeightPeriodLabel();
 }
 
-/* ========== WEIGHT FULL CHART（点折线图 → 全屏大折线图） ========== */
 var _weightRange='all';
 function applyWFRotation(){
   var wf=document.getElementById('weightFull');
@@ -1722,7 +1615,6 @@ function refreshWeightFull(){
     lbl.textContent=rangeMap[range]||'';
   }
 }
-/* 月视图：固定最近 12 个月窗口，无记录月份保留占位（w=null 不画点） */
 function buildMonthSeries(all){
   if(!all.length)return [];
   var last=new Date(all[all.length-1].date+'T00:00:00');
@@ -1799,7 +1691,6 @@ function fmtDetail(dateStr,range){
   if(range==='month')return y+'年'+m+'月';
   return y+'年'+m+'月'+d+'日';
 }
-/* 数值标签：多行带状避让，构造上保证不重叠；放不下就跳过（靠点按读数补全） */
 function buildValueLabels(pts,o){
   var slots=[];
   function blocked(x,y,w,h){for(var si=0;si<slots.length;si++){var s=slots[si];if(x-w/2<s.x2&&x+w/2>s.x1&&y-h/2<s.y2&&y+h/2>s.y1)return true}return false}
@@ -1870,25 +1761,24 @@ function renderWeightFullChart(recs,range){
   if(!svg)return;
   if(!recs.length){svg.innerHTML='';svg.style.width='100%';svg.style.height='100%';return}
   var wrap=svg.parentElement;
-  // 固定 Y 轴层：sticky 钉在左侧，横向滚动时不动
   var yaxis=document.getElementById('weightFullYAxis');
   if(!yaxis){yaxis=document.createElement('div');yaxis.id='weightFullYAxis';yaxis.className='wf-yaxis';wrap.insertBefore(yaxis,svg);}
   var cw=wrap.clientWidth||480;
   var availH=wrap.clientHeight||Math.round(cw/1.8);
   var n=recs.length;
-  var scrollable=true; // 所有模式横轴均可横向滚动，保证每个日期标签分开
-  // 用满二级页面可用高度，去掉 cw/1.8 的上限，让网格线垂直间距更大
+  var scrollable=range!=='all';
   var H=availH;
   if(H<160)H=Math.max(160,Math.round(cw/1.8));
-  // 左右留白：左给 Y 轴数值，右给最右侧标签；padT 留高给多排数值标签
-  var padL=44,padR=24,padT=Math.round(H*0.22),padB=Math.round(H*0.13);
+  var padL=scrollable?44:36,padR=scrollable?24:12;
+  var padT=Math.round(H*(scrollable?0.22:0.18));
+  var padB=Math.round(H*(scrollable?0.13:0.12));
   var chartAreaW,colW;
   if(scrollable){
-    colW=Math.max(cw/30,72); // 每列至少 72px，保证日期标签水平分开不重叠
+    colW=Math.max(cw/30,72);
     chartAreaW=colW*n;
   }else{
     chartAreaW=Math.max(cw-padL-padR,10);
-    colW=chartAreaW/n;
+    colW=Math.max(chartAreaW/Math.max(n,1),4); // 最小 4px，点不会重叠
   }
   var contentW=Math.round(padL+chartAreaW+padR);
   var chartH=H-padT-padB;
@@ -1896,7 +1786,6 @@ function renderWeightFullChart(recs,range){
   if(!hasVals.length){svg.innerHTML='';svg.style.width='100%';svg.style.height='100%';return}
   var wMin=Math.min.apply(null,hasVals.map(function(r){return r.w}));
   var wMax=Math.max.apply(null,hasVals.map(function(r){return r.w}));
-  /* 纵轴：固定每 1kg 一格（如 50 / 49 / 48 …），整数刻度自上而下 */
   var yStep=1;
   var yPad=(wMax-wMin)<1?1.5:(wMax-wMin)*0.2;
   var yMin=Math.floor((wMin-yPad)/yStep)*yStep;
@@ -1909,7 +1798,6 @@ function renderWeightFullChart(recs,range){
   var orange='#FF9500';
   var baselineY=padT+chartH;
   var html='';
-  // ① 网格线（Y 轴水平虚线，固定每 1kg 一格）；刻度文字改由固定层 wf-yaxis 渲染，不随横滚移动
   var yAxisHTML='';
   for(var gv=yMax; gv>=yMin-1e-6; gv-=yStep){
     var gy=padT+chartH-(gv-yMin)/(yMax-yMin)*chartH;
@@ -1917,12 +1805,25 @@ function renderWeightFullChart(recs,range){
     yAxisHTML+='<div class="wf-yaxis-label" style="top:'+gy.toFixed(1)+'px">'+gv+'kg</div>';
   }
   if(yaxis){yaxis.innerHTML=yAxisHTML;yaxis.style.height=H+'px';}
-  // ② X 轴日期标签（详细：含年份；按可见宽度均匀间隔；空月不标）
   var years=[];recs.forEach(function(r){if(r.w!=null&&years.indexOf(r.y)<0)years.push(r.y)});
-  // X 轴日期标签：每一个有记录的日期都标（空值占位跳过）
-  // 年月日 → 分两行：月日在上面，年在下面
+  /* 全部 mode 只在 4 个标签位置画日期，避免最下面一排日期堆叠
+     labelIdxs 存的是 recs 原始 index（不是 pts 数组 index），与 for xi 循环一致 */
+  var labelIdxs=[];
+  if(range==='all'){
+    var _nonNullIdxs=[];
+    for(var _li=0;_li<recs.length;_li++)if(recs[_li].w!=null)_nonNullIdxs.push(_li);
+    if(_nonNullIdxs.length>0){
+      labelIdxs=[_nonNullIdxs[0]];
+      var lstep=Math.max(1,Math.floor((_nonNullIdxs.length-1)/3));
+      for(var lj=1;lj<4;lj++){
+        var _idx=Math.min(lj*lstep,_nonNullIdxs.length-1);
+        if(labelIdxs.indexOf(_nonNullIdxs[_idx])<0)labelIdxs.push(_nonNullIdxs[_idx]);
+      }
+    }
+  }
   for(var xi=0;xi<n;xi+=1){
     var r0=recs[xi];if(r0.w==null)continue; /* 空月占位不标 */
+    if(range==='all' && labelIdxs.length>0 && labelIdxs.indexOf(xi)<0)continue;
     var x=xScale(xi);
     if(range==='year'){
       html+='<text x="'+x.toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" font-size="12" fill="'+axisColor+'" font-weight="500">'+r0.y+'</text>';
@@ -1933,10 +1834,8 @@ function renderWeightFullChart(recs,range){
       html+='<text x="'+x.toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="10" fill="'+axisColor+'" font-weight="500" opacity="0.8">'+r0.y+'</text>';
     }
   }
-  // ④ 计算所有点坐标（跳过空月占位）
   var pts=[];
   recs.forEach(function(r,i){if(r.w!=null)pts.push({x:xScale(i),y:yScale(r.w),i:i,w:r.w})});
-  // ⑤ 平滑曲线（Catmull-Rom → Cubic Bezier）
   function smoothPath(points){
     if(points.length<2)return 'M'+points[0].x.toFixed(1)+' '+points[0].y.toFixed(1);
     var d='M'+points[0].x.toFixed(1)+' '+points[0].y.toFixed(1);
@@ -1954,7 +1853,6 @@ function renderWeightFullChart(recs,range){
     return d;
   }
   var lineD=smoothPath(pts);
-  // ⑥ 渐变填充区（淡，跟背景融合）；空月占位处分段，不跨越连线
   if(pts.length>1){
     var segs=[];var cur=[];
     pts.forEach(function(p,i){
@@ -1972,19 +1870,29 @@ function renderWeightFullChart(recs,range){
         +'<stop offset="100%" stop-color="'+orange+'" stop-opacity="0.02"/>'
         +'</linearGradient></defs>';
       html+='<path d="'+fillD+'" fill="url(#'+gradId+')" stroke="none"/>';
-      // ⑦ 平滑曲线（淡色）
       html+='<path d="'+segD+'" fill="none" stroke="'+orange+'" stroke-width="2.5" stroke-opacity="0.6" stroke-linejoin="round" stroke-linecap="round"/>';
     });
   }
-  // ⑧⑨ 数据点 + 数值标签（多行带状避让，保证不重叠；放不下靠点按读数）
   var dotR=scrollable?3:4;
   recs.forEach(function(r,i){
     if(r.w==null)return; /* 空月占位不画点 */
     var x=xScale(i),y=yScale(r.w);
     html+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+dotR+'" fill="#FFFFFF" stroke="'+orange+'" stroke-width="2"/>';
   });
-  html+=buildValueLabels(pts,{fontSize:13,charW:7.2,labelColor:'var(--text)',firstGap:21,bandGap:17,maxBands:scrollable?2:3,padT:padT,baselineY:baselineY});
-  // ⑩ 透明点击热区：点任意点 → 详细日期 + 数值气泡
+  if(range==='all' && pts.length>0){
+    var labelIdx=[0];
+    var step=Math.max(1,Math.floor((pts.length-1)/3));
+    for(var li=1;li<4;li++){labelIdx.push(Math.min(li*step,pts.length-1))}
+    var seen={};
+    labelIdx=labelIdx.filter(function(i){if(seen[i])return false;seen[i]=true;return true});
+    labelIdx.forEach(function(i){
+      var p=pts[i];if(!p)return;
+      var val=p.w.toFixed(1);
+      html+='<text x="'+p.x.toFixed(1)+'" y="'+(p.y-12).toFixed(1)+'" text-anchor="middle" font-size="13" fill="var(--text)" font-weight="700">'+val+'</text>';
+    });
+  }else{
+    html+=buildValueLabels(pts,{fontSize:13,charW:7.2,labelColor:'var(--text)',firstGap:21,bandGap:17,maxBands:scrollable?2:3,padT:padT,baselineY:baselineY});
+  }
   recs.forEach(function(r,i){if(r.w!=null){html+='<circle class="wfhit" data-i="'+i+'" cx="'+xScale(i).toFixed(1)+'" cy="'+yScale(r.w).toFixed(1)+'" r="15" fill="transparent" pointer-events="all" style="cursor:pointer"/>'}});
   _wfRecs=recs;_wfRange=range;_wfGeo={x:xScale,y:yScale,W:contentW,H:H,padT:padT,baselineY:baselineY,padL:padL,padR:padR};
   svg.innerHTML=html;
@@ -2041,7 +1949,6 @@ function confirmWeightUpdate(){
   showToast(msg);
 }
 
-/* ========== PHOTO UPLOAD ========== */
 function handlePhotoUpload(event){
   var file=event.target.files[0];event.target.value='';if(!file)return;
   showLoading('处理照片...');
@@ -2058,9 +1965,6 @@ function handlePhotoUpload(event){
   reader.readAsDataURL(file);
 }
 
-
-
-/* ========== NUTRITION BREAKDOWN MODAL ========== */
 var nbdCurrentNutri='protein';
 function openNutritionBreakdown(){
   const foods=getTodayFoods();
@@ -2097,7 +2001,6 @@ function renderNbdTab(nutriKey){
 }
 function switchNbdTab(nutriKey){renderNbdTab(nutriKey)}
 
-/* ========== BMI BREAKDOWN MODAL ========== */
 function openBmiBreakdown(){
   const hh=state.profile.height,ww=state.profile.weight;
   const bmi=calcBMI(hh,ww);
@@ -2112,7 +2015,6 @@ function openBmiBreakdown(){
   const bf=calcBodyFat(state.profile);
   const profile=state.profile;
   const gender=profile.gender||'male';
-  /* BMI 色带 SVG */
   const bmiMin=10,bmiMax=35,bmiRange=bmiMax-bmiMin;
   var bmiGaugeSvg='<svg width="100%" height="48" viewBox="0 0 300 48" style="display:block;margin:8px 0">'+
     '<defs><linearGradient id="bmiGrad" x1="0" y1="0" x2="1" y2="0">'+
@@ -2142,7 +2044,6 @@ function openBmiBreakdown(){
     '<text x="'+markerX+'" y="8" font-size="9" font-weight="700" fill="'+info.color+'" text-anchor="middle">'+bmi.toFixed(1)+'</text>'+
     '</svg>';
 
-  /* 目标体重范围 */
   var minW=(18.5*Math.pow(hh/100,2)).toFixed(1);
   var maxW=(24*Math.pow(hh/100,2)).toFixed(1);
   var idealW=Math.round(22*Math.pow(hh/100,2));
@@ -2155,7 +2056,6 @@ function openBmiBreakdown(){
     (toLose==0&&toGain==0?'<br><span style="color:var(--green)">✅ 当前体重已在健康范围内</span>':'')+
     '<br><span style="color:var(--text2);font-size:12px">理想体重 '+(profile.goal==='gain'?idealW+' kg (BMI 22)<br>增肌期建议 '+(idealW+5)+'~'+(idealW+10)+' kg':idealW+' kg')+'</span></div>';
 
-  /* 体型判断（综合BMI+体脂）*/
   var fusionHtml='';
   if(bf!==null&&bf>0){
     var bmiOk=bmi>=18.5&&bmi<25.0;
@@ -2178,7 +2078,6 @@ function openBmiBreakdown(){
   document.getElementById('bmiBreakdownContent').innerHTML=content;
   showModal('bmiModal');
 }
-/* ========== CALORIE BREAKDOWN MODAL ========== */
 function openCalorieBreakdown(){
   const foods=getTodayFoods();
   const target=calcTargetCalories();
@@ -2191,7 +2090,6 @@ function openCalorieBreakdown(){
     showModal('calorieModal');
     return;
   }
-  /* --- 宏观营养素 & 计算 --- */
   const tp=foods.reduce((s,f)=>s+(f.p||0),0);
   const tc=foods.reduce((s,f)=>s+(f.c||0),0);
   const tf=foods.reduce((s,f)=>s+(f.f||0),0);
@@ -2206,7 +2104,6 @@ function openCalorieBreakdown(){
   const actFactors={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
   const goalLabels={buddha:'佛系',lose:'减脂',maintain:'维持',gain:'增肌'};
   const diff=target-consumed;
-  /* --- 宏量营养素圆环 SVG --- */
   function donutArc(pct,color,rotStart){
     var r=37,cx=50,cy=50,sw=11;
     var circ=2*Math.PI*r;
@@ -2226,7 +2123,6 @@ function openCalorieBreakdown(){
   donutSvg+='<text x="50" y="47" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text)">'+consumed+'</text>';
   donutSvg+='<text x="50" y="60" text-anchor="middle" font-size="9" fill="var(--text2)">kcal</text>';
   donutSvg+='</svg>';
-  /* --- 宏量营养素详情 --- */
   var macroDetailHtml='';
   if(totalMacroKcal>0){
     macroDetailHtml='<div class="cal-breakdown-macros">'+
@@ -2239,14 +2135,12 @@ function openCalorieBreakdown(){
     macroDetailHtml='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px">暂无食物记录</div>';
   }
   var macroSection='<div class="info-modal-item"><div class="cal-macro-header"><span class="info-modal-item-title">🥗 宏量营养素分布</span></div><div class="cal-macro-grid"><div class="cal-macro-donut">'+donutSvg+'</div>'+macroDetailHtml+'</div></div>';
-  /* --- BMR vs TDEE --- */
   var bmrSection='<div class="info-modal-item"><div class="info-modal-item-title">🔥 基础代谢 vs 总消耗</div><div class="cal-bmr-grid">'+
     '<div class="cal-bmr-item"><span class="cal-bmr-label">基础代谢 BMR</span><span class="cal-bmr-val">'+bmr+' kcal</span></div>'+
     '<div class="cal-bmr-item"><span class="cal-bmr-label">活动系数</span><span class="cal-bmr-val">'+(actLabels[profile.activity]||'未知')+' ×'+(actFactors[profile.activity]||'1.2')+'</span></div>'+
     '<div class="cal-bmr-item" style="border-top:1px solid var(--card-border);padding-top:8px"><span class="cal-bmr-label" style="font-weight:700">总消耗 TDEE</span><span class="cal-bmr-val" style="font-weight:700">'+tdee+' kcal</span></div>'+
     '<div class="cal-bmr-item"><span class="cal-bmr-label">目标调节</span><span class="cal-bmr-val" style="color:var(--text2)">'+(goalLabels[profile.goal]||'维持')+' → '+target+' kcal</span></div>'+
   '</div></div>';
-  /* --- 盈亏状态（卡片化）--- */
   var statusHtml='';
   if(diff>0){
     var pctOfTarget=consumed/target*100;
@@ -2266,7 +2160,7 @@ function openCalorieBreakdown(){
       '<div><div class="cal-status-title" style="color:var(--red)">已超过目标</div>'+
       '<div class="cal-status-desc">已摄入 <strong>'+consumed+' kcal</strong>，超出目标 <strong>'+Math.abs(diff)+' kcal</strong>（'+overPct.toFixed(0)+'%）</div></div></div>';
   }
-  
+
   content='<div class="info-modal-body">'+
     macroSection+
     bmrSection+
@@ -2287,7 +2181,6 @@ function spawnGhost(bar,fromX,fromY,fromW,fromH){
   ghost.style.height=fromH+'px';
   ghost.style.transform='translate3d('+fromX+'px,'+fromY+'px,0)';
   bar.appendChild(ghost);
-  /* 下帧启动渐隐（去掉 transform 0s，避免干扰） */
   requestAnimationFrame(function(){
     ghost.style.opacity='0';
     setTimeout(function(){if(ghost.parentNode)ghost.parentNode.removeChild(ghost)},400);
@@ -2331,14 +2224,12 @@ function updateTabIndicator(animate){
   if(_indW>0&&_indH>0){
     spawnGhost(bar,_indX,_indY,_indW,_indH);
   }
-  /* 冻结主 indicator 到当前位置 */
   ind.style.transition='none';
   ind.style.width=_indW||w+'px';
   ind.style.height=_indH||h+'px';
   ind.style.transform='translate3d('+(_indX||x)+'px,'+(_indY||y)+'px,0) scale(var(--ind-scale,1))';
   ind.offsetHeight;
   _indX=x;_indY=y;_indW=w;_indH=h;
-  /* 下一帧：加 transition，让 indicator 从原位 spring 到新位（中间帧 ghost 同时在原位渐隐） */
   requestAnimationFrame(function(){
     ind.style.transition='transform .55s cubic-bezier(0.34,1.4,0.64,1),width .4s cubic-bezier(0.34,1.4,0.64,1),height .4s cubic-bezier(0.34,1.4,0.64,1),border-radius .4s cubic-bezier(0.34,1.4,0.64,1),opacity .25s ease';
     ind.style.width=w+'px';
@@ -2355,7 +2246,6 @@ function hideLoading(){document.getElementById('loadingOverlay').classList.remov
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),2500)}
 function updateOnlineStatus(){const b=document.getElementById('offlineBadge');if(navigator.onLine){b.classList.remove('show')}else{b.classList.add('show')}}
 
-/* ========== APP LOCK ========== */
 var patternLock={mode:'idle',firstPattern:null,dots:[],drawing:false,containerEl:null,svgEl:null,gridEl:null,dotPositions:[]};
 function onAppLockToggle(){
   var toggle=document.getElementById('appLockToggle');
@@ -2535,7 +2425,6 @@ function onPatternComplete(dots){
         state.appLock={enabled:true,method:'pattern',pattern:dots.slice(),backupPassword:'',backupHint:''};
         saveState();
         hidePatternLockScreen();
-        // 显示备用密码设置模态框
         setTimeout(function(){
           showModal('backupSetupModal');
           document.getElementById('backupPasswordInput').value='';
@@ -2583,7 +2472,6 @@ function onLockFooterBtn(){
     var toggle=document.getElementById('appLockToggle');
     if(toggle)toggle.checked=false;
   }else if(patternLock.mode==='unlock'){
-    // 显示备用密码输入区域
     document.getElementById('lockPatternContainer').style.display='none';
     document.getElementById('lockScreenTitle').textContent='备用密码解锁';
     document.getElementById('lockScreenSubtitle').textContent='请输入你设置的备用密码';
@@ -2623,29 +2511,22 @@ function skipBackupPassword(){
   showToast('应用锁已启用（未设置备用密码）');
 }
 
-/* ========== INIT ========== */
-/* 自动识别平台与系统版本：给 <html> 打 class 驱动差异化玻璃样式 */
 function detectPlatform(){
   var ua=(navigator.userAgent||'').toLowerCase();
   var html=document.documentElement;
-  // 是否支持 backdrop-filter（CSS.supports 不可靠时回退到前缀判断）
   var supportBF=false;
   try{supportBF=(typeof CSS!=='undefined'&&CSS.supports&&CSS.supports('backdrop-filter','blur(1px)'))||(typeof CSS!=='undefined'&&CSS.supports&&CSS.supports('-webkit-backdrop-filter','blur(1px)'))}catch(e){}
   if(!supportBF){html.classList.add('no-backdrop')}
-  // 安卓
   if(/android/.test(ua)){
     html.classList.add('android');
-    /* 老安卓 Chrome <76:saturate 在 -webkit-backdrop-filter 上不识别,打 old class 降级 */
     var chromeM=ua.match(/chrome\/(\d+)/);
     if(chromeM&&parseInt(chromeM[1],10)<76){html.classList.add('old')}
     return
   }
-  // iPadOS 13+ 伪装 Mac:maxTouchPoints > 0 + Mac UA = iPad,主动识别
   if(/macintosh/.test(ua)&&typeof navigator.maxTouchPoints==='number'&&navigator.maxTouchPoints>0){
     html.classList.add('ipad');
     return
   }
-  // iOS / iPadOS(旧 UA):从 UA 抓系统大版本
   var iOSV=null;
   var m=ua.match(/os (\d+)_/);if(m)iOSV=parseInt(m[1],10);
   if(/iphone|ipad|ipod/.test(ua)){
@@ -2654,7 +2535,6 @@ function detectPlatform(){
     else{html.classList.add('ios26')}
     return
   }
-  // 桌面 / 其他（Mac / Windows / Linux）
   html.classList.add('desktop')
 }
 async function init(){
@@ -2685,20 +2565,23 @@ async function init(){
     window.addEventListener('mouseup',function(){wfDrag=false});
     wfWrap.addEventListener('click',function(e){if(wfMoved){e.preventDefault();e.stopPropagation()}},true);
   }
+
+
   var mq=window.matchMedia('(prefers-color-scheme:dark)');function onSchemeChange(e){if(state.theme==='auto'){document.querySelector('meta[name="theme-color"]').content=e.matches?'#000000':'#F2F2F7'}};mq.addEventListener?mq.addEventListener('change',onSchemeChange):mq.addListener(onSchemeChange);onSchemeChange(mq);
-  /* 主流 tabbar 标准：高度固定，不随滚动收窄 */
-  /* tab-indicator 初始化 + 跟随尺寸/字体加载变化自适应 */
   function initTabIndicator(){updateTabIndicator(false)}
   if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initTabIndicator,0)}else{document.addEventListener('DOMContentLoaded',initTabIndicator)}
-  /* 字体加载完成后重算（PingFang/SF Pro 等动态加载会改尺寸） */
   if(document.fonts&&document.fonts.ready){document.fonts.ready.then(initTabIndicator)}
-  /* 容器尺寸变化（横竖屏/窗口）时重算 */
-  if(typeof ResizeObserver!=='undefined'){new ResizeObserver(function(){updateTabIndicator(false)}).observe(document.querySelector('.tab-bar'))}else{window.addEventListener('resize',function(){updateTabIndicator(false)})}
-  /* 点击 tab-item 时先预滑动 indicator（提前一拍获得"点击立即响应"感） */
-  tabBar.addEventListener('click',function(e){
-    var t=e.target.closest('.tab-item');
-    if(!t||t.classList.contains('active'))return;
-    var i=tabBar.querySelector('.tab-indicator');
+  var tabBarEl=document.querySelector('.tab-bar');
+  if(tabBarEl){
+    if(typeof ResizeObserver!=='undefined'){new ResizeObserver(function(){updateTabIndicator(false)}).observe(tabBarEl)}else{window.addEventListener('resize',function(){updateTabIndicator(false)})}
+  }else{
+    window.addEventListener('resize',function(){updateTabIndicator(false)});
+  }
+  if(tabBarEl){
+    tabBarEl.addEventListener('click',function(e){
+      var t=e.target.closest('.tab-item');
+      if(!t||t.classList.contains('active'))return;
+      var i=tabBarEl.querySelector('.tab-indicator');
     if(!i)return;
     /* iOS 26 原生点击反馈：
        1) 点击瞬间 --ind-scale 收到 0.92，滑块“按下”
@@ -2711,10 +2594,10 @@ async function init(){
         i.style.setProperty('--ind-scale','1');
       });
     });
-  });
+    });
+  }
   if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除')})}).catch(function(){console.warn('[App] SW注册失败')})}
   renderAll();
-  /* renderAll 完成后 DOM 稳定，重新计算 tab-indicator */
   requestAnimationFrame(function(){updateTabIndicator(false)});
   generateIcon();
   if(!state.profile.height&&!state.profile.weight)setTimeout(()=>showToast('请在设置填写身高体重开始使用'),500)
@@ -2724,5 +2607,4 @@ init();
 </script>
 </body>
 </html>
-
 
