@@ -98,8 +98,6 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .nutri-bar-name{color:var(--text2)}.nutri-bar-val{font-weight:600}
 .nutri-bar-track{height:6px;background:rgba(118,118,128,0.12);border-radius:3px;overflow:hidden}
 .nutri-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
-.nutri-over-badge{display:none;font-size:10px;font-weight:600;color:#fff;background:var(--red);padding:1px 5px;border-radius:6px;margin-left:4px;vertical-align:middle}
-.nutri-over-badge.show{display:inline-block}
 .date-nav{display:flex;align-items:center;justify-content:space-between;margin:0 16px 8px}
 .date-nav-btn{width:36px;height:36px;border-radius:50%;border:none;background:rgba(118,118,128,0.1);font-size:18px;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .date-nav-btn:active{background:rgba(118,118,128,0.2)}.date-nav-title{font-size:16px;font-weight:600}
@@ -422,14 +420,14 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="card-title">营养素摄入</div>
       <div class="nutri-grid">
         <div class="nutri-col">
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">蛋白质</span><span class="nutri-over-badge" id="proteinOver">超标</span><span class="nutri-bar-val" id="proteinVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="proteinBar" style="width:0%;background:var(--green)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">碳水化合物</span><span class="nutri-over-badge" id="carbsOver">超标</span><span class="nutri-bar-val" id="carbsVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="carbsBar" style="width:0%;background:var(--orange)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">脂肪</span><span class="nutri-over-badge" id="fatOver">超标</span><span class="nutri-bar-val" id="fatVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fatBar" style="width:0%;background:var(--red)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">蛋白质</span><span class="nutri-bar-val" id="proteinVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="proteinBar" style="width:0%;background:var(--green)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">碳水化合物</span><span class="nutri-bar-val" id="carbsVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="carbsBar" style="width:0%;background:var(--orange)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">脂肪</span><span class="nutri-bar-val" id="fatVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fatBar" style="width:0%;background:var(--red)"></div></div></div>
         </div>
         <div class="nutri-col">
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">膳食纤维</span><span class="nutri-over-badge" id="fiberOver">超标</span><span class="nutri-bar-val" id="fiberVal">0 / 25g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fiberBar" style="width:0%;background:var(--cyan)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素A</span><span class="nutri-over-badge" id="vitAOver">超标</span><span class="nutri-bar-val" id="vitAVal">0 / 800μg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitABar" style="width:0%;background:var(--yellow)"></div></div></div>
-          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素C</span><span class="nutri-over-badge" id="vitCOver">超标</span><span class="nutri-bar-val" id="vitCVal">0 / 100mg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitCBar" style="width:0%;background:var(--purple)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">膳食纤维</span><span class="nutri-bar-val" id="fiberVal">0 / 25g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="fiberBar" style="width:0%;background:var(--cyan)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素A</span><span class="nutri-bar-val" id="vitAVal">0 / 800μg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitABar" style="width:0%;background:var(--yellow)"></div></div></div>
+          <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">维生素C</span><span class="nutri-bar-val" id="vitCVal">0 / 100mg</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="vitCBar" style="width:0%;background:var(--purple)"></div></div></div>
         </div>
       </div>
       <div class="nutri-rec" id="nutriRec"></div>
@@ -1073,22 +1071,20 @@ function renderNutrition(){
   foods.forEach(function(f){
     tp+=f.p||0;tc+=f.c||0;tf+=f.f||0;tfi+=f.fi||0;tva+=f.va||0;tvc+=f.vc||0;
   });
-  function setNutri(valId,barId,overId,baseColor,consumed,target,unit,decimals,overRatio){
-    var valEl=document.getElementById(valId),barEl=document.getElementById(barId),overEl=document.getElementById(overId);
+  function setNutri(valId,barId,baseColor,consumed,target,unit,decimals,overRatio){
+    var valEl=document.getElementById(valId),barEl=document.getElementById(barId);
     var ratio=target>0?consumed/target:0;
     var over=target>0&&ratio>overRatio;
     valEl.textContent=consumed.toFixed(decimals)+' / '+target+unit;
-    valEl.style.color=over?'var(--red)':'';
     barEl.style.background=over?'var(--red)':baseColor;
     barEl.style.width=Math.min(100,ratio*100)+'%';
-    if(overEl)overEl.classList.toggle('show',over);
   }
-  setNutri('proteinVal','proteinBar','proteinOver','var(--green)',tp,t.p,'g',1,1.3);
-  setNutri('carbsVal','carbsBar','carbsOver','var(--orange)',tc,t.c,'g',1,1.15);
-  setNutri('fatVal','fatBar','fatOver','var(--red)',tf,t.f,'g',1,1.15);
-  setNutri('fiberVal','fiberBar','fiberOver','var(--cyan)',tfi,t.fiber,'g',1,1.3);
-  setNutri('vitAVal','vitABar','vitAOver','var(--yellow)',tva,t.va,'μg',0,1.5);
-  setNutri('vitCVal','vitCBar','vitCOver','var(--purple)',tvc,t.vc,'mg',0,1.5);
+  setNutri('proteinVal','proteinBar','var(--green)',tp,t.p,'g',1,1.3);
+  setNutri('carbsVal','carbsBar','var(--orange)',tc,t.c,'g',1,1.15);
+  setNutri('fatVal','fatBar','var(--red)',tf,t.f,'g',1,1.15);
+  setNutri('fiberVal','fiberBar','var(--cyan)',tfi,t.fiber,'g',1,1.3);
+  setNutri('vitAVal','vitABar','var(--yellow)',tva,t.va,'μg',0,1.5);
+  setNutri('vitCVal','vitCBar','var(--purple)',tvc,t.vc,'mg',0,1.5);
   var totalConsumed=foods.reduce(function(s,f){return s+(f.cal||0)},0);
   var target=calcTargetCalories();
   if(totalConsumed>0&&target>0&&totalConsumed/target>=0.9){
