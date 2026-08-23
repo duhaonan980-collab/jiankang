@@ -418,7 +418,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <button class="action-btn primary" onclick="openSearchModal()"><span class="icon">🔍</span> 手动搜索添加</button>
       <div class="action-btn-row">
         <button class="action-btn secondary" onclick="document.getElementById('photoInput').click()"><span class="icon">📸</span> 拍照上传</button>
-        <button class="action-btn secondary" onclick="document.getElementById('nutritionPhotoInput').click()"><span class="icon">📋</span> 拍营养成分表</button>
+        <button class="action-btn secondary" onclick="document.getElementById('nutritionPhotoInput').click()"><span class="icon">📋</span> 自定义添加</button>
       </div>
     </div>
     <div style="height:1px;margin:4px 28px;background:var(--card-border);opacity:0.5"></div>
@@ -591,7 +591,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.13.0</div><div>营养追踪 · 体重管理 · 拍照上传 · 拍营养成分表 · U.S. Navy 体脂算法</div></div>
+    <div class="about-text"><div class="ver">热量营养检测 v3.13.0</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · U.S. Navy 体脂算法</div></div>
   </div>
   </main>
 
@@ -603,7 +603,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   <div class="modal-overlay" id="photoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><img class="photo-modal-img" id="photoModalImg" alt=""><div id="photoModalInfo" style="text-align:center;margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closePhotoModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="customFoodModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">自定义食物</div><div class="cf-form"><div class="cf-name-wrap"><div class="cf-label">食物名称</div><input class="cf-name-input" type="text" id="cfName" placeholder="例如：某品牌燕麦片"></div><div class="cf-hint" id="cfPerHint" style="margin-top:0;margin-bottom:12px">📋 已从营养成分表识别，按每 100 克计，可手动修正</div><div class="cf-grid"><div class="cf-field"><div class="cf-label">热量 (kcal)</div><input class="cf-input" type="number" id="cfCal" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">蛋白质 (g)</div><input class="cf-input" type="number" id="cfP" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">碳水化合物 (g)</div><input class="cf-input" type="number" id="cfC" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">脂肪 (g)</div><input class="cf-input" type="number" id="cfF" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">膳食纤维 (g)</div><input class="cf-input" type="number" id="cfFi" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素C (mg)</div><input class="cf-input" type="number" id="cfVc" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素A (μg)</div><input class="cf-input" type="number" id="cfVa" inputmode="decimal"></div></div><div class="cf-raw" id="cfRaw" style="display:none"></div></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveCustomFood()">保存为自定义食物</button><button class="modal-btn danger" onclick="closeCustomFoodModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">取消</button></div></div></div></div></div>
+  <div class="modal-overlay" id="customFoodModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">自定义食物</div><div class="cf-form"><img id="cfPhoto" style="display:none;width:100%;max-height:200px;object-fit:contain;border-radius:12px;margin-bottom:12px;background:rgba(118,118,128,0.08)"><div class="cf-name-wrap"><div class="cf-label">食物名称</div><input class="cf-name-input" type="text" id="cfName" placeholder="例如：某品牌燕麦片"></div><div class="cf-hint" id="cfPerHint" style="margin-top:0;margin-bottom:12px">✍️ 拍照或手动输入营养数值，按每 100 克计</div><div class="cf-grid"><div class="cf-field"><div class="cf-label">热量（<span id="cfEnergyUnit">千卡</span>）<span onclick="toggleCfEnergyUnit()" style="float:right;color:var(--blue);cursor:pointer;font-weight:600">千卡⇄千焦</span></div><input class="cf-input" type="number" id="cfCal" inputmode="decimal" placeholder="包装上的能量数字直接填"></div><div class="cf-field"><div class="cf-label">蛋白质 (g)</div><input class="cf-input" type="number" id="cfP" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">碳水化合物 (g)</div><input class="cf-input" type="number" id="cfC" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">脂肪 (g)</div><input class="cf-input" type="number" id="cfF" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">膳食纤维 (g)</div><input class="cf-input" type="number" id="cfFi" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素C (mg)</div><input class="cf-input" type="number" id="cfVc" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素A (μg)</div><input class="cf-input" type="number" id="cfVa" inputmode="decimal"></div></div><div class="cf-raw" id="cfRaw" style="display:none"></div></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveCustomFood()">保存为自定义食物</button><button class="modal-btn danger" onclick="closeCustomFoodModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">取消</button></div></div></div></div></div>
 
   <div class="modal-overlay" id="weightModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">更新体重与腰围</div><div style="text-align:center;padding:8px 0 16px;color:var(--text2);font-size:14px">记录今日数据，追踪变化趋势</div><div class="weight-input-row"><input class="weight-update-input" type="number" id="weightModalInput" placeholder="输入体重" inputmode="decimal" step="0.1"><span class="weight-unit">kg</span></div><div class="weight-input-row" style="margin-top:4px"><input class="weight-update-input" type="number" id="waistModalInput" placeholder="输入腰围（选填）" inputmode="decimal" step="0.1"><span class="weight-unit">cm</span></div><div id="weightModalLast" style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmWeightUpdate()">确认更新</button><button class="modal-btn danger" onclick="hideModal('weightModal')" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
@@ -1965,51 +1965,48 @@ function handlePhotoUpload(event){
   reader.readAsDataURL(file);
 }
 
-/* ============ 拍营养成分表 → 自定义食物 ============ */
-const OCR_SERVER = 'http://127.0.0.1:8765';
-
+/* ============ 拍营养成分表 → 拍照作配图 + 手动输入 ============ */
 function handleNutritionPhoto(event){
   var file=event.target.files[0];event.target.value='';if(!file)return;
-  showLoading('识别营养成分表...');
+  showLoading('处理照片...');
   var reader=new FileReader();
   reader.onload=function(e){
-    resizeImage(e.target.result,1600,0.85,function(compressed){
-      callOcr(compressed);
+    resizeImage(e.target.result,800,0.8,function(compressed){
+      hideLoading();
+      state.tempPhoto=compressed;
+      showToast('照片已添加，请手动填写营养数值');
+      openCustomFoodEditor();
     });
   };
   reader.readAsDataURL(file);
 }
 
-async function callOcr(dataUrl){
-  try{
-    const resp=await fetch(OCR_SERVER+'/ocr',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dataUrl})});
-    const data=await resp.json();
-    hideLoading();
-    if(data&&data.ok&&data.parsed){openCustomFoodEditor(data.parsed,data.texts||[])}
-    else{showToast((data&&data.error)||'识别失败，请重试')}
-  }catch(err){
-    hideLoading();
-    showToast('OCR 服务未启动，请先运行 nutrition_ocr_server.py');
-  }
+var cfKj=false; // 热量输入框当前单位：false=千卡 true=千焦
+function toggleCfEnergyUnit(){
+  const el=document.getElementById('cfCal');
+  const v=parseFloat(el.value);
+  if(!isNaN(v)&&v>0){el.value=String(Math.round((cfKj?v/4.184:v*4.184)*10)/10)}
+  cfKj=!cfKj;
+  document.getElementById('cfEnergyUnit').textContent=cfKj?'千焦':'千卡';
 }
 
-function openCustomFoodEditor(parsed,texts){
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=(v===0||v===null||v===undefined||v==='')?'':v};
+function openCustomFoodEditor(){
   document.getElementById('cfName').value='';
-  set('cfCal',parsed.cal);set('cfP',parsed.p);set('cfC',parsed.c);set('cfF',parsed.f);
-  set('cfFi',parsed.fi);set('cfVa',parsed.va);set('cfVc',parsed.vc);
-  const hint=document.getElementById('cfPerHint');
-  hint.className='cf-hint'+(parsed.per100===false?' warn':'');
-  hint.textContent=parsed.per100===false?'⚠️ 识别到「每份」标注，数值按每份计，请确认基准量':'📋 已从营养成分表识别，按每 100 克计，可手动修正';
-  const raw=document.getElementById('cfRaw');
-  if(texts&&texts.length){raw.style.display='block';raw.textContent='识别原文：'+texts.join(' / ')}else{raw.style.display='none'}
+  ['cfCal','cfP','cfC','cfF','cfFi','cfVa','cfVc'].forEach(function(id){const el=document.getElementById(id);if(el)el.value=''});
+  cfKj=false;document.getElementById('cfEnergyUnit').textContent='千卡';
+  const ph=document.getElementById('cfPhoto');
+  if(state.tempPhoto){ph.src=state.tempPhoto;ph.style.display='block'}else{ph.style.display='none'}
+  document.getElementById('cfPerHint').className='cf-hint';
+  document.getElementById('cfPerHint').textContent='✍️ 对照上方照片手动输入营养数值（按每 100 克计）';
+  document.getElementById('cfRaw').style.display='none';
   showModal('customFoodModal');
 }
 
 function saveCustomFood(){
   const name=document.getElementById('cfName').value.trim();
   const num=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?0:v};
-  const cal=Math.round(num('cfCal'));
+  const calRaw=num('cfCal');
+  const cal=Math.round(cfKj?calRaw/4.184:calRaw);
   if(!name){showToast('请填写食物名称');return}
   if(cal<=0){showToast('请填写热量（kcal）');return}
   const food={name:name,icon:'🏷️',cat:'自定义',cal:cal,p:num('cfP'),c:num('cfC'),f:num('cfF'),fi:num('cfFi'),va:Math.round(num('cfVa')),vc:num('cfVc')};
@@ -2022,7 +2019,7 @@ function saveCustomFood(){
   showToast('已保存自定义食物: '+name);
   openAmountModal(food);
 }
-function closeCustomFoodModal(){hideModal('customFoodModal')}
+function closeCustomFoodModal(){hideModal('customFoodModal');state.tempPhoto=null}
 
 var nbdCurrentNutri='protein';
 function openNutritionBreakdown(){
@@ -2559,7 +2556,7 @@ async function init(){
 
 
   var mq=window.matchMedia('(prefers-color-scheme:dark)');function onSchemeChange(e){if(state.theme==='auto'){document.querySelector('meta[name="theme-color"]').content=e.matches?'#000000':'#F2F2F7'}};mq.addEventListener?mq.addEventListener('change',onSchemeChange):mq.addListener(onSchemeChange);onSchemeChange(mq);
-    if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除');if(e.data&&e.data.type==='SW_UPDATED'){console.log('[App] SW已更新,重新加载');location.reload()}})}).catch(function(){console.warn('[App] SW注册失败')})}
+    if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除');if(e.data&&e.data.type==='SW_UPDATED'){console.log('[App] SW已更新');var sk='sw_reloaded_'+(e.data.version||'x');if(!sessionStorage.getItem(sk)){sessionStorage.setItem(sk,'1');location.reload()}}})}).catch(function(){console.warn('[App] SW注册失败')})}
   renderAll();
   generateIcon();
   if(!state.profile.height&&!state.profile.weight)setTimeout(()=>showToast('请在设置填写身高体重开始使用'),500)

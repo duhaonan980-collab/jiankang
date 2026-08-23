@@ -4,7 +4,7 @@
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v67';
+const CACHE_VERSION = 'v76';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 
@@ -19,7 +19,9 @@ const APP_SHELL_FILES = [
 ];
 
 // ==================== INSTALL ====================
+let IS_UPDATE = false; // 是否为"更新安装"（页面已有旧版本在运行）
 self.addEventListener('install', (event) => {
+  IS_UPDATE = !!self.registration.active;
   console.log('[SW] 安装中... v' + CACHE_VERSION);
   event.waitUntil(
     caches.open(APP_SHELL).then((cache) => {
@@ -54,8 +56,9 @@ self.addEventListener('activate', (event) => {
       // 接管所有页面，并强制刷新（让客户端拉新 HTML）
       return self.clients.claim().then(() => {
         return self.clients.matchAll().then((clients) => {
+          // 只有"旧版本被替换"时才通知客户端刷新；首次安装不打扰
+          if (!IS_UPDATE) return;
           clients.forEach((client) => {
-            // 通知所有客户端跳过等待并强制 reload
             if (client.navigate) {
               client.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION });
             }
