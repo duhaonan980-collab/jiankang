@@ -418,7 +418,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <button class="action-btn primary" onclick="openSearchModal()"><span class="icon">🔍</span> 手动搜索添加</button>
       <div class="action-btn-row">
         <button class="action-btn secondary" onclick="document.getElementById('photoInput').click()"><span class="icon">📸</span> 拍照上传</button>
-        <button class="action-btn secondary" onclick="document.getElementById('nutritionPhotoInput').click()"><span class="icon">📋</span> 自定义添加</button>
+        <button class="action-btn secondary" onclick="openCustomFoodEditor()"><span class="icon">📋</span> 自定义添加</button>
       </div>
     </div>
     <div style="height:1px;margin:4px 28px;background:var(--card-border);opacity:0.5"></div>
@@ -603,7 +603,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   <div class="modal-overlay" id="photoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><img class="photo-modal-img" id="photoModalImg" alt=""><div id="photoModalInfo" style="text-align:center;margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closePhotoModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="customFoodModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">自定义食物</div><div class="cf-form"><img id="cfPhoto" style="display:none;width:100%;max-height:200px;object-fit:contain;border-radius:12px;margin-bottom:12px;background:rgba(118,118,128,0.08)"><div class="cf-name-wrap"><div class="cf-label">食物名称</div><input class="cf-name-input" type="text" id="cfName" placeholder="例如：某品牌燕麦片"></div><div class="cf-hint" id="cfPerHint" style="margin-top:0;margin-bottom:12px">✍️ 拍照或手动输入营养数值，按每 100 克计</div><div class="cf-grid"><div class="cf-field"><div class="cf-label">热量（<span id="cfEnergyUnit">千卡</span>）<span onclick="toggleCfEnergyUnit()" style="float:right;color:var(--blue);cursor:pointer;font-weight:600">千卡⇄千焦</span></div><input class="cf-input" type="number" id="cfCal" inputmode="decimal" placeholder="包装上的能量数字直接填"></div><div class="cf-field"><div class="cf-label">蛋白质 (g)</div><input class="cf-input" type="number" id="cfP" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">碳水化合物 (g)</div><input class="cf-input" type="number" id="cfC" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">脂肪 (g)</div><input class="cf-input" type="number" id="cfF" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">膳食纤维 (g)</div><input class="cf-input" type="number" id="cfFi" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素C (mg)</div><input class="cf-input" type="number" id="cfVc" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素A (μg)</div><input class="cf-input" type="number" id="cfVa" inputmode="decimal"></div></div><div class="cf-raw" id="cfRaw" style="display:none"></div></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveCustomFood()">保存为自定义食物</button><button class="modal-btn danger" onclick="closeCustomFoodModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">取消</button></div></div></div></div></div>
+  <div class="modal-overlay" id="customFoodModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">自定义食物</div><div class="cf-form"><div class="cf-name-wrap"><div class="cf-label">食物名称</div><input class="cf-name-input" type="text" id="cfName" placeholder="例如：某品牌燕麦片"></div><div class="cf-hint" id="cfPerHint" style="margin-top:0;margin-bottom:12px">✍️ 对照营养成分表手动输入营养数值，按每 100 克计</div><div class="cf-grid"><div class="cf-field"><div class="cf-label">热量（<span id="cfEnergyUnit">千卡</span>）<span onclick="toggleCfEnergyUnit()" style="float:right;color:var(--blue);cursor:pointer;font-weight:600">千卡⇄千焦</span></div><input class="cf-input" type="number" id="cfCal" inputmode="decimal" placeholder="包装上的能量数字直接填"></div><div class="cf-field"><div class="cf-label">蛋白质 (g)</div><input class="cf-input" type="number" id="cfP" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">碳水化合物 (g)</div><input class="cf-input" type="number" id="cfC" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">脂肪 (g)</div><input class="cf-input" type="number" id="cfF" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">膳食纤维 (g)</div><input class="cf-input" type="number" id="cfFi" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素C (mg)</div><input class="cf-input" type="number" id="cfVc" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素A (μg)</div><input class="cf-input" type="number" id="cfVa" inputmode="decimal"></div></div><div class="cf-raw" id="cfRaw" style="display:none"></div></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveCustomFood()">保存为自定义食物</button><button class="modal-btn danger" onclick="closeCustomFoodModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">取消</button></div></div></div></div></div>
 
   <div class="modal-overlay" id="weightModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">更新体重与腰围</div><div style="text-align:center;padding:8px 0 16px;color:var(--text2);font-size:14px">记录今日数据，追踪变化趋势</div><div class="weight-input-row"><input class="weight-update-input" type="number" id="weightModalInput" placeholder="输入体重" inputmode="decimal" step="0.1"><span class="weight-unit">kg</span></div><div class="weight-input-row" style="margin-top:4px"><input class="weight-update-input" type="number" id="waistModalInput" placeholder="输入腰围（选填）" inputmode="decimal" step="0.1"><span class="weight-unit">cm</span></div><div id="weightModalLast" style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmWeightUpdate()">确认更新</button><button class="modal-btn danger" onclick="hideModal('weightModal')" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
@@ -665,7 +665,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     </div>
   </div>
   <input type="file" accept="image/*" capture="environment" id="photoInput" style="display:none" onchange="handlePhotoUpload(event)">
-  <input type="file" accept="image/*" capture="environment" id="nutritionPhotoInput" style="display:none" onchange="handleNutritionPhoto(event)">
 </div>
 <nav class="tab-bar">
   <div class="tab-item active" data-page="main" onclick="switchPage('main')"><span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M12 3.5l8 6.8V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1v-9.7L12 3.5z"/></svg></span><span class="tab-label">首页</span></div>
@@ -1965,22 +1964,7 @@ function handlePhotoUpload(event){
   reader.readAsDataURL(file);
 }
 
-/* ============ 拍营养成分表 → 拍照作配图 + 手动输入 ============ */
-function handleNutritionPhoto(event){
-  var file=event.target.files[0];event.target.value='';if(!file)return;
-  showLoading('处理照片...');
-  var reader=new FileReader();
-  reader.onload=function(e){
-    resizeImage(e.target.result,800,0.8,function(compressed){
-      hideLoading();
-      state.tempPhoto=compressed;
-      showToast('照片已添加，请手动填写营养数值');
-      openCustomFoodEditor();
-    });
-  };
-  reader.readAsDataURL(file);
-}
-
+/* ============ 自定义食物（手动输入） ============ */
 var cfKj=false; // 热量输入框当前单位：false=千卡 true=千焦
 function toggleCfEnergyUnit(){
   const el=document.getElementById('cfCal');
@@ -1994,10 +1978,8 @@ function openCustomFoodEditor(){
   document.getElementById('cfName').value='';
   ['cfCal','cfP','cfC','cfF','cfFi','cfVa','cfVc'].forEach(function(id){const el=document.getElementById(id);if(el)el.value=''});
   cfKj=false;document.getElementById('cfEnergyUnit').textContent='千卡';
-  const ph=document.getElementById('cfPhoto');
-  if(state.tempPhoto){ph.src=state.tempPhoto;ph.style.display='block'}else{ph.style.display='none'}
   document.getElementById('cfPerHint').className='cf-hint';
-  document.getElementById('cfPerHint').textContent='✍️ 对照上方照片手动输入营养数值（按每 100 克计）';
+  document.getElementById('cfPerHint').textContent='✍️ 对照营养成分表手动输入营养数值（按每 100 克计）';
   document.getElementById('cfRaw').style.display='none';
   showModal('customFoodModal');
 }
@@ -2019,7 +2001,7 @@ function saveCustomFood(){
   showToast('已保存自定义食物: '+name);
   openAmountModal(food);
 }
-function closeCustomFoodModal(){hideModal('customFoodModal');state.tempPhoto=null}
+function closeCustomFoodModal(){hideModal('customFoodModal')}
 
 var nbdCurrentNutri='protein';
 function openNutritionBreakdown(){
