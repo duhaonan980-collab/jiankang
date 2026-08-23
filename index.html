@@ -79,6 +79,20 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .action-btn.primary{background:var(--blue);color:#fff;margin-bottom:10px}
 .action-btn.secondary{background:rgba(118,118,128,0.12);color:var(--text)}
 .action-btn .icon{font-size:22px}
+.action-btn-row{display:flex;gap:8px}
+.action-btn-row .action-btn{flex:1;width:auto;margin-bottom:0;font-size:15px;padding:14px 8px}
+/* 自定义食物编辑弹窗 */
+.cf-form{padding:4px 0 8px}
+.cf-name-wrap{margin-bottom:12px}
+.cf-name-input{width:100%;background:rgba(118,118,128,0.08);border:none;border-radius:12px;padding:12px 14px;font-size:17px;font-weight:600;color:var(--text);font-family:inherit;outline:none}
+.cf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cf-field{}
+.cf-label{font-size:12px;color:var(--text2);margin-bottom:5px}
+.cf-input{width:100%;background:rgba(118,118,128,0.08);border:none;border-radius:10px;padding:10px 12px;font-size:16px;font-weight:600;color:var(--text);font-family:inherit;outline:none}
+.cf-hint{font-size:12px;color:var(--text2);line-height:1.5;margin-top:12px;padding:10px 12px;background:rgba(118,118,128,0.06);border-radius:10px}
+.cf-hint.warn{color:var(--orange);background:rgba(255,149,0,0.08)}
+.cf-raw{font-size:11px;color:var(--text3);line-height:1.5;margin-top:8px;padding:8px 10px;background:rgba(118,118,128,0.05);border-radius:8px;max-height:90px;overflow:auto;user-select:text;-webkit-user-select:text}
+.search-item-del{flex:none;width:26px;height:26px;border-radius:50%;border:none;background:rgba(255,59,48,0.12);color:var(--red);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .calorie-main{display:flex;align-items:center;gap:16px}
 .ring-wrap{position:relative;width:100px;height:100px;flex-shrink:0}
 .ring-svg{transform:rotate(-90deg)}
@@ -402,7 +416,10 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <div class="card">
       <div class="card-title">食物识别</div>
       <button class="action-btn primary" onclick="openSearchModal()"><span class="icon">🔍</span> 手动搜索添加</button>
-      <button class="action-btn secondary" onclick="document.getElementById('photoInput').click()"><span class="icon">📸</span> 拍照上传</button>
+      <div class="action-btn-row">
+        <button class="action-btn secondary" onclick="document.getElementById('photoInput').click()"><span class="icon">📸</span> 拍照上传</button>
+        <button class="action-btn secondary" onclick="document.getElementById('nutritionPhotoInput').click()"><span class="icon">📋</span> 拍营养成分表</button>
+      </div>
     </div>
     <div style="height:1px;margin:4px 28px;background:var(--card-border);opacity:0.5"></div>
     <div class="card card-clickable" onclick="openCalorieBreakdown()">
@@ -574,7 +591,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
       <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.12.0</div><div>营养追踪 · 体重管理 · 拍照上传 · U.S. Navy 体脂算法</div></div>
+    <div class="about-text"><div class="ver">热量营养检测 v3.13.0</div><div>营养追踪 · 体重管理 · 拍照上传 · 拍营养成分表 · U.S. Navy 体脂算法</div></div>
   </div>
   </main>
 
@@ -585,6 +602,8 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   <div class="modal-overlay" id="calendarModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">历史记录</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div><div class="calendar-grid" id="calGrid"></div><div class="cal-stats" id="calStats"></div><div id="calDetail"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeCalendarModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div></div></div></div>
 
   <div class="modal-overlay" id="photoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><img class="photo-modal-img" id="photoModalImg" alt=""><div id="photoModalInfo" style="text-align:center;margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closePhotoModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button></div></div></div></div></div>
+
+  <div class="modal-overlay" id="customFoodModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">自定义食物</div><div class="cf-form"><div class="cf-name-wrap"><div class="cf-label">食物名称</div><input class="cf-name-input" type="text" id="cfName" placeholder="例如：某品牌燕麦片"></div><div class="cf-hint" id="cfPerHint" style="margin-top:0;margin-bottom:12px">📋 已从营养成分表识别，按每 100 克计，可手动修正</div><div class="cf-grid"><div class="cf-field"><div class="cf-label">热量 (kcal)</div><input class="cf-input" type="number" id="cfCal" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">蛋白质 (g)</div><input class="cf-input" type="number" id="cfP" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">碳水化合物 (g)</div><input class="cf-input" type="number" id="cfC" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">脂肪 (g)</div><input class="cf-input" type="number" id="cfF" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">膳食纤维 (g)</div><input class="cf-input" type="number" id="cfFi" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素C (mg)</div><input class="cf-input" type="number" id="cfVc" inputmode="decimal"></div><div class="cf-field"><div class="cf-label">维生素A (μg)</div><input class="cf-input" type="number" id="cfVa" inputmode="decimal"></div></div><div class="cf-raw" id="cfRaw" style="display:none"></div></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveCustomFood()">保存为自定义食物</button><button class="modal-btn danger" onclick="closeCustomFoodModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">取消</button></div></div></div></div></div>
 
   <div class="modal-overlay" id="weightModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">更新体重与腰围</div><div style="text-align:center;padding:8px 0 16px;color:var(--text2);font-size:14px">记录今日数据，追踪变化趋势</div><div class="weight-input-row"><input class="weight-update-input" type="number" id="weightModalInput" placeholder="输入体重" inputmode="decimal" step="0.1"><span class="weight-unit">kg</span></div><div class="weight-input-row" style="margin-top:4px"><input class="weight-update-input" type="number" id="waistModalInput" placeholder="输入腰围（选填）" inputmode="decimal" step="0.1"><span class="weight-unit">cm</span></div><div id="weightModalLast" style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmWeightUpdate()">确认更新</button><button class="modal-btn danger" onclick="hideModal('weightModal')" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
@@ -646,6 +665,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     </div>
   </div>
   <input type="file" accept="image/*" capture="environment" id="photoInput" style="display:none" onchange="handlePhotoUpload(event)">
+  <input type="file" accept="image/*" capture="environment" id="nutritionPhotoInput" style="display:none" onchange="handleNutritionPhoto(event)">
 </div>
 <nav class="tab-bar">
   <div class="tab-item active" data-page="main" onclick="switchPage('main')"><span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M12 3.5l8 6.8V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1v-9.7L12 3.5z"/></svg></span><span class="tab-label">首页</span></div>
@@ -660,6 +680,7 @@ let state = {
   foodLogs:{}, weightRecords:{},
   selectedDate:getDateKey(new Date()),
   pendingFood:null, pendingMeal:null, currentCat:'all',
+  customFoods:[],
   tempPhoto:null, theme:'auto',
   weightChartYear:new Date().getFullYear(), weightChartMonth:new Date().getMonth(),
   weightChartAll:false,
@@ -675,8 +696,8 @@ function getPhoto(id){if(!photoDB)return Promise.resolve(null);return new Promis
 function deletePhotoData(id){if(!photoDB)return;return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readwrite');tx.objectStore('photos').delete(id);tx.oncomplete=resolve;tx.onerror=resolve})}
 function clearAllPhotoData(){if(!photoDB)return;return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readwrite');tx.objectStore('photos').clear();tx.oncomplete=resolve;tx.onerror=resolve})}
 
-function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode}))}catch(e){showToast('存储失败')}}
-function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';/* 兼容旧版 weightRecords: 数字 → {w,waist} */
+function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods}))}catch(e){showToast('存储失败')}}
+function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];/* 兼容旧版 weightRecords: 数字 → {w,waist} */
 Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto'}}catch(e){console.error(e)}}
 
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -904,17 +925,19 @@ function closeAmountModal(){hideModal('amountModal');state.tempPhoto=null}
 
 function openSearchModal(){document.getElementById('searchInput').value='';state.currentCat='all';renderCatFilter();searchFood();showModal('searchModal')}
 function closeSearchModal(){hideModal('searchModal')}
-function renderCatFilter(){const cats=['all','主食','肉类','蔬菜','水果','饮料','零食','菜肴','原料'];document.getElementById('catFilter').innerHTML=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('')}
+function renderCatFilter(){const cats=['all','主食','肉类','蔬菜','水果','饮料','零食','菜肴','原料','自定义'];document.getElementById('catFilter').innerHTML=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('')}
 function setCat(c){state.currentCat=c;renderCatFilter();searchFood()}
+function getAllFoods(){return FOOD_DB.concat(state.customFoods||[])}
 function searchFood(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
-  let r=FOOD_DB;if(state.currentCat!=='all')r=r.filter(f=>f.cat===state.currentCat);
+  let r=getAllFoods();if(state.currentCat!=='all')r=r.filter(f=>f.cat===state.currentCat);
   if(q)r=r.filter(f=>f.name.toLowerCase().includes(q));
   const c=document.getElementById('searchResults');
   if(!r.length){c.innerHTML='<div style="text-align:center;padding:32px;color:var(--text3)">未找到相关食物</div>';return}
-  c.innerHTML=r.map(f=>'<div class="search-item" onclick="selectSearchFood(\''+f.name.replace(/'/g,"\\'")+'\')"><span class="search-item-icon">'+f.icon+'</span><div class="search-item-info"><div class="search-item-name">'+f.name+'</div><div class="search-item-cal">'+f.cal+' kcal / 100g</div></div><span class="search-item-cat">'+f.cat+'</span></div>').join('')
+  c.innerHTML=r.map(f=>'<div class="search-item" onclick="selectSearchFood(\''+f.name.replace(/'/g,"\\'")+'\')"><span class="search-item-icon">'+f.icon+'</span><div class="search-item-info"><div class="search-item-name">'+f.name+'</div><div class="search-item-cal">'+f.cal+' kcal / 100g</div></div><span class="search-item-cat">'+f.cat+'</span>'+(f.cat==='自定义'?'<button class="search-item-del" onclick="deleteCustomFood(event,this)" data-name="'+f.name+'">✕</button>':'')+'</div>').join('')
 }
-function selectSearchFood(name){closeSearchModal();const f=FOOD_DB.find(x=>x.name===name);if(f)openAmountModal(f)}
+function selectSearchFood(name){closeSearchModal();const f=getAllFoods().find(x=>x.name===name);if(f)openAmountModal(f)}
+function deleteCustomFood(e,btn){e.stopPropagation();const name=btn.getAttribute('data-name');if(!confirm('删除自定义食物「'+name+'」？'))return;state.customFoods=(state.customFoods||[]).filter(x=>x.name!==name);saveState();searchFood();showToast('已删除')}
 
 async function viewPhoto(id){
   const photo=await getPhoto(id);if(!photo)return;
@@ -1941,6 +1964,65 @@ function handlePhotoUpload(event){
   };
   reader.readAsDataURL(file);
 }
+
+/* ============ 拍营养成分表 → 自定义食物 ============ */
+const OCR_SERVER = 'http://127.0.0.1:8765';
+
+function handleNutritionPhoto(event){
+  var file=event.target.files[0];event.target.value='';if(!file)return;
+  showLoading('识别营养成分表...');
+  var reader=new FileReader();
+  reader.onload=function(e){
+    resizeImage(e.target.result,1600,0.85,function(compressed){
+      callOcr(compressed);
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+async function callOcr(dataUrl){
+  try{
+    const resp=await fetch(OCR_SERVER+'/ocr',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dataUrl})});
+    const data=await resp.json();
+    hideLoading();
+    if(data&&data.ok&&data.parsed){openCustomFoodEditor(data.parsed,data.texts||[])}
+    else{showToast((data&&data.error)||'识别失败，请重试')}
+  }catch(err){
+    hideLoading();
+    showToast('OCR 服务未启动，请先运行 nutrition_ocr_server.py');
+  }
+}
+
+function openCustomFoodEditor(parsed,texts){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=(v===0||v===null||v===undefined||v==='')?'':v};
+  document.getElementById('cfName').value='';
+  set('cfCal',parsed.cal);set('cfP',parsed.p);set('cfC',parsed.c);set('cfF',parsed.f);
+  set('cfFi',parsed.fi);set('cfVa',parsed.va);set('cfVc',parsed.vc);
+  const hint=document.getElementById('cfPerHint');
+  hint.className='cf-hint'+(parsed.per100===false?' warn':'');
+  hint.textContent=parsed.per100===false?'⚠️ 识别到「每份」标注，数值按每份计，请确认基准量':'📋 已从营养成分表识别，按每 100 克计，可手动修正';
+  const raw=document.getElementById('cfRaw');
+  if(texts&&texts.length){raw.style.display='block';raw.textContent='识别原文：'+texts.join(' / ')}else{raw.style.display='none'}
+  showModal('customFoodModal');
+}
+
+function saveCustomFood(){
+  const name=document.getElementById('cfName').value.trim();
+  const num=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?0:v};
+  const cal=Math.round(num('cfCal'));
+  if(!name){showToast('请填写食物名称');return}
+  if(cal<=0){showToast('请填写热量（kcal）');return}
+  const food={name:name,icon:'🏷️',cat:'自定义',cal:cal,p:num('cfP'),c:num('cfC'),f:num('cfF'),fi:num('cfFi'),va:Math.round(num('cfVa')),vc:num('cfVc')};
+  const list=state.customFoods||[];
+  const idx=list.findIndex(x=>x.name===name);
+  if(idx>=0)list[idx]=food;else list.push(food);
+  state.customFoods=list;
+  saveState();
+  hideModal('customFoodModal');
+  showToast('已保存自定义食物: '+name);
+  openAmountModal(food);
+}
+function closeCustomFoodModal(){hideModal('customFoodModal')}
 
 var nbdCurrentNutri='protein';
 function openNutritionBreakdown(){

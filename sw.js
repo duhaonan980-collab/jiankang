@@ -4,7 +4,7 @@
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v60';
+const CACHE_VERSION = 'v67';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 
@@ -41,19 +41,27 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          // 清除旧版本缓存
-          if (
-            (cacheName.startsWith('calorie-app-shell-') && cacheName !== APP_SHELL) ||
-            (cacheName.startsWith('calorie-photos-') && cacheName !== PHOTO_CACHE)
-          ) {
-            console.log('[SW] 清除旧缓存:', cacheName);
-            return caches.delete(cacheName);
+          // 清除所有旧版本缓存（包括 shell 和 photos）
+          if (cacheName.startsWith('calorie-app-shell-') || cacheName.startsWith('calorie-photos-')) {
+            if (cacheName !== APP_SHELL && cacheName !== PHOTO_CACHE) {
+              console.log('[SW] 清除旧缓存:', cacheName);
+              return caches.delete(cacheName);
+            }
           }
         })
       );
     }).then(() => {
-      // 接管所有页面
-      return self.clients.claim();
+      // 接管所有页面，并强制刷新（让客户端拉新 HTML）
+      return self.clients.claim().then(() => {
+        return self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            // 通知所有客户端跳过等待并强制 reload
+            if (client.navigate) {
+              client.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION });
+            }
+          });
+        });
+      });
     })
   );
 });
