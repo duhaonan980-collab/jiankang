@@ -4,7 +4,7 @@
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v77';
+const CACHE_VERSION = 'v78';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 
@@ -15,7 +15,8 @@ const APP_SHELL_FILES = [
   './sw.js',
   './favicon.png',
   './apple-touch-icon.png',
-  './foods.js'
+  './foods.js',
+  './recipes.js'
 ];
 
 // ==================== INSTALL ====================
