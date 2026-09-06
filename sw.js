@@ -1,10 +1,10 @@
 /* ============================================
    热量营养检测 - Service Worker
-   版本: v3.11.4
+   版本: v3.11.11
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v82';
+const CACHE_VERSION = 'v89';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 
