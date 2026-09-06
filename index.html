@@ -2571,13 +2571,34 @@ function newRecipeForm(){
 function importBuiltinToMine(){
   var src=findRecipe(_rcpCurId);
   if(!src||!src.builtin)return null;
+  /* 已有同名"我的菜谱"就直接编辑那一份，避免每点一次复制一份 */
+  var exist=null;(state.recipes||[]).forEach(function(r){if(!r.builtin&&r.name===src.name)exist=r});
+  if(exist){
+    /* 兼容旧脏数据：早前复制出的副本可能缺营养字段，顺手补齐 */
+    if(!(exist.cal>0)){
+      var et=_rcpTotals(exist.ingrs||[]);
+      exist.cal=Math.round(et.cal);exist.p=+et.p.toFixed(1);exist.c=+et.c.toFixed(1);exist.f=+et.f.toFixed(1);exist.fi=+et.fi.toFixed(1);exist.va=Math.round(et.va);exist.vc=+et.vc.toFixed(1);exist.cat=_rcpCatOf(et.p,et.c,et.fi);exist.icon=exist.icon||src.icon||'🍳';
+      saveState();
+    }
+    _rcpCurId=exist.id;showToast('已有同名菜谱，直接编辑「'+src.name+'」');return exist
+  }
   var id='r'+Date.now();
   var ingrs=(src.ingrs||[]).map(function(x){
     var db=null;(typeof FOOD_DB!=='undefined'?FOOD_DB:[]).forEach(function(f){if(f.name===x.name)db=f});
     return{name:x.name,icon:x.icon||'🍽️',cal:db?(db.cal||0):0,p:db?(db.p||0):0,c:db?(db.c||0):0,f:db?(db.f||0):0,fi:db?(db.fi||0):0,va:db?(db.va||0):0,vc:db?(db.vc||0):0,gram:x.gram||100};
   });
-  var rec={id:id,name:src.name,img:null,time:src.time||0,season:src.season||'',ingrs:ingrs,steps:(src.steps&&src.steps.length)?src.steps.slice():[],createdAt:Date.now()};
-  var list=state.recipes||[];list.push(rec);state.recipes=list;saveState();
+  /* 同步算出营养字段，否则详情/列表会显示 undefined */
+  var t=_rcpTotals(ingrs);
+  var rec={id:id,name:src.name,icon:src.icon||'🍳',img:null,time:src.time||0,season:src.season||'',ingrs:ingrs,steps:(src.steps&&src.steps.length)?src.steps.slice():[],
+    cal:Math.round(t.cal),p:+t.p.toFixed(1),c:+t.c.toFixed(1),f:+t.f.toFixed(1),fi:+t.fi.toFixed(1),va:Math.round(t.va),vc:+t.vc.toFixed(1),cat:_rcpCatOf(t.p,t.c,t.fi),createdAt:Date.now()};
+  var list=state.recipes||[];list.push(rec);state.recipes=list;
+  /* 立即同步自定义菜肴（主页同名顶替生效），保存时会被 saveRecipe 同 idr 覆盖 */
+  var cf=state.customFoods||[];cf=cf.filter(function(x){return !(x.idr&&x.idr===id)});
+  var totG=ingrs.reduce(function(s2,x){return s2+(x.gram||0)},0);
+  var k=totG>0?(100/totG):1;
+  cf.push({idr:id,name:rec.name,cat:'菜肴',imgkey:null,cal:Math.round(rec.cal*k),p:+((rec.p||0)*k).toFixed(1),c:+((rec.c||0)*k).toFixed(1),f:+((rec.f||0)*k).toFixed(1),fi:+((rec.fi||0)*k).toFixed(1),va:Math.round((rec.va||0)*k),vc:+((rec.vc||0)*k).toFixed(1)});
+  state.customFoods=cf;
+  saveState();
   _rcpCurId=id;
   showToast('已把「'+rec.name+'」复制为我的菜谱，可随意修改');
   return rec;
