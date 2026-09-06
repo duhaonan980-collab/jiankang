@@ -568,7 +568,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
     <div id="rcpDetail" style="display:none">
       <div id="rcpDImg" style="width:100%;height:300px;background-color:rgba(118,118,128,0.08);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:80px"></div>
-      <button onclick="exitRecipeDetail()" aria-label="返回" style="position:fixed;top:calc(var(--safe-top) + 10px);left:14px;z-index:40;width:36px;height:36px;border-radius:50%;border:none;background:var(--card-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid var(--card-border);font-size:20px;line-height:1;cursor:pointer;color:var(--text)">‹</button>
+      <button onclick="navUiBack()" aria-label="返回" style="position:fixed;top:calc(var(--safe-top) + 10px);left:14px;z-index:40;width:36px;height:36px;border-radius:50%;border:none;background:var(--card-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid var(--card-border);font-size:20px;line-height:1;cursor:pointer;color:var(--text)">‹</button>
       <div id="rcpDContent" style="position:relative;z-index:2;margin-top:-20px;border-radius:20px 20px 0 0;background:var(--bg);padding:18px 0 132px;min-height:72vh"></div>
       <div id="rcpDActions" style="display:none;position:fixed;left:0;right:0;bottom:calc(var(--tab-h) + var(--safe-bottom) + 6px);padding:8px 16px;z-index:30;background:var(--bg)">
         <div style="display:flex;gap:8px;max-width:520px;margin:0 auto">
@@ -676,7 +676,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：个人资料 ============ -->
     <div id="setSubProfile" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <button class="set-back" onclick="settingsSubBack()">‹</button>
         <div class="set-title">个人资料</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">基本资料 · 影响热量目标计算</div>
@@ -697,7 +697,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：身体测量与体脂 ============ -->
     <div id="setSubBody" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <button class="set-back" onclick="settingsSubBack()">‹</button>
         <div class="set-title">身体测量与体脂</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">选填 · 填得越全，体脂越准</div>
@@ -729,7 +729,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：目标与活动 ============ -->
     <div id="setSubGoal" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <button class="set-back" onclick="settingsSubBack()">‹</button>
         <div class="set-title">目标与活动</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">决定每日热量与营养素推荐</div>
@@ -769,7 +769,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：应用锁 ============ -->
     <div id="setSubLock" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <button class="set-back" onclick="settingsSubBack()">‹</button>
         <div class="set-title">应用锁</div>
         <span id="lockStatusPill" style="display:none;margin-left:auto;font-size:11px;background:rgba(52,199,89,0.15);color:#1E9E4E;padding:3px 11px;border-radius:10px;font-weight:600">已开启</span>
       </div>
@@ -814,7 +814,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：通用与数据 ============ -->
     <div id="setSubData" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <button class="set-back" onclick="settingsSubBack()">‹</button>
         <div class="set-title">通用与数据</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">备份 · 迁移 · 存储</div>
@@ -1924,7 +1924,7 @@ function renderStatsGrid(){
   document.getElementById('statsGrid').innerHTML='<div class="stat-item"><div class="stat-val">'+weekAvg+'</div><div class="stat-label">本周日均热量</div></div><div class="stat-item"><div class="stat-val">'+streak+'</div><div class="stat-label">连续记录天数</div></div><div class="stat-item"><div class="stat-val">'+total+'</div><div class="stat-label">总记录天数</div></div><div class="stat-item"><div class="stat-val" style="font-size:16px">'+mostEaten+'</div><div class="stat-label">最常吃食物</div></div>'
 }
 
-function openSettingsSub(key){
+function _showSetSub(key){
   var home=document.getElementById('setHome');if(home)home.style.display='none';
   document.querySelectorAll('#settings-page .set-sub').forEach(function(el){el.style.display='none'});
   var t=document.getElementById('setSub'+key.charAt(0).toUpperCase()+key.slice(1));
@@ -1932,12 +1932,21 @@ function openSettingsSub(key){
   t.style.display='block';
   var pg=document.getElementById('settings-page');if(pg)pg.scrollTop=0;
 }
+function openSettingsSub(key){
+  /* 记录返回目标：settings 子页相互嵌套时记录上一个子页 */
+  if(_navCur&&_navCur.kind==='set'&&_navCur.key===key){_showSetSub(key);return}
+  var back=_navCur&&_navCur.kind==='set'?{kind:'set',key:_navCur.key}:{kind:'setHome'};
+  _navPush(back);
+  _navCur={kind:'set',key:key};
+  _showSetSub(key);
+}
 function settingsShowHome(){
   var home=document.getElementById('setHome');if(home)home.style.display='';
   document.querySelectorAll('#settings-page .set-sub').forEach(function(el){el.style.display='none'});
   refreshSettingsTop();
   var pg=document.getElementById('settings-page');if(pg)pg.scrollTop=0;
 }
+function settingsSubBack(){navUiBack()}
 function refreshSettingsTop(){
   function T(id,v){var e=document.getElementById(id);if(e)e.textContent=v}
   function setD(id,v,cls){var e=document.getElementById(id);if(!e)return;if(v==null){e.style.display='none';return}e.style.display='';e.className='hm-d '+(cls||'');e.textContent=v}
@@ -2962,6 +2971,10 @@ function onRcpScaleGram(el){
 function openRecipeDetail(id){
   var rec=findRecipe(id);
   if(!rec)return;
+  if(!(_navCur&&_navCur.kind==='recipeDetail'&&_navCur.id===id)){
+    _navPush({kind:'recipeHome'});
+    _navCur={kind:'recipeDetail',id:id};
+  }
   var home=document.getElementById('rcpHome');
   var det=document.getElementById('rcpDetail');
   if(!home||!det)return;
@@ -3019,6 +3032,7 @@ function openRecipeDetail(id){
     +'</div>';
 }
 function exitRecipeDetail(){
+  _navCur=null;
   var home=document.getElementById('rcpHome');
   var det=document.getElementById('rcpDetail');
   if(home)home.style.display='';
@@ -3494,7 +3508,63 @@ function openCalorieBreakdown(){
   showModal('calorieModal');
 }
 
-function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}else if(n==='recipe'){renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}}
+var _navStack=[],_navCur=null;
+function _navPush(back){
+  /* 同屏去重由调用方通过 _navCur 判断（同目标不重复压），此处直接入栈 */
+  _navStack.push(back);
+  try{history.pushState({nav:1},'')}catch(e){}
+}
+function _navDoBack(){
+  if(!_navStack.length)return;
+  var t=_navStack.pop();
+  if(!t)return;
+  if(t.kind==='recipeHome'){
+    _navCur=null;exitRecipeDetail();
+  }else if(t.kind==='setHome'){
+    _navCur=null;settingsShowHome();
+  }else if(t.kind==='set'){
+    _navCur={kind:'set',key:t.key};_showSetSub(t.key);
+  }
+}
+function _navClear(){
+  /* 切换底部 tab / 关闭二级视图时：内部栈可保留(系统返回仍能一步步回)，此处只清理重复状态标记 */
+  if(!_navStack.length)return;
+  /* 不主动清：让 popstate 自然回退 */
+}
+window.addEventListener('popstate',function(){_navDoBack()});
+/* iOS 边缘右滑返回：仅二级视图打开时拦截左缘横向滑动 */
+var _swipeT=null;
+document.addEventListener('touchstart',function(e){
+  if(!(_navStack.length&&_navCur)){return}
+  var t=e.touches&&e.touches[0];if(!t)return;
+  /* 仅屏幕左缘约 22px 内起手 */
+  if(t.clientX>22)return;
+  _swipeT={x:t.clientX,y:t.clientY,active:true,moved:false};
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+  if(!_swipeT||!_swipeT.active)return;
+  var t=e.touches&&e.touches[0];if(!t)return;
+  var dx=t.clientX-_swipeT.x,dy=t.clientY-_swipeT.y;
+  /* 判定为横向右滑且位移足够 */
+  if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.5){_swipeT.moved=true}
+  if(_swipeT.moved){try{e.preventDefault()}catch(err){}}
+},{passive:false});
+document.addEventListener('touchend',function(e){
+  if(!_swipeT)return;
+  var t=e.changedTouches&&e.changedTouches[0];
+  if(_swipeT.moved&&t){
+    var dx=t.clientX-_swipeT.x;
+    if(dx>80){navUiBack()}
+  }
+  _swipeT=null;
+},{passive:true});
+
+function navUiBack(){
+  /* ‹ 按钮 / 手势：优先走 history.back 使系统返回键与 UI 同步 */
+  if(_navStack.length){try{history.back();return}catch(e){}}
+  _navDoBack();
+}
+function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='recipe'){var det=document.getElementById('rcpDetail');if(det&&det.style.display!=='none'){det.style.display='none';var hm=document.getElementById('rcpHome');if(hm)hm.style.display='';var br=document.getElementById('rcpDActions');if(br)br.style.display='none';_navCur=null;renderRecipeList()}renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}else if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
 function hideModal(id){document.getElementById(id).classList.remove('show')}
 function showLoading(t){document.getElementById('loadingText').textContent=t||'加载中...';document.getElementById('loadingOverlay').classList.add('show')}
