@@ -274,7 +274,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .about-text{text-align:center;padding:24px;font-size:13px;color:var(--text3)}
 .about-text .ver{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:4px}
 /* iOS 18 标准 tab 栏：全屏贴底、顶部细线、简洁无装饰 */
-.tab-bar{position:fixed;left:0;right:0;bottom:0;height:calc(var(--tab-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);display:flex;align-items:center;justify-content:space-around;background:var(--bg);border-top:0.5px solid var(--tab-border);z-index:100}
+.tab-bar{position:fixed;left:0;right:0;bottom:0;height:calc(var(--tab-h) + env(safe-area-inset-bottom,0px));transition:transform .28s cubic-bezier(0.32,0.72,0,1);padding-bottom:env(safe-area-inset-bottom,0px);display:flex;align-items:center;justify-content:space-around;background:var(--bg);border-top:0.5px solid var(--tab-border);z-index:100}
 .tab-item{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#8E8E93;transition:color .2s ease;height:100%;-webkit-tap-highlight-color:transparent}
 .tab-item:active{opacity:.6}
 .tab-item.active{color:var(--blue)}
@@ -329,6 +329,12 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{color:#fff;font-size:16px;font-weight:600}
+/* ===== 二级全屏模式：进入二级页隐藏底部 tab、页面留白归零 ===== */
+body.fullscreen{--tab-h:0px}
+/* 注意：--tab-h 归零会让 .tab-bar 自身高度塌成 0，translateY(%) 相对 0 高度 = 不位移！
+   因此全屏隐藏 tab 栏必须给固定高度基准再整体移出。 */
+body.fullscreen .tab-bar{height:calc(49px + env(safe-area-inset-bottom,0px));transform:translateY(calc(100% + 12px));opacity:0;pointer-events:none;visibility:hidden}
+body.fullscreen .page.active{padding-bottom:calc(var(--safe-bottom) + 18px)}
 .toast{position:fixed;bottom:calc(var(--tab-h) + var(--safe-bottom) + 24px);left:50%;transform:translateX(-50%) translateY(100px);background:rgba(0,0,0,0.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;padding:10px 24px;border-radius:20px;font-size:14px;font-weight:600;z-index:1200;opacity:0;transition:all .3s;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -676,7 +682,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：个人资料 ============ -->
     <div id="setSubProfile" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsSubBack()">‹</button>
+        <button class="set-back" onclick="navUiBack()">‹</button>
         <div class="set-title">个人资料</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">基本资料 · 影响热量目标计算</div>
@@ -697,7 +703,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：身体测量与体脂 ============ -->
     <div id="setSubBody" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsSubBack()">‹</button>
+        <button class="set-back" onclick="navUiBack()">‹</button>
         <div class="set-title">身体测量与体脂</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">选填 · 填得越全，体脂越准</div>
@@ -729,7 +735,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：目标与活动 ============ -->
     <div id="setSubGoal" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsSubBack()">‹</button>
+        <button class="set-back" onclick="navUiBack()">‹</button>
         <div class="set-title">目标与活动</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">决定每日热量与营养素推荐</div>
@@ -769,7 +775,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：应用锁 ============ -->
     <div id="setSubLock" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsSubBack()">‹</button>
+        <button class="set-back" onclick="navUiBack()">‹</button>
         <div class="set-title">应用锁</div>
         <span id="lockStatusPill" style="display:none;margin-left:auto;font-size:11px;background:rgba(52,199,89,0.15);color:#1E9E4E;padding:3px 11px;border-radius:10px;font-weight:600">已开启</span>
       </div>
@@ -814,7 +820,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <!-- ============ 二级：通用与数据 ============ -->
     <div id="setSubData" class="set-sub" style="display:none">
       <div class="set-sub-head">
-        <button class="set-back" onclick="settingsSubBack()">‹</button>
+        <button class="set-back" onclick="navUiBack()">‹</button>
         <div class="set-title">通用与数据</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">备份 · 迁移 · 存储</div>
@@ -958,8 +964,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <button class="modal-btn danger" onclick="closeRecAllModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button>
   </div></div></div>
 
-  <div class="modal-overlay" id="calendarModal">
-  <div class="modal-overlay" id="calendarModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">历史记录</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div><div class="calendar-grid" id="calGrid"></div><div class="cal-stats" id="calStats"></div><div id="calDetail"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeCalendarModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div></div></div></div>
+  <div class="modal-overlay" id="calendarModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">历史记录</div><div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div><div class="calendar-grid" id="calGrid"></div><div class="cal-stats" id="calStats"></div><div id="calDetail"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeCalendarModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:12px">关闭</button></div></div></div></div>
 
   <div class="modal-overlay" id="photoModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><img class="photo-modal-img" id="photoModalImg" alt=""><div id="photoModalInfo" style="text-align:center;margin-bottom:16px"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closePhotoModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">关闭</button></div></div></div></div></div>
 
@@ -1025,7 +1030,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     </div>
   </div>
   <!-- ===== RECIPE EDITOR 菜谱编辑 ===== -->
-  <div class="modal-overlay" id="recipeModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll">
+  <div class="modal-overlay" id="recipeModal" data-maskkeep="1"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll">
     <div class="modal-title" id="recipeModalTitle">新建菜谱</div>
 
     <div class="rcp-cover" id="rcpImgCover" onclick="document.getElementById('rcpImgInput').click()">
@@ -1924,6 +1929,75 @@ function renderStatsGrid(){
   document.getElementById('statsGrid').innerHTML='<div class="stat-item"><div class="stat-val">'+weekAvg+'</div><div class="stat-label">本周日均热量</div></div><div class="stat-item"><div class="stat-val">'+streak+'</div><div class="stat-label">连续记录天数</div></div><div class="stat-item"><div class="stat-val">'+total+'</div><div class="stat-label">总记录天数</div></div><div class="stat-item"><div class="stat-val" style="font-size:16px">'+mostEaten+'</div><div class="stat-label">最常吃食物</div></div>'
 }
 
+/* ========== 二级全屏导航栈 ==========
+   返回目标栈：每进一层二级视图 push 一条「返回该回哪」+ history.pushState。
+   系统返回键/popstate、‹ 按钮、边缘滑动手势统一汇到 popstate -> _navRestoreOne 弹栈恢复。
+   pushState 在 file:// 下可能失败(catch)，此时 ‹/手势靠超时兜底手动弹栈。 */
+var _navStack=[],_navWaitTimer=null,_curSetKey=null,_curRecipeDetail=null;
+function _fsOn(){document.body.classList.add('fullscreen')}
+function _fsOff(){document.body.classList.remove('fullscreen')}
+function _pushNav(back){
+  _navStack.push(back);
+  var ok=false;
+  try{history.pushState({n:_navStack.length},'');ok=true}catch(e){ok=false}
+  return ok;
+}
+function _restoreNavEntry(t){
+  if(!t)return;
+  if(t.type==='setHome'){_curSetKey=null;_fsOff();settingsShowHome()}
+  else if(t.type==='setSub'){_curSetKey=t.key;_showSetSub(t.key);_fsOn()}
+  else if(t.type==='recipeList'){_curRecipeDetail=null;_fsOff();exitRecipeDetail()}
+}
+function _navRestoreOne(){
+  if(!_navStack.length)return;
+  var t=_navStack.pop();
+  _restoreNavEntry(t);
+}
+window.addEventListener('popstate',function(){
+  /* 系统返回 / Android 返回键 / 浏览器侧滑都到这儿：弹一条恢复 */
+  if(_navWaitTimer){clearTimeout(_navWaitTimer);_navWaitTimer=null}
+  _navRestoreOne();
+});
+/* iOS 边缘右滑返回：仅全屏二级视图(_navStack 非空)时拦截左缘手势 */
+var _swipeT=null;
+document.addEventListener('touchstart',function(e){
+  if(!_navStack.length)return;
+  var t=e.touches&&e.touches[0];if(!t)return;
+  if(t.clientX>22)return;
+  _swipeT={x:t.clientX,y:t.clientY,active:true,moved:false};
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+  if(!_swipeT||!_swipeT.active)return;
+  var t=e.touches&&e.touches[0];if(!t)return;
+  var dx=t.clientX-_swipeT.x,dy=t.clientY-_swipeT.y;
+  if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.5){_swipeT.moved=true}
+  if(_swipeT.moved){try{e.preventDefault()}catch(err){}}
+},{passive:false});
+document.addEventListener('touchend',function(e){
+  if(!_swipeT)return;
+  var t=e.changedTouches&&e.changedTouches[0];
+  if(_swipeT.moved&&t&&(t.clientX-_swipeT.x>80)){navUiBack()}
+  _swipeT=null;
+},{passive:true});
+
+function navUiBack(){
+  /* ‹ 按钮 / iOS 边缘滑动手势：优先走 history.back() 让 popstate 处理(与系统键同步) */
+  if(_navStack.length){
+    var before=_navStack.length;
+    var fired=false;
+    try{history.back();fired=true}catch(e){fired=false}
+    if(!fired){
+      /* pushState 失败(file://)等场景：等一小会若栈没变则手动弹 */
+      _navWaitTimer=setTimeout(function(){_navWaitTimer=null;if(_navStack.length===before)_navRestoreOne()},120);
+    }else{
+      _navWaitTimer=setTimeout(function(){_navWaitTimer=null;if(_navStack.length===before)_navRestoreOne()},150);
+    }
+  }else{
+    /* 无栈：兜底回当前 tab 根 */
+    var pgEl=document.querySelector('.page.active');
+    if(pgEl&&pgEl.id==='settings-page'){settingsShowHome()}
+  }
+}
 function _showSetSub(key){
   var home=document.getElementById('setHome');if(home)home.style.display='none';
   document.querySelectorAll('#settings-page .set-sub').forEach(function(el){el.style.display='none'});
@@ -1933,20 +2007,23 @@ function _showSetSub(key){
   var pg=document.getElementById('settings-page');if(pg)pg.scrollTop=0;
 }
 function openSettingsSub(key){
-  /* 记录返回目标：settings 子页相互嵌套时记录上一个子页 */
-  if(_navCur&&_navCur.kind==='set'&&_navCur.key===key){_showSetSub(key);return}
-  var back=_navCur&&_navCur.kind==='set'?{kind:'set',key:_navCur.key}:{kind:'setHome'};
-  _navPush(back);
-  _navCur={kind:'set',key:key};
+  /* 重复进入同一子页不重复压栈 */
+  if(_curSetKey===key){_showSetSub(key);_fsOn();return}
+  /* 返回目标 = 当前所在：主页则回主页，已在子页则回上一子页 */
+  var back=_curSetKey?{type:'setSub',key:_curSetKey}:{type:'setHome'};
+  _pushNav(back);
+  _curSetKey=key;
   _showSetSub(key);
+  _fsOn();
 }
 function settingsShowHome(){
+  _curSetKey=null;
+  _fsOff();
   var home=document.getElementById('setHome');if(home)home.style.display='';
   document.querySelectorAll('#settings-page .set-sub').forEach(function(el){el.style.display='none'});
   refreshSettingsTop();
   var pg=document.getElementById('settings-page');if(pg)pg.scrollTop=0;
 }
-function settingsSubBack(){navUiBack()}
 function refreshSettingsTop(){
   function T(id,v){var e=document.getElementById(id);if(e)e.textContent=v}
   function setD(id,v,cls){var e=document.getElementById(id);if(!e)return;if(v==null){e.style.display='none';return}e.style.display='';e.className='hm-d '+(cls||'');e.textContent=v}
@@ -2971,10 +3048,11 @@ function onRcpScaleGram(el){
 function openRecipeDetail(id){
   var rec=findRecipe(id);
   if(!rec)return;
-  if(!(_navCur&&_navCur.kind==='recipeDetail'&&_navCur.id===id)){
-    _navPush({kind:'recipeHome'});
-    _navCur={kind:'recipeDetail',id:id};
+  if(_curRecipeDetail!==id){
+    _pushNav({type:'recipeList'});
+    _curRecipeDetail=id;
   }
+  _fsOn();
   var home=document.getElementById('rcpHome');
   var det=document.getElementById('rcpDetail');
   if(!home||!det)return;
@@ -3032,7 +3110,8 @@ function openRecipeDetail(id){
     +'</div>';
 }
 function exitRecipeDetail(){
-  _navCur=null;
+  _curRecipeDetail=null;
+  _fsOff();
   var home=document.getElementById('rcpHome');
   var det=document.getElementById('rcpDetail');
   if(home)home.style.display='';
@@ -3508,64 +3587,21 @@ function openCalorieBreakdown(){
   showModal('calorieModal');
 }
 
-var _navStack=[],_navCur=null;
-function _navPush(back){
-  /* 同屏去重由调用方通过 _navCur 判断（同目标不重复压），此处直接入栈 */
-  _navStack.push(back);
-  try{history.pushState({nav:1},'')}catch(e){}
-}
-function _navDoBack(){
-  if(!_navStack.length)return;
-  var t=_navStack.pop();
-  if(!t)return;
-  if(t.kind==='recipeHome'){
-    _navCur=null;exitRecipeDetail();
-  }else if(t.kind==='setHome'){
-    _navCur=null;settingsShowHome();
-  }else if(t.kind==='set'){
-    _navCur={kind:'set',key:t.key};_showSetSub(t.key);
-  }
-}
-function _navClear(){
-  /* 切换底部 tab / 关闭二级视图时：内部栈可保留(系统返回仍能一步步回)，此处只清理重复状态标记 */
-  if(!_navStack.length)return;
-  /* 不主动清：让 popstate 自然回退 */
-}
-window.addEventListener('popstate',function(){_navDoBack()});
-/* iOS 边缘右滑返回：仅二级视图打开时拦截左缘横向滑动 */
-var _swipeT=null;
-document.addEventListener('touchstart',function(e){
-  if(!(_navStack.length&&_navCur)){return}
-  var t=e.touches&&e.touches[0];if(!t)return;
-  /* 仅屏幕左缘约 22px 内起手 */
-  if(t.clientX>22)return;
-  _swipeT={x:t.clientX,y:t.clientY,active:true,moved:false};
-},{passive:true});
-document.addEventListener('touchmove',function(e){
-  if(!_swipeT||!_swipeT.active)return;
-  var t=e.touches&&e.touches[0];if(!t)return;
-  var dx=t.clientX-_swipeT.x,dy=t.clientY-_swipeT.y;
-  /* 判定为横向右滑且位移足够 */
-  if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.5){_swipeT.moved=true}
-  if(_swipeT.moved){try{e.preventDefault()}catch(err){}}
-},{passive:false});
-document.addEventListener('touchend',function(e){
-  if(!_swipeT)return;
-  var t=e.changedTouches&&e.changedTouches[0];
-  if(_swipeT.moved&&t){
-    var dx=t.clientX-_swipeT.x;
-    if(dx>80){navUiBack()}
-  }
-  _swipeT=null;
-},{passive:true});
-
-function navUiBack(){
-  /* ‹ 按钮 / 手势：优先走 history.back 使系统返回键与 UI 同步 */
-  if(_navStack.length){try{history.back();return}catch(e){}}
-  _navDoBack();
-}
-function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='recipe'){var det=document.getElementById('rcpDetail');if(det&&det.style.display!=='none'){det.style.display='none';var hm=document.getElementById('rcpHome');if(hm)hm.style.display='';var br=document.getElementById('rcpDActions');if(br)br.style.display='none';_navCur=null;renderRecipeList()}renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}else if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}}
+function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}else if(n==='recipe'){renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t&&t.classList&&t.classList.contains('modal-overlay')&&!t.classList.contains('show'))return;
+  if(t&&t.classList&&t.classList.contains('modal-overlay')){
+    if(t.getAttribute('data-maskkeep')==='1')return;
+    /* 自定义添加弹窗：已填内容时点遮罩先确认，避免误触丢输入 */
+    if(t.id==='customFoodModal'){
+      var _has=function(x){var el=document.getElementById(x);return el&&(el.value||'').trim()!==''};
+      if(_has('cfName')||_has('cfCal')||_has('cfP')||_has('cfC')||_has('cfF')){if(!confirm('放弃当前编辑的内容？'))return}
+    }
+    t.classList.remove('show');
+  }
+});
 function hideModal(id){document.getElementById(id).classList.remove('show')}
 function showLoading(t){document.getElementById('loadingText').textContent=t||'加载中...';document.getElementById('loadingOverlay').classList.add('show')}
 function hideLoading(){document.getElementById('loadingOverlay').classList.remove('show')}
