@@ -1930,10 +1930,10 @@ function renderStatsGrid(){
 }
 
 /* ========== 二级全屏导航栈 ==========
-   返回目标栈：每进一层二级视图 push 一条「返回该回哪」+ history.pushState（带唯一 navId）。
-   系统返回键/popstate、‹ 按钮、iOS 边缘滑动手势统一汇到 popstate -> _navRestoreOne 弹栈恢复。
-   防双弹：navId 识别重复 popstate + 300ms 恢复防抖；pushState 失败(file://)时 ‹/手势直接手动弹栈。
-   切 tab 时 _collapseSecondaries 收回二级视图并把残留条目标为死条目（只消费历史、不触发恢复）。 */
+   栈与 history 一一对应：进入二级 push 一次栈 + pushState；任何「返回」
+   （‹ 按钮 / iOS 边缘滑动手势 / Android 系统返回键 / 浏览器侧滑）都让 history 退一格，
+   由 popstate 统一弹栈恢复。pushState 不可用时(file://)退化为纯栈式手动弹栈。
+   防双弹：300ms 恢复防抖；切换 tab 时 _collapseSecondaries 清空栈并 history.go(-n) 同步 history。 */
 var _navStack=[],_curSetKey=null,_curRecipeDetail=null,_navSeq=0,_navPushOk=false,_navGuardUntil=0;
 function _fsOn(){document.body.classList.add('fullscreen')}
 function _fsOff(){document.body.classList.remove('fullscreen')}
@@ -1952,21 +1952,29 @@ function _restoreNavEntry(t){
   else if(t.type==='recipeList'){_curRecipeDetail=null;_fsOff();exitRecipeDetail()}
 }
 function _navRestoreOne(){
-  if(!_navStack.length)return;
-  /* 300ms 防抖：手势+系统各触发一次等双触发场景，只吃第一次 */
+  if(!_navStack.length)return false;
   var now=Date.now();
-  if(now<_navGuardUntil)return;
+  if(now<_navGuardUntil)return false;   /* 防双触发：300ms 内只弹一次 */
   _navGuardUntil=now+300;
   var t=_navStack.pop();
   _restoreNavEntry(t.back);
+  return true;
+}
+function _navFallbackIfEmpty(){
+  /* 栈已空：兜底收回设置主页二级视图 */
+  var pgEl=document.querySelector('.page.active');
+  if(pgEl&&pgEl.id==='settings-page'){settingsShowHome();_fsOff()}
 }
 window.addEventListener('popstate',function(e){
-  /* 系统返回 / Android 返回键 / 浏览器侧滑都到这儿：弹一条恢复 */
-  if(!_navStack.length)return;
-  /* 重复 popstate（同一历史条目再进来）：目标已在栈顶则忽略 */
-  var top=_navStack[_navStack.length-1];
-  if(e.state&&e.state.navId===top.id)return;
-  _navRestoreOne();
+  /* 统一入口：栈与 history 一一对应。history 已退一格，我们同步弹栈。 */
+  if(_navStack.length){
+    /* 重复 popstate（同一历史条目再进来）：目标已在栈顶则忽略 */
+    var top=_navStack[_navStack.length-1];
+    if(e.state&&e.state.navId===top.id)return;
+    _navRestoreOne();
+  }else{
+    _navFallbackIfEmpty();
+  }
 });
 /* iOS 边缘右滑返回：仅 iOS 启用（iOS PWA 无系统返回，需页面自实现）。
    Android 上系统返回手势本身从左缘滑入，若页面也拦截会「手势+系统」双触发连弹两层 */
@@ -1994,19 +2002,13 @@ document.addEventListener('touchend',function(e){
 },{passive:true});
 
 function navUiBack(){
-  /* ‹ 按钮 / iOS 边缘滑动手势 */
-  if(_navStack.length){
-    if(_navPushOk){
-      /* pushState 可用：交给 history.back() -> popstate 统一弹栈，不做超时兜底（会与 popstate 竞态双弹） */
-      try{history.back()}catch(e){_navRestoreOne()}
-    }else{
-      /* pushState 不可用(file:// 等)：无历史条目可退，直接手动弹栈 */
-      _navRestoreOne();
-    }
+  /* 统一入口：栈与 history 一一对应。
+     pushState 可用 → history.back() 让 history 退一格，popstate 触发弹栈；
+     pushState 不可用(file://)→ 纯栈式直接弹栈；栈空时一律 settingsShowHome 兜底。 */
+  if(_navPushOk){
+    try{history.back()}catch(e){if(!_navRestoreOne())_navFallbackIfEmpty()}
   }else{
-    /* 无栈：兜底回当前 tab 根 */
-    var pgEl=document.querySelector('.page.active');
-    if(pgEl&&pgEl.id==='settings-page'){settingsShowHome()}
+    if(!_navRestoreOne())_navFallbackIfEmpty();
   }
 }
 function _showSetSub(key){
@@ -2980,10 +2982,39 @@ function renderRecipeList(){
       +'</div>';
   });
   el.innerHTML=html;
-  list.forEach(function(r){
-    if(r.img){getPhoto(r.img).then(function(d){
-      if(d){var box=el.querySelector('[data-rimg="'+r.id+'"]');if(box){box.style.backgroundImage='url('+d+')';box.style.backgroundSize='cover';box.textContent=''}}
-    })}
+  _loadRcpThumbnails(el,list);
+}
+/* 缩略图懒加载：进入视口或距视口 200px 内才从 IndexedDB 读取，避免进入菜谱页就发 150 个 getPhoto
+   把 #recipe-page（滚动容器）作为 root 观察，进入视口才读。返回列表时 DOM 已在，无需重渲。 */
+var _rcpThumbIO=null;
+function _loadRcpThumbnails(el,list){
+  if(!('IntersectionObserver' in window)){
+    /* 兜底：旧 WebView 直接全量读 */
+    list.forEach(function(r){if(r.img)getPhoto(r.img).then(function(d){if(d){var box=el.querySelector('[data-rimg="'+r.id+'"]');if(box){box.style.backgroundImage='url('+d+')';box.style.backgroundSize='cover';box.textContent=''}}})});
+    return;
+  }
+  var root=document.getElementById('recipe-page');
+  if(_rcpThumbIO){try{_rcpThumbIO.disconnect()}catch(e){}}
+  _rcpThumbIO=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting)return;
+      var box=en.target;
+      _rcpThumbIO.unobserve(box);
+      var id=box.getAttribute('data-rimg');
+      var rec=list.find(function(x){return x.id===id});
+      if(!rec||!rec.img)return;
+      getPhoto(rec.img).then(function(d){
+        if(d&&box){box.style.backgroundImage='url('+d+')';box.style.backgroundSize='cover';box.textContent=''}
+      });
+    });
+  },{root:root||null,rootMargin:'200px',threshold:0.01});
+  el.querySelectorAll('[data-rimg]').forEach(function(box){
+    var id=box.getAttribute('data-rimg');
+    var rec=list.find(function(x){return x.id===id});
+    if(!rec||!rec.img)return;
+    /* 已加载过的跳过观察 */
+    if(box.style.backgroundImage)return;
+    _rcpThumbIO.observe(box);
   });
 }
 var _rcpScale=1,_rcpG0=1,_rcpStepOrig=[];
@@ -3129,7 +3160,7 @@ function exitRecipeDetail(){
   if(det)det.style.display='none';
   var bar=document.getElementById('rcpDActions');if(bar)bar.style.display='none';
   var pg=document.getElementById('recipe-page');if(pg)pg.scrollTop=0;
-  renderRecipeList();
+  /* 不调 renderRecipeList()：列表 DOM 仍在原位，只是不显示；重渲会让 150 张卡 innerHTML 重建 + 一连串 IndexedDB getPhoto 排队，造成返回后"卡一会儿"。分类/搜索/新建/删除路径已在对应处显式 invalidate。 */
 }
 function setRecipeCat(cat,btn){
   _rcpCat=cat;
@@ -3599,12 +3630,20 @@ function openCalorieBreakdown(){
 }
 
 function _collapseSecondaries(){
-  /* 切 tab 时收回二级视图：栈条目标记为死条目（back=null 只消费历史、不再触发恢复），防止跨 tab 幻影恢复 */
+  /* 切 tab 时收回二级视图 + 清空栈 + history.go(-n) 同步 history。
+     避免残留栈条目在其他 tab 被按返回时幻影恢复，也避免残留历史条目导致「假 back」。 */
   if(!_navStack.length)return;
-  for(var i=0;i<_navStack.length;i++)_navStack[i].back=null;
-  if(_curSetKey)settingsShowHome();
-  if(_curRecipeDetail)exitRecipeDetail();
+  var dead=_navStack.length;
+  _navStack.length=0;
+  _curSetKey=null;_curRecipeDetail=null;
+  if(typeof settingsShowHome==='function')settingsShowHome();
+  if(typeof exitRecipeDetail==='function')exitRecipeDetail();
   _fsOff();
+  if(_navPushOk&&dead>0&&history.length>dead+1){
+    /* 用较长的防抖窗口吞掉 history.go 派发的 N 个 popstate（栈已空，popstate 兜底不做事） */
+    _navGuardUntil=Date.now()+600;
+    try{history.go(-dead)}catch(e){}
+  }
 }
 function switchPage(n){_collapseSecondaries();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}else if(n==='recipe'){renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
