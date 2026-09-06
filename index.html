@@ -158,7 +158,53 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .date-nav{display:flex;align-items:center;justify-content:space-between;margin:0 16px 8px}
 .date-nav-btn{width:36px;height:36px;border-radius:50%;border:none;background:rgba(118,118,128,0.1);font-size:18px;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .date-nav-btn:active{background:rgba(118,118,128,0.2)}.date-nav-title{font-size:16px;font-weight:600}
-.meal-section{margin:0 16px 12px}
+.meal-section{margin:0 16px 12px}/* ===== 设置 v2 ===== */
+.set-gtitle{font-size:12px;font-weight:600;color:var(--text3);margin:16px 16px 8px}
+.set-hf{margin:4px 16px 6px;background:var(--card-bg);border:0.5px solid var(--card-border);border-radius:18px;padding:13px 14px;cursor:pointer}
+.set-entry{display:flex;align-items:center;gap:11px;margin:0 16px 9px;padding:11px 13px;background:var(--card-bg);border:0.5px solid var(--card-border);border-radius:16px;cursor:pointer}
+.se-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.se-tt{font-size:14.5px;font-weight:700;color:var(--text)}
+.se-st{font-size:11.5px;color:var(--text3);margin-top:1px}
+.se-val{font-size:12px;color:var(--text2);text-align:right;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.se-che{color:var(--text3);font-size:16px;flex-shrink:0}
+.set-sub-head{display:flex;align-items:center;gap:8px;padding:8px 16px 4px;position:sticky;top:0;background:var(--bg);z-index:6}
+.set-back{width:36px;height:36px;border-radius:50%;border:none;background:var(--card-bg);border:0.5px solid var(--card-border);font-size:20px;color:var(--text);cursor:pointer;line-height:1;font-family:inherit}
+.set-title{font-size:18px;font-weight:800;color:var(--text);flex:1;text-align:center;padding-right:36px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-card{margin:8px 16px;background:var(--card-bg);border:0.5px solid var(--card-border);border-radius:18px;overflow:hidden}
+.set-card .sc-head{display:flex;align-items:center;justify-content:space-between;padding:13px 14px 8px}
+.sc-tt{font-size:14px;font-weight:800;color:var(--text)}
+.sc-link{font-size:11.5px;color:var(--blue);font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;padding:0}
+.set-row{display:flex;align-items:center;gap:10px;padding:11px 14px}
+.set-row+.set-row{border-top:0.5px solid var(--card-border)}
+.set-row .rl{font-size:14.5px;font-weight:600;color:var(--text);flex:0 0 64px}
+.set-cap{display:inline-flex;align-items:center;gap:6px;flex:1;justify-content:flex-end}
+.set-input{width:104px;text-align:center;background:rgba(118,118,128,0.10);border-radius:16px;border:none;outline:none;padding:7px 8px;font-size:15px;font-weight:600;color:var(--text);font-family:inherit;-webkit-appearance:none}
+.set-unit{font-size:13px;color:var(--text2)}
+.set-seg{display:flex;gap:4px;background:rgba(118,118,128,0.08);border-radius:13px;padding:3px}
+.set-seg .seg-item{font-size:12.5px;padding:7px 16px;margin:0}
+.set-seg .seg-item.active{background:var(--card-bg);color:var(--blue);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.bf3{display:flex;gap:8px;padding:2px 14px 12px}
+.bf3 .bf{flex:1;background:rgba(118,118,128,0.05);border-radius:13px;padding:10px 6px 8px;text-align:center}
+.bf .bf-l{font-size:11.5px;color:var(--text2)}
+.bf .bf-i{width:70px;margin:6px auto 0;display:block;text-align:center;background:var(--card-bg);border:1px solid var(--card-border);border-radius:11px;padding:6px 4px;font-size:15px;font-weight:600;color:var(--text);outline:none;font-family:inherit;-webkit-appearance:none}
+.bf .bf-u{font-size:10px;color:var(--text3);display:block;margin-top:2px}
+.sc-note{font-size:11px;color:var(--text3);line-height:1.6}
+.set-tip{background:rgba(0,122,255,0.06);border-radius:14px;padding:11px 14px;font-size:12px;color:var(--text2);line-height:1.7;margin:8px 16px}
+.set-copy{font-size:12px;line-height:1.6}
+.set-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;background:rgba(0,122,255,0.10);color:var(--blue);white-space:nowrap}
+.set-pill.g{background:rgba(52,199,89,0.12);color:#34C759}
+.set-pill.o{background:rgba(255,149,0,0.12);color:#E8830C}
+.set-hf .hf1{display:flex;align-items:center;gap:11px}
+.set-hf .hf-btn{flex-shrink:0;background:var(--blue);color:#fff;border:none;border-radius:15px;padding:8px 18px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+.set-hf .hf2{display:flex;margin-top:12px;padding-top:11px;border-top:0.5px solid var(--card-border);gap:26px}
+.hf2 .hm{flex:1}
+.hm .hm-l{font-size:11px;color:var(--text3)}
+.hm .hm-v{font-size:16px;font-weight:800;color:var(--text)}
+.hm .hm-v small{font-size:11px;color:var(--text3);font-weight:600}
+.hm .hm-d{font-size:11px;font-weight:700;margin-top:1px}
+.hm .hm-d.dn{color:#34C759}.hm .hm-d.up{color:#FF9500}
+.danger-card{margin:8px 16px;background:rgba(255,59,48,0.06);border:0.5px solid rgba(255,59,48,0.25);border-radius:16px;padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+
 .meal-header{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .meal-name{font-size:15px;font-weight:600}.meal-cal{font-size:14px;color:var(--text2);font-weight:600}
 .food-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid var(--card-border);border-radius:14px;margin-bottom:6px;animation:cardIn .3s ease both}
@@ -283,7 +329,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{color:#fff;font-size:16px;font-weight:600}
-.toast{position:fixed;bottom:calc(var(--tab-h) + var(--safe-bottom) + 24px);left:50%;transform:translateX(-50%) translateY(100px);background:rgba(0,0,0,0.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;padding:10px 24px;border-radius:20px;font-size:14px;font-weight:600;z-index:400;opacity:0;transition:all .3s;white-space:nowrap;max-width:90vw}
+.toast{position:fixed;bottom:calc(var(--tab-h) + var(--safe-bottom) + 24px);left:50%;transform:translateX(-50%) translateY(100px);background:rgba(0,0,0,0.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;padding:10px 24px;border-radius:20px;font-size:14px;font-weight:600;z-index:1200;opacity:0;transition:all .3s;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .cal-title{font-size:18px;font-weight:700}
@@ -353,7 +399,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .ios-toggle input:checked+.ios-toggle-track{background:var(--green)}
 .ios-toggle input:checked+.ios-toggle-track .ios-toggle-thumb{transform:translateX(20px)}
 .applock-section{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
-.applock-label{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600}
+.applock-label{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;flex-direction:column;align-items:flex-start;gap:3px}.applock-label-sub{font-size:12px;font-weight:400;color:var(--text3)}
 .applock-icon{font-size:20px}
 .applock-desc{font-size:13px;color:var(--text2);padding:0 16px 10px;line-height:1.5}
 .lock-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(var(--safe-top) + 40px) 20px calc(var(--safe-bottom) + 40px);opacity:0;pointer-events:none;transition:opacity .3s}
@@ -559,117 +605,343 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   <!-- ===== SETTINGS PAGE 设置页面 ===== -->
   <div id="settings-page" class="page">
-    <div class="page-header"><div class="page-title">设置</div></div>
 
-    <!-- ===== 区块 1：个人信息（必填） ===== -->
-    <div class="settings-section-title">个人信息</div>
-    <div class="settings-section">
-      <div class="settings-item"><span class="settings-label">身高</span><div style="display:flex;align-items:center;gap:4px"><input class="settings-input" type="number" id="setHeight" placeholder="170" inputmode="decimal"><span style="color:var(--text2);font-size:14px">cm</span></div></div>
-      <div class="settings-item"><span class="settings-label">体重</span><div style="display:flex;align-items:center;gap:4px"><input class="settings-input" type="number" id="setWeight" placeholder="65" inputmode="decimal"><span style="color:var(--text2);font-size:14px">kg</span></div></div>
-      <div class="settings-item"><span class="settings-label">年龄</span><div style="display:flex;align-items:center;gap:4px"><input class="settings-input" type="number" id="setAge" placeholder="25" inputmode="numeric"><span style="color:var(--text2);font-size:14px">岁</span></div></div>
-      <div class="settings-item"><span class="settings-label">性别</span><div class="seg-control" style="width:140px;margin:0" id="genderControl"><div class="seg-item active" data-gender="male" onclick="setGender('male')">男</div><div class="seg-item" data-gender="female" onclick="setGender('female')">女</div></div></div>
-    </div>
-    <button class="update-btn" onclick="updateWeightRecord()" style="margin:0 16px 16px;width:calc(100% - 32px)"><span style="font-size:20px">⚖️</span> 更新体重记录</button>
+    <!-- ============ 一级：设置主页 ============ -->
+    <div id="setHome">
+      <div class="page-header"><div class="page-title">设置</div></div>
 
-    <!-- ===== 区块 2：身体测量（选填·可折叠） ===== -->
-    <div class="settings-section-title">身体测量</div>
-    <div class="settings-section">
-      <div class="settings-item" style="background:rgba(52,199,89,0.06);border-bottom:none;cursor:pointer" onclick="document.getElementById('bfMeasure').classList.toggle('open');state.profile._bfOpen=document.getElementById('bfMeasure').classList.contains('open');saveState();document.getElementById('bfExpandLabel').textContent=state.profile._bfOpen?'▲ 收起':'▼ 展开'">
-        <span class="settings-label"><span style="margin-right:6px">📏</span>体脂测量字段 <span style="font-size:11px;color:var(--green);font-weight:600">选填</span></span>
-        <span id="bfExpandLabel" style="color:var(--text3);font-size:15px">▼ 展开</span>
+      <!-- 高频卡 -->
+      <div class="set-hf" onclick="updateWeightRecord()">
+        <div class="hf1">
+          <div class="se-ico" style="background:rgba(10,132,255,0.10)">⚖️</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:15px;font-weight:800;color:var(--text)">记录体重与腰围</div>
+            <div style="font-size:11.5px;color:var(--text3);margin-top:2px">今天测了就记一下 · 趋势跟着更新</div>
+          </div>
+          <button class="hf-btn" onclick="event.stopPropagation();updateWeightRecord()">去记录 ›</button>
+        </div>
+        <div class="hf2">
+          <div class="hm"><div class="hm-l">最近体重</div><div class="hm-v"><span id="hfW">--</span><small> kg</small></div><div class="hm-d" id="hfWd" style="display:none"></div></div>
+          <div class="hm"><div class="hm-l">最近腰围</div><div class="hm-v"><span id="hfC">--</span><small> cm</small></div><div class="hm-d" id="hfCd" style="display:none"></div></div>
+        </div>
       </div>
-      <div class="collapsible" id="bfMeasure">
-        <div class="collapsible-inner">
-          <!-- 算法选择 -->
-          <div style="margin-bottom:10px">
-            <div style="font-size:13px;color:var(--text2);margin-bottom:4px">体脂算法 <span style="font-size:11px;color:var(--blue);font-weight:600">自动选择最优</span></div>
-            <div class="seg-control" style="width:100%" id="bfMethodControl">
-              <div class="seg-item active" data-method="auto" onclick="setBFMethod('auto')">自动</div>
-              <div class="seg-item" data-method="navy" onclick="setBFMethod('navy')">U.S. Navy</div>
-              <div class="seg-item" data-method="hybrid" onclick="setBFMethod('hybrid')">混合法</div>
-              <div class="seg-item" data-method="bmi" onclick="setBFMethod('bmi')">BMI法</div>
-            </div>
-          </div>
-          <!-- 共用字段 -->
-          <div class="bf-fields">
-            <div class="bf-field"><span class="bf-field-label">腰围</span><input type="number" id="setWaist" placeholder="72" inputmode="decimal"><span style="font-size:10px;color:var(--text2);display:block;text-align:center;margin-top:2px">cm</span></div>
-            <div class="bf-field"><span class="bf-field-label">颈围</span><input type="number" id="setNeck" placeholder="36" inputmode="decimal"><span style="font-size:10px;color:var(--text2);display:block;text-align:center;margin-top:2px">cm</span></div>
-            <div class="bf-field gender-section" id="hipField"><span class="bf-field-label">臀围</span><input type="number" id="setHip" placeholder="90" inputmode="decimal"><span style="font-size:10px;color:var(--text2);display:block;text-align:center;margin-top:2px">cm</span></div>
-          </div>
-          <div class="bf-hint" id="bfHint">💡 填写腰围+颈围后激活 U.S. Navy 体脂公式（精度最高）。女性额外填写臀围。留空则使用 BMI 估算。</div>
-          <!-- 算法对比 -->
-          <div class="algo-card" id="algoCompareCard">
-            <div class="algo-header">
-              <span class="algo-name">体脂结果对比</span>
-              <span class="algo-stars">各算法同时显示</span>
-            </div>
-            <div class="algo-compare" id="algoCompareInner">
-              <div class="algo-compare-item"><div class="val" id="bfNavyVal">--</div><div class="label">Navy 法</div><div class="stars">★★★★</div></div>
-              <div class="algo-compare-item"><div class="val" id="bfHybridVal">--</div><div class="label">混合法</div><div class="stars">★★★</div></div>
-              <div class="algo-compare-item"><div class="val" id="bfBMIVal">--</div><div class="label">BMI 法</div><div class="stars">★★</div></div>
-            </div>
-          </div>
+
+      <div class="set-gtitle">身体数据</div>
+      <div class="set-entry" onclick="openSettingsSub('profile')">
+        <div class="se-ico" style="background:rgba(10,132,255,0.08)">👤</div>
+        <div style="flex:0 1 auto"><div class="se-tt">个人资料</div><div class="se-st">身高 / 体重 / 年龄 / 性别</div></div>
+        <div class="se-val" id="sProfVal">--</div>
+        <span class="se-che">›</span>
+      </div>
+      <div class="set-entry" onclick="openSettingsSub('body')">
+        <div class="se-ico" style="background:rgba(52,199,89,0.08)">📏</div>
+        <div style="flex:0 1 auto"><div class="se-tt">身体测量与体脂</div><div class="se-st">腰颈臀 · 算法对比</div></div>
+        <div class="se-val"><span class="set-pill g" id="sBfVal" style="display:none">已填写</span><span class="set-pill o" id="sBfValNo" style="display:none">未填写</span></div>
+        <span class="se-che">›</span>
+      </div>
+      <div class="set-entry" onclick="openSettingsSub('goal')">
+        <div class="se-ico" style="background:rgba(255,149,0,0.10)">🎯</div>
+        <div style="flex:0 1 auto"><div class="se-tt">目标与活动</div><div class="se-st">饮食目标 · 活动量</div></div>
+        <div class="se-val"><span class="set-pill" id="sGoalVal">--</span></div>
+        <span class="se-che">›</span>
+      </div>
+
+      <div class="set-gtitle">偏好与安全</div>
+      <div class="set-entry" style="cursor:default">
+        <div class="se-ico" style="background:rgba(138,124,255,0.08)">🎨</div>
+        <div style="flex:0 1 auto"><div class="se-tt">外观主题</div><div class="se-st">随系统 / 浅色 / 深色</div></div>
+        <div style="flex:1"></div>
+        <div class="set-seg" id="themeControl">
+          <div class="seg-item active" data-theme="auto" onclick="setTheme('auto')">自动</div>
+          <div class="seg-item" data-theme="light" onclick="setTheme('light')">浅色</div>
+          <div class="seg-item" data-theme="dark" onclick="setTheme('dark')">深色</div>
+        </div>
+      </div>
+      <div class="set-entry" onclick="openSettingsSub('lock')">
+        <div class="se-ico" style="background:rgba(255,149,0,0.12)">🔒</div>
+        <div style="flex:0 1 auto"><div class="se-tt">应用锁</div><div class="se-st">图案锁 · 备用密码</div></div>
+        <div class="se-val" id="sLockVal">未开启</div>
+        <span class="se-che">›</span>
+      </div>
+
+      <div class="set-gtitle">数据</div>
+      <div class="set-entry" onclick="openSettingsSub('data')">
+        <div class="se-ico" style="background:rgba(118,118,128,0.08)">🗂️</div>
+        <div style="flex:0 1 auto"><div class="se-tt">通用与数据</div><div class="se-st">导出导入 · 清缓存 · 关于</div></div>
+        <div class="se-val" id="sDataVal">v3.13.0</div>
+        <span class="se-che">›</span>
+      </div>
+    </div>
+
+    <!-- ============ 二级：个人资料 ============ -->
+    <div id="setSubProfile" class="set-sub" style="display:none">
+      <div class="set-sub-head">
+        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <div class="set-title">个人资料</div>
+      </div>
+      <div class="set-gtitle" style="margin-top:6px">基本资料 · 影响热量目标计算</div>
+      <div class="set-card">
+        <div class="set-row"><span class="rl">身高</span><span class="set-cap"><input class="set-input" type="number" id="setHeight" placeholder="170" inputmode="decimal"><span class="set-unit">cm</span></span></div>
+        <div class="set-row"><span class="rl">体重</span><span class="set-cap"><input class="set-input" type="number" id="setWeight" placeholder="65" inputmode="decimal"><span class="set-unit">kg</span></span></div>
+        <div class="set-row"><span class="rl">年龄</span><span class="set-cap"><input class="set-input" type="number" id="setAge" placeholder="25" inputmode="numeric"><span class="set-unit">岁</span></span></div>
+        <div class="set-row"><span class="rl">性别</span><span class="set-cap"><div class="seg-control set-seg" style="margin:0" id="genderControl"><div class="seg-item active" data-gender="male" onclick="setGender('male')">男</div><div class="seg-item" data-gender="female" onclick="setGender('female')">女</div></div></span></div>
+      </div>
+      <div class="set-tip"><span id="setBMRInfo">由这些数据估算：基础代谢 -- kcal · 每日消耗 -- kcal</span><br>修改后首页热量环与推荐目标即时更新（即改即存）</div>
+      <div class="set-entry" onclick="openSettingsSub('body')">
+        <div class="se-ico" style="background:rgba(52,199,89,0.08)">📏</div>
+        <div style="flex:0 1 auto"><div class="se-tt">身体测量与体脂</div><div class="se-st">腰围 / 颈围 / 臀围</div></div>
+        <span class="se-che">›</span>
+      </div>
+    </div>
+
+    <!-- ============ 二级：身体测量与体脂 ============ -->
+    <div id="setSubBody" class="set-sub" style="display:none">
+      <div class="set-sub-head">
+        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <div class="set-title">身体测量与体脂</div>
+      </div>
+      <div class="set-gtitle" style="margin-top:6px">选填 · 填得越全，体脂越准</div>
+      <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">体脂算法</span><span class="set-pill">自动选择最优</span></div>
+        <div class="seg-control" style="margin:0 14px 12px;width:auto" id="bfMethodControl">
+          <div class="seg-item active" data-method="auto" onclick="setBFMethod('auto')">自动</div>
+          <div class="seg-item" data-method="navy" onclick="setBFMethod('navy')">U.S. Navy</div>
+          <div class="seg-item" data-method="hybrid" onclick="setBFMethod('hybrid')">混合法</div>
+          <div class="seg-item" data-method="bmi" onclick="setBFMethod('bmi')">BMI 法</div>
+        </div>
+        <div class="bf3">
+          <div class="bf"><span class="bf-l">腰围</span><input class="bf-i" type="number" id="setWaist" placeholder="72" inputmode="decimal"><span class="bf-u">cm</span></div>
+          <div class="bf"><span class="bf-l">颈围</span><input class="bf-i" type="number" id="setNeck" placeholder="36" inputmode="decimal"><span class="bf-u">cm</span></div>
+          <div class="bf" id="hipField"><span class="bf-l">臀围</span><input class="bf-i" type="number" id="setHip" placeholder="90" inputmode="decimal"><span class="bf-u">cm</span></div>
+        </div>
+      </div>
+      <div class="set-tip">💡 填腰围+颈围启用 U.S. Navy 公式（精度最高）；女性填臀围。留空则用 BMI 估算。</div>
+      <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">体脂结果对比</span><span style="font-size:11px;color:var(--text3)">各算法同显 · 高亮为当前采用</span></div>
+        <div class="algo-compare" id="algoCompareInner">
+          <div class="algo-compare-item"><div class="val" id="bfNavyVal">--</div><div class="label">Navy 法</div><div class="stars">★★★★</div></div>
+          <div class="algo-compare-item"><div class="val" id="bfHybridVal">--</div><div class="label">混合法</div><div class="stars">★★★</div></div>
+          <div class="algo-compare-item"><div class="val" id="bfBMIVal">--</div><div class="label">BMI 法</div><div class="stars">★★</div></div>
         </div>
       </div>
     </div>
 
-    <!-- ===== 区块 3：目标与活动 ===== -->
-    <div class="settings-section-title">目标与活动</div>
-    <div class="settings-section">
-      <div class="settings-item" style="background:rgba(255,149,0,0.04);border-bottom:0.5px solid var(--card-border);cursor:pointer" onclick="document.getElementById('goalSection').classList.toggle('open');state.profile._goalOpen=document.getElementById('goalSection').classList.contains('open');saveState();document.getElementById('goalExpandLabel').textContent=state.profile._goalOpen?'▲':'▼'">
-        <span class="settings-label"><span style="margin-right:6px">🎯</span>运动与饮食目标</span>
-        <span style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:13px;font-weight:600;color:var(--blue);background:rgba(0,122,255,0.1);padding:4px 10px;border-radius:20px" id="goalCalBadge">--</span>
-          <span id="goalExpandLabel" style="color:var(--text3);font-size:15px">▼</span>
-        </span>
+    <!-- ============ 二级：目标与活动 ============ -->
+    <div id="setSubGoal" class="set-sub" style="display:none">
+      <div class="set-sub-head">
+        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <div class="set-title">目标与活动</div>
       </div>
-      <div class="collapsible open" id="goalSection">
-        <div class="collapsible-inner">
-          <div style="margin-bottom:14px">
-            <div style="font-size:13px;color:var(--text2);margin-bottom:4px">日常活动量 <span class="info-link" onclick="showActivityInfo()" style="float:right">说明</span></div>
-            <div class="seg-control" style="width:100%" id="activityControl">
-              <div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div>
-              <div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div>
-              <div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div>
-              <div class="seg-item" data-act="high" onclick="setActivity('high')">高</div>
-              <div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:13px;color:var(--text2);margin-bottom:4px">饮食目标 <span class="info-link" onclick="showGoalInfo()" style="float:right">说明</span></div>
-            <div class="seg-control" style="width:100%" id="goalControl">
-              <div class="seg-item" data-goal="buddha" onclick="setGoal('buddha')">佛系</div>
-              <div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div>
-              <div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div>
-              <div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div>
-            </div>
-            <div class="goal-tip" id="goalTip"></div>
-          </div>
+      <div class="set-gtitle" style="margin-top:6px">决定每日热量与营养素推荐</div>
+      <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">日常活动量</span><button class="sc-link" onclick="showActivityInfo()">说明</button></div>
+        <div class="seg-control" style="margin:0 14px 10px;width:auto" id="activityControl">
+          <div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div>
+          <div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div>
+          <div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div>
+          <div class="seg-item" data-act="high" onclick="setActivity('high')">高</div>
+          <div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div>
         </div>
+        <div class="sc-note" style="padding:0 14px 12px">正常 = 久坐为主，每周轻度运动 1-3 天（代谢 ×1.375）</div>
+      </div>
+      <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">饮食目标</span><button class="sc-link" onclick="showGoalInfo()">说明</button></div>
+        <div class="seg-control" style="margin:0 14px 10px;width:auto" id="goalControl">
+          <div class="seg-item" data-goal="buddha" onclick="setGoal('buddha')">佛系</div>
+          <div class="seg-item active" data-goal="lose" onclick="setGoal('lose')">减脂</div>
+          <div class="seg-item" data-goal="maintain" onclick="setGoal('maintain')">维持</div>
+          <div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div>
+        </div>
+        <div class="goal-tip" id="goalTip" style="padding:0 14px 12px;font-size:11px"></div>
+      </div>
+      <div class="set-tip" style="background:rgba(0,122,255,0.06)">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">按当前设置 · 每日推荐</div>
+        <div style="display:flex;align-items:baseline;gap:18px">
+          <span style="font-size:24px;font-weight:800;color:var(--blue)"><span id="gCal">--</span> <span style="font-size:12px;font-weight:600;color:var(--text3)">kcal</span></span>
+          <span style="font-size:13px;color:var(--text2)">蛋白 <b style="color:var(--text)"><span id="gP">--</span>g</b></span>
+          <span style="font-size:13px;color:var(--text2)">碳水 <b style="color:var(--text)"><span id="gC">--</span>g</b></span>
+          <span style="font-size:13px;color:var(--text2)">脂肪 <b style="color:var(--text)"><span id="gF">--</span>g</b></span>
+        </div>
+        <div style="font-size:10.5px;color:var(--text3);margin-top:7px">改动即生效 · 首页热量环 / 缺口推荐同步更新</div>
       </div>
     </div>
 
-    <!-- ===== 其他设置 ===== -->
-    <div class="settings-section-title">外观</div>
-    <div class="settings-section"><div class="seg-control" style="margin:8px" id="themeControl"><div class="seg-item active" data-theme="auto" onclick="setTheme('auto')">跟随系统</div><div class="seg-item" data-theme="light" onclick="setTheme('light')">浅色</div><div class="seg-item" data-theme="dark" onclick="setTheme('dark')">深色</div></div></div>
-    <div class="settings-section-title">应用锁</div>
-    <div class="settings-section">
-      <div class="applock-section">
-        <div class="applock-label"><span class="applock-icon">🔒</span>启用应用锁</div>
-        <label class="ios-toggle"><input type="checkbox" id="appLockToggle" onchange="onAppLockToggle()"><span class="ios-toggle-track"><span class="ios-toggle-thumb"></span></span></label>
+    <!-- ============ 二级：应用锁 ============ -->
+    <div id="setSubLock" class="set-sub" style="display:none">
+      <div class="set-sub-head">
+        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <div class="set-title">应用锁</div>
+        <span id="lockStatusPill" style="display:none;margin-left:auto;font-size:11px;background:rgba(52,199,89,0.15);color:#1E9E4E;padding:3px 11px;border-radius:10px;font-weight:600">已开启</span>
       </div>
-      <div class="applock-desc" id="appLockDesc">开启后每次打开应用需要验证身份，保护你的隐私数据</div>
+      <div class="set-gtitle" style="margin-top:6px">保护饮食与体重记录不被他人查看</div>
+      <div class="set-card">
+        <div class="applock-section">
+          <div class="applock-label"><span class="applock-icon">🔒</span>启用应用锁
+            <div class="applock-label-sub">每次打开应用需绘制图案验证身份</div>
+          </div>
+          <label class="ios-toggle"><input type="checkbox" id="appLockToggle" onchange="onAppLockToggle()"><span class="ios-toggle-track"><span class="ios-toggle-thumb"></span></span></label>
+        </div>
+      </div>
+      <div class="set-gtitle" id="lockStateTitle" style="display:none">已设置</div>
+      <div class="set-card" id="lockStateCard" style="display:none">
+        <div class="set-row" style="cursor:pointer" onclick="reDrawPattern()">
+          <span class="rl" style="font-size:19px;text-align:center">🔏</span>
+          <span style="flex:1"><span style="display:block;font-size:14.5px;font-weight:600">解锁图案</span><span style="display:block;font-size:11px;color:var(--text3);margin-top:1px" id="lockPatternDesc">已设置</span></span>
+          <span style="color:var(--blue);font-size:13px;flex-shrink:0">重新绘制</span><span class="se-che">›</span>
+        </div>
+        <div class="set-row" style="cursor:pointer" onclick="reSetupPassword()">
+          <span class="rl" style="font-size:19px;text-align:center">🔑</span>
+          <span style="flex:1"><span style="display:block;font-size:14.5px;font-weight:600">备用密码</span><span style="display:block;font-size:11px;color:var(--text3);margin-top:1px" id="lockPwdDesc">未设置</span></span>
+          <span style="color:var(--blue);font-size:13px;flex-shrink:0" id="lockPwdLink">设置</span><span class="se-che">›</span>
+        </div>
+      </div>
+      <div class="set-gtitle" id="lockMgmtTitle" style="display:none">管理</div>
+      <div class="set-card" id="lockMgmtCard" style="display:none">
+        <div class="set-row" style="cursor:pointer" onclick="lockNow()">
+          <span class="rl" style="font-size:19px;text-align:center">🚪</span>
+          <span style="flex:1"><span style="display:block;font-size:14.5px;font-weight:600">立即锁定</span><span style="display:block;font-size:11px;color:var(--text3);margin-top:1px">马上回到解锁页，验证后才继续使用</span></span>
+          <span class="se-che">›</span>
+        </div>
+        <div class="set-row" style="cursor:pointer" onclick="lockOff()">
+          <span class="rl" style="font-size:19px;text-align:center">🗑️</span>
+          <span style="flex:1"><span style="display:block;font-size:14.5px;font-weight:600;color:var(--red)">关闭应用锁</span><span style="display:block;font-size:11px;color:var(--text3);margin-top:1px">移除解锁图案与备用密码</span></span>
+          <span class="se-che">›</span>
+        </div>
+      </div>
+      <div class="set-tip" id="lockHintTip" style="background:rgba(255,149,0,0.07)">开启后可随时「重新绘制」「修改」——改图案不会丢备用密码，改密码不会动图案。</div>
     </div>
-    <div class="settings-section-title">数据管理</div>
-    <div class="settings-section">
-      <div class="settings-item" style="cursor:pointer" onclick="exportData()"><span class="settings-label">导出数据</span><span style="color:var(--text3)">›</span></div>
-      <div class="settings-item" style="cursor:pointer" onclick="importData()"><span class="settings-label">导入数据</span><span style="color:var(--text3)">›</span></div>
-      <div class="settings-item" style="cursor:pointer" onclick="clearPhotoCache()"><span class="settings-label">清除照片缓存</span><span style="color:var(--text3)">›</span></div>
-      <div class="settings-item" style="cursor:pointer" onclick="clearAllData()"><span class="settings-label" style="color:var(--red)">清除所有数据</span><span style="color:var(--text3)">›</span></div>
+
+    <!-- ============ 二级：通用与数据 ============ -->
+    <div id="setSubData" class="set-sub" style="display:none">
+      <div class="set-sub-head">
+        <button class="set-back" onclick="settingsShowHome()">‹</button>
+        <div class="set-title">通用与数据</div>
+      </div>
+      <div class="set-gtitle" style="margin-top:6px">备份 · 迁移 · 存储</div>
+      <div class="set-card">
+        <div class="set-row" style="cursor:pointer" onclick="exportData()"><span style="font-size:18px;width:30px;text-align:center">📤</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">导出数据</div><div style="font-size:11px;color:var(--text3);margin-top:1px">把记录与设置存成备份文件</div></span><span class="se-che">›</span></div>
+        <div class="set-row" style="cursor:pointer" onclick="exportRecipes()"><span style="font-size:18px;width:30px;text-align:center">🍳</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">导出自定义菜谱</div><div style="font-size:11px;color:var(--text3);margin-top:1px">把自建菜谱存成单独文件（不含内置菜）</div></span><span class="se-che">›</span></div>
+        <div class="set-row" style="cursor:pointer" onclick="importData()"><span style="font-size:18px;width:30px;text-align:center">📥</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">导入数据</div><div style="font-size:11px;color:var(--text3);margin-top:1px">可整体还原 或 只合并菜谱（导入前会让你选）</div></span><span class="se-che">›</span></div>
+        <div class="set-row" style="cursor:pointer" onclick="clearPhotoCache()"><span style="font-size:18px;width:30px;text-align:center">🖼️</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">清除照片缓存</div><div style="font-size:11px;color:var(--text3);margin-top:1px">仅清图片临时副本 · 不删任何照片记录</div></span><span class="se-che">›</span></div>
+      </div>
+      <div class="set-gtitle" style="color:#E8A9A5">危险操作</div>
+      <div class="danger-card" onclick="clearAllData()">
+        <span style="font-size:18px">⚠️</span>
+        <span style="flex:1"><div style="font-size:14px;font-weight:700;color:#D6342B">清除所有数据</div><div style="font-size:11px;color:#C76A63;margin-top:1px">删除全部记录 / 照片 / 设置，无法恢复</div></span>
+        <span style="color:#D9807A;font-size:15px">›</span>
+      </div>
+      <div class="set-gtitle">关于</div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.0</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
     </div>
-    <div class="about-text"><div class="ver">热量营养检测 v3.13.0</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · U.S. Navy 体脂算法</div></div>
   </div>
+
   </main>
+
+  <!-- ============ 首次使用引导（iPhone 式，完成一次后不再出现） ============ -->
+  <div id="onboard" style="display:none;position:fixed;inset:0;z-index:1100;background:var(--bg);-webkit-overflow-scrolling:touch">
+    <div style="max-width:440px;margin:0 auto;height:100%;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safe-top) + 10px) 18px 2px;flex-shrink:0">
+        <button id="obBackBtn" onclick="obBack()" aria-label="上一步" style="visibility:hidden;border:none;background:var(--card-bg);width:34px;height:34px;border-radius:50%;border:0.5px solid var(--card-border);font-size:19px;line-height:1;cursor:pointer;color:var(--blue)">‹</button>
+        <div id="obDots" style="display:flex;gap:6px;align-items:center"></div>
+        <button id="obSkipBtn" onclick="obSkipAll()" style="border:none;background:none;color:var(--blue);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;padding:6px 2px">跳过</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 16px calc(24px + var(--safe-bottom))">
+        <div style="text-align:center;margin:18px 0 20px">
+          <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#34C759,#007AFF);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px">🥗</div>
+          <div style="font-size:22px;font-weight:800">热量营养检测</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:6px">三步完成初始设置，马上开始记录</div>
+        </div>
+
+        <!-- STEP 1 个人资料 -->
+        <div class="ob-step" id="obStep1">
+          <div class="set-gtitle" style="margin-top:2px">第一步 · 个人资料（必填）</div>
+          <div class="set-card" style="margin:6px 0 12px">
+            <div class="set-row"><span class="rl">身高</span><span class="set-cap"><input class="set-input" type="number" id="obHeight" inputmode="decimal"><span class="set-unit">cm</span></span></div>
+            <div class="set-row"><span class="rl">体重</span><span class="set-cap"><input class="set-input" type="number" id="obWeight" inputmode="decimal"><span class="set-unit">kg</span></span></div>
+            <div class="set-row"><span class="rl">年龄</span><span class="set-cap"><input class="set-input" type="number" id="obAge" inputmode="numeric"><span class="set-unit">岁</span></span></div>
+            <div class="set-row"><span class="rl">性别</span><span class="set-cap"><div class="seg-control set-seg" style="margin:0" id="obGender"><div class="seg-item active" data-gender="male" onclick="obSetGender('male')">男</div><div class="seg-item" data-gender="female" onclick="obSetGender('female')">女</div></div></span></div>
+          </div>
+          <div class="set-tip">身高体重用于计算 BMI 与每日热量目标，填完即生效<br><span style="font-size:11px;color:var(--text3)">在框里输入数字，右侧已标好单位（cm / kg / 岁）</span></div>
+          <button onclick="obNext()" style="width:100%;margin-top:22px;border:none;border-radius:14px;background:var(--blue);color:#fff;font-size:16px;font-weight:700;font-family:inherit;padding:14px;cursor:pointer">继续 ›</button>
+        </div>
+
+        <!-- STEP 2 身体测量与体脂 -->
+        <div class="ob-step" id="obStep2" style="display:none">
+          <div class="set-gtitle" style="margin-top:2px">第二步 · 身体测量与体脂（选填）</div>
+          <div class="set-card" style="margin:6px 0 12px">
+            <div class="sc-head"><span class="sc-tt">体脂算法</span><span class="set-pill">自动选择最优</span></div>
+            <div class="seg-control" style="margin:0 14px 12px;width:auto" id="obBf">
+              <div class="seg-item active" data-method="auto" onclick="obSetBf('auto')">自动</div>
+              <div class="seg-item" data-method="navy" onclick="obSetBf('navy')">U.S. Navy</div>
+              <div class="seg-item" data-method="hybrid" onclick="obSetBf('hybrid')">混合法</div>
+              <div class="seg-item" data-method="bmi" onclick="obSetBf('bmi')">BMI 法</div>
+            </div>
+            <div class="bf3">
+              <div class="bf"><span class="bf-l">腰围</span><input class="bf-i" type="number" id="obWaist" inputmode="decimal"><span class="bf-u">cm</span></div>
+              <div class="bf"><span class="bf-l">颈围</span><input class="bf-i" type="number" id="obNeck" inputmode="decimal"><span class="bf-u">cm</span></div>
+              <div class="bf" id="obHipField"><span class="bf-l">臀围</span><input class="bf-i" type="number" id="obHip" inputmode="decimal"><span class="bf-u">cm</span></div>
+            </div>
+          </div>
+          <div class="set-tip">💡 填腰围+颈围启用 U.S. Navy 公式（精度最高）；女性填臀围。留空则用 BMI 估算。</div>
+          <button onclick="obNext()" style="width:100%;margin-top:22px;border:none;border-radius:14px;background:var(--blue);color:#fff;font-size:16px;font-weight:700;font-family:inherit;padding:14px;cursor:pointer">继续 ›</button>
+          <p style="text-align:center;font-size:13px;color:var(--text3);margin:14px 0 0"><span style="cursor:pointer" onclick="obNext()">跳过这步</span></p>
+        </div>
+
+        <!-- STEP 3 目标与活动 -->
+        <div class="ob-step" id="obStep3" style="display:none">
+          <div class="set-gtitle" style="margin-top:2px">第三步 · 目标与活动</div>
+          <div class="set-card" style="margin:6px 0 12px">
+            <div class="sc-head"><span class="sc-tt">日常活动量</span></div>
+            <div class="seg-control" style="margin:0 14px 10px;width:auto" id="obAct">
+              <div class="seg-item active" data-act="low" onclick="obSetAct('low')">偏低</div>
+              <div class="seg-item" data-act="normal" onclick="obSetAct('normal')">正常</div>
+              <div class="seg-item" data-act="medium" onclick="obSetAct('medium')">稍高</div>
+              <div class="seg-item" data-act="high" onclick="obSetAct('high')">高</div>
+              <div class="seg-item" data-act="extreme" onclick="obSetAct('extreme')">极高</div>
+            </div>
+            <div class="sc-note" style="padding:0 14px 12px">正常 = 久坐为主，每周轻度运动 1-3 天（代谢 ×1.375）</div>
+          </div>
+          <div class="set-card" style="margin:0 0 12px">
+            <div class="sc-head"><span class="sc-tt">饮食目标</span></div>
+            <div class="seg-control" style="margin:0 14px 10px;width:auto" id="obGoal">
+              <div class="seg-item" data-goal="buddha" onclick="obSetGoal('buddha')">佛系</div>
+              <div class="seg-item active" data-goal="lose" onclick="obSetGoal('lose')">减脂</div>
+              <div class="seg-item" data-goal="maintain" onclick="obSetGoal('maintain')">维持</div>
+              <div class="seg-item" data-goal="gain" onclick="obSetGoal('gain')">增肌</div>
+            </div>
+          </div>
+          <div class="set-tip" style="background:rgba(0,122,255,0.06)">
+            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">按当前设置 · 每日推荐</div>
+            <div style="display:flex;align-items:baseline;gap:18px">
+              <span style="font-size:24px;font-weight:800;color:var(--blue)"><span id="obCal">--</span> <span style="font-size:12px;font-weight:600;color:var(--text3)">kcal</span></span>
+              <span style="font-size:13px;color:var(--text2)">蛋白 <b style="color:var(--text)"><span id="obP">--</span>g</b></span>
+              <span style="font-size:13px;color:var(--text2)">碳水 <b style="color:var(--text)"><span id="obC">--</span>g</b></span>
+              <span style="font-size:13px;color:var(--text2)">脂肪 <b style="color:var(--text)"><span id="obF">--</span>g</b></span>
+            </div>
+          </div>
+          <button onclick="obFinish()" style="width:100%;margin-top:22px;border:none;border-radius:14px;background:var(--blue);color:#fff;font-size:16px;font-weight:700;font-family:inherit;padding:14px;cursor:pointer">开始使用 🎉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 导入方式选择 ===== -->
+  <div class="modal-overlay" id="importChoiceModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll">
+    <div class="modal-title">导入数据</div>
+    <div id="impSummary" style="font-size:13px;color:var(--text2);line-height:1.7;margin:2px 6px 14px"></div>
+    <div style="border:0.5px solid var(--card-border);border-radius:14px;overflow:hidden;background:var(--card-bg)">
+      <div onclick="doImportRestore()" style="display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:0.5px solid var(--card-border);cursor:pointer">
+        <span style="width:30px;height:30px;border-radius:9px;background:rgba(255,59,48,0.10);display:flex;align-items:center;justify-content:center;flex-shrink:0">↩️</span>
+        <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:var(--text)">整体还原</span><span style="display:block;font-size:11.5px;color:var(--text3);margin-top:1px">用备份替换全部记录 / 设置 / 菜谱（覆盖当前数据）</span></span>
+        <span style="color:var(--text3);font-size:15px">›</span>
+      </div>
+      <div onclick="doImportRecipesOnly()" style="display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer">
+        <span style="width:30px;height:30px;border-radius:9px;background:rgba(0,122,255,0.10);display:flex;align-items:center;justify-content:center;flex-shrink:0">🍳</span>
+        <span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700;color:var(--text)">只合并自定义菜谱</span><span style="display:block;font-size:11.5px;color:var(--text3);margin-top:1px">把文件里的菜谱加入我的菜谱，不动任何记录（同名跳过）</span></span>
+        <span style="color:var(--text3);font-size:15px">›</span>
+      </div>
+    </div>
+  </div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('importChoiceModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">取消</button></div></div></div>
 
   <div class="modal-overlay" id="amountModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">确认食物信息</div><div class="food-preview"><span class="food-preview-icon" id="amountIcon">🍽️</span><div class="food-preview-name" id="amountName">食物名称</div></div><div class="amount-input-wrap"><input class="amount-input" type="number" id="amountInput" value="100" step="0.5" inputmode="decimal" oninput="updateAmountResult()"><span class="amount-unit" id="amountUnit">克</span></div><div class="amount-quick" id="amountQuick"><button class="amount-quick-btn" onclick="setAmount(50,this)">50g</button><button class="amount-quick-btn active" onclick="setAmount(100,this)">100g</button><button class="amount-quick-btn" onclick="setAmount(150,this)">150g</button><button class="amount-quick-btn" onclick="setAmount(200,this)">200g</button><button class="amount-quick-btn" onclick="setAmount(300,this)">300g</button></div><div class="amount-tip" id="amountTip">💡 估不准重量？</div><div class="amount-result">热量约 <strong id="amountCalories">0</strong> kcal</div><div class="meal-select"><div class="seg-control" id="mealControl"><div class="seg-item" data-meal="breakfast" onclick="setMeal('breakfast')">早餐</div><div class="seg-item" data-meal="lunch" onclick="setMeal('lunch')">午餐</div><div class="seg-item" data-meal="dinner" onclick="setMeal('dinner')">晚餐</div><div class="seg-item" data-meal="snack" onclick="setMeal('snack')">加餐</div></div></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="confirmAddFood()">添加到今日记录</button><button class="modal-btn danger" onclick="closeAmountModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
@@ -851,7 +1123,7 @@ let state = {
   weightChartYear:new Date().getFullYear(), weightChartMonth:new Date().getMonth(),
   weightChartAll:false,
   chartMode:'weight',
-  appLock:{enabled:false,method:'pattern',pattern:[],backupPassword:'',backupHint:''}
+  appLock:{enabled:false,method:'pattern',pattern:[],backupPassword:'',backupHint:''},onboarded:false
 };
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
 let photoDB=null;
@@ -862,8 +1134,8 @@ function getPhoto(id){if(!photoDB)return Promise.resolve(null);return new Promis
 function deletePhotoData(id){if(!photoDB)return;return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readwrite');tx.objectStore('photos').delete(id);tx.oncomplete=resolve;tx.onerror=resolve})}
 function clearAllPhotoData(){if(!photoDB)return;return new Promise((resolve)=>{const tx=photoDB.transaction(['photos'],'readwrite');tx.objectStore('photos').clear();tx.oncomplete=resolve;tx.onerror=resolve})}
 
-function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes}))}catch(e){showToast('存储失败')}}
-function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];/* 兼容旧版 weightRecords: 数字 → {w,waist} */
+function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes,onboarded:!!state.onboarded}))}catch(e){showToast('存储失败')}}
+function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];state.onboarded=!!d.onboarded;/* 兼容旧版 weightRecords: 数字 → {w,waist} */
 Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto'}}catch(e){console.error(e)}}
 
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -1526,10 +1798,7 @@ function renderSettings(){
   var hipField=document.getElementById('hipField');
   if(hipField)hipField.style.display=state.profile.gender==='female'?'block':'none';
   document.querySelectorAll('#bfMethodControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.method===state.profile.bfMethod));
-  var bfEl=document.getElementById('bfMeasure');
-  if(bfEl){bfEl.classList.toggle('open',!!state.profile._bfOpen);document.getElementById('bfExpandLabel').textContent=state.profile._bfOpen?'▲ 收起':'▼ 展开'}
-  var goalEl=document.getElementById('goalSection');
-  if(goalEl){goalEl.classList.toggle('open',!!state.profile._goalOpen);document.getElementById('goalExpandLabel').textContent=state.profile._goalOpen?'▲':'▼'}
+  /* v2 布局：身体测量与目标改为独立二级页常显，折叠逻辑移除 */
   renderBFCompare();
   document.querySelectorAll('#activityControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.act===state.profile.activity));
   document.querySelectorAll('#goalControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.goal===state.profile.goal));
@@ -1557,8 +1826,8 @@ function renderSettings(){
   applyUIConstraints(finalInfo);
   var lockToggle=document.getElementById('appLockToggle');
   if(lockToggle)lockToggle.checked=state.appLock.enabled;
-  var lockDesc=document.getElementById('appLockDesc');
-  if(lockDesc){if(state.appLock.enabled){lockDesc.textContent='已启用图案解锁，每次打开应用需绘制图案验证身份'}else{lockDesc.textContent='开启后每次打开应用需要绘制图案验证身份，保护你的隐私数据'}}
+  renderAppLockState();
+  refreshSettingsTop();
 }
 function renderBFCompare(){
   var all=calcBodyFatAll(state.profile);
@@ -1655,6 +1924,63 @@ function renderStatsGrid(){
   document.getElementById('statsGrid').innerHTML='<div class="stat-item"><div class="stat-val">'+weekAvg+'</div><div class="stat-label">本周日均热量</div></div><div class="stat-item"><div class="stat-val">'+streak+'</div><div class="stat-label">连续记录天数</div></div><div class="stat-item"><div class="stat-val">'+total+'</div><div class="stat-label">总记录天数</div></div><div class="stat-item"><div class="stat-val" style="font-size:16px">'+mostEaten+'</div><div class="stat-label">最常吃食物</div></div>'
 }
 
+function openSettingsSub(key){
+  var home=document.getElementById('setHome');if(home)home.style.display='none';
+  document.querySelectorAll('#settings-page .set-sub').forEach(function(el){el.style.display='none'});
+  var t=document.getElementById('setSub'+key.charAt(0).toUpperCase()+key.slice(1));
+  if(!t){settingsShowHome();return}
+  t.style.display='block';
+  var pg=document.getElementById('settings-page');if(pg)pg.scrollTop=0;
+}
+function settingsShowHome(){
+  var home=document.getElementById('setHome');if(home)home.style.display='';
+  document.querySelectorAll('#settings-page .set-sub').forEach(function(el){el.style.display='none'});
+  refreshSettingsTop();
+  var pg=document.getElementById('settings-page');if(pg)pg.scrollTop=0;
+}
+function refreshSettingsTop(){
+  function T(id,v){var e=document.getElementById(id);if(e)e.textContent=v}
+  function setD(id,v,cls){var e=document.getElementById(id);if(!e)return;if(v==null){e.style.display='none';return}e.style.display='';e.className='hm-d '+(cls||'');e.textContent=v}
+  /* 最近体重 / 腰围 与上一条差值 */
+  var wrs=state.weightRecords||{};
+  var keys=Object.keys(wrs).filter(function(k){var r=wrs[k];return (r&&(typeof r!=='object'||(r.w||r.waist)))||(typeof r==='number'&&r>0)}).sort();
+  var last=keys.length?wrs[keys[keys.length-1]]:null;
+  var prev=keys.length>1?wrs[keys[keys.length-2]]:null;
+  function gW(r){return r&&typeof r==='object'?r.w:r}
+  function gC(r){return r&&typeof r==='object'?(r.waist||0):0}
+  var wv=gW(last),wv2=gW(prev),cv=gC(last),cv2=gC(prev);
+  if(wv>0){T('hfW',wv);
+    var dw=+(wv-(wv2>0?wv2:wv)).toFixed(1);
+    if(wv2>0&&Math.abs(dw)>0.0001)setD('hfWd',(dw<0?'▼ ':'▲ ')+Math.abs(dw).toFixed(1),dw<0?'dn':'up');else setD('hfWd',null);
+  }else T('hfW','--');
+  if(cv>0){T('hfC',cv);
+    var dc=+(cv-(cv2>0?cv2:cv)).toFixed(1);
+    if(cv2>0&&Math.abs(dc)>0.0001)setD('hfCd',(dc<0?'▼ ':'▲ ')+Math.abs(dc).toFixed(1),dc<0?'dn':'up');else setD('hfCd',null);
+  }else T('hfC','--');
+  /* 个人资料摘要 */
+  var pr=state.profile||{};
+  var gName=pr.gender==='male'?'男':(pr.gender==='female'?'女':'');
+  if(pr.height&&pr.weight){T('sProfVal',pr.height+'cm · '+pr.weight+'kg'+(gName?' · '+gName:''))}else T('sProfVal','未填写');
+  /* 身体测量状态 */
+  var filled=!!(pr.waist&&pr.neck);
+  var bfY=document.getElementById('sBfVal'),bfN=document.getElementById('sBfValNo');
+  if(bfY)bfY.style.display=filled?'':'none';
+  if(bfN)bfN.style.display=filled?'none':'';
+  /* 目标与活动 pill + 每日推荐预览 */
+  var goalNames={'buddha':'佛系','lose':'减脂','maintain':'维持','gain':'增肌'};
+  var cal=calcTargetCalories();
+  var goal=goalNames[pr.goal]||'--';
+  T('sGoalVal',(cal>0?(goal+' · '+cal):goal));
+  var nt=calcNutritionTargets();
+  if(cal>0){T('gCal',cal);T('gP',Math.round(nt.p));T('gC',Math.round(nt.c));T('gF',Math.round(nt.f))}else{T('gCal','--');T('gP','--');T('gC','--');T('gF','--')}
+  /* 应用锁 */
+  var lockOn=!!(state.appLock&&state.appLock.enabled);
+  T('sLockVal',lockOn?'已开启':'未开启');
+  /* 资料页 BMR 信息 */
+  var bmr=calcBMR(pr),tdee=calcTDEE(pr);
+  if(bmr>0)T('setBMRInfo','由这些数据估算：基础代谢 '+Math.round(bmr)+' kcal · 每日消耗 '+Math.round(tdee)+' kcal');
+  else T('setBMRInfo','填完身高体重年龄，这里会给出你的基础代谢与每日消耗');
+}
 function setBFMethod(m){state.profile.bfMethod=m;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
 function setGender(g){state.profile.gender=g;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
 function setActivity(a){state.profile.activity=a;saveState();renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart()}
@@ -1699,9 +2025,161 @@ function updateWeightPeriodNav(){
     b.style.pointerEvents=state.weightChartAll?'none':'auto';
   });
 }
-function exportData(){const json=JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords},null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='热量营养检测_数据_'+getDateKey(new Date())+'.json';a.click();URL.revokeObjectURL(url);showToast('数据已导出')}
-function importData(){const input=document.createElement('input');input.type='file';input.accept='.json';input.onchange=function(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=function(ev){try{const d=JSON.parse(ev.target.result);state.profile=d.profile||state.profile;if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0}});saveState();renderAll();showToast('数据已导入')}catch(err){showToast('导入失败: 文件格式错误')}};reader.readAsText(f)};input.click()}
-async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');await clearAllPhotoData();state={profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,currentCat:'all',tempPhoto:null,theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),weightChartAll:false,chartMode:'weight',appLock:{enabled:false,method:'pattern',pattern:[]}};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
+function exportData(){
+  /* 全量备份：记录 + 设置 + 自定义菜谱全部数据（菜谱/自定义食物同步菜肴） */
+  const json=JSON.stringify({
+    profile:state.profile,
+    foodLogs:state.foodLogs,
+    weightRecords:state.weightRecords,
+    recipes:(state.recipes||[]).filter(function(r){return !r.builtin}),
+    customFoods:(state.customFoods||[]).filter(function(x){return x.cat==='菜肴'&&x.idr}),
+    customManual:(state.customFoods||[]).filter(function(x){return !(x.cat==='菜肴'&&x.idr)}),
+    exportedAt:new Date().toISOString()
+  },null,2);
+  const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='热量营养检测_数据_'+getDateKey(new Date())+'.json';a.click();URL.revokeObjectURL(url);
+  showToast('数据已导出（含全部自定义菜谱）');
+}
+var _impData=null;
+function importData(){
+  const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
+  input.onchange=function(e){
+    const f=e.target.files[0];if(!f)return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        const d=JSON.parse(ev.target.result);
+        if(!d||typeof d!=='object'){showToast('导入失败: 文件格式错误');return}
+        _impData=d;
+        /* 摘要：食物记录天数/条数、体重天数、菜谱道数 */
+        var days=0,rows=0,wDays=0,rcp=0;
+        var fl=d.foodLogs||{};
+        Object.keys(fl).forEach(function(k){days++;rows+=(fl[k]||[]).length});
+        wDays=Object.keys(d.weightRecords||{}).length;
+        var rs=(d.recipes||[]).filter(function(r){return r&&!r.builtin&&r.name});
+        rcp=rs.length;
+        var isCalorieFile=d.type==='calorie_recipes';
+        var sum=document.getElementById('impSummary');
+        if(sum){
+          var lines='';
+          if(rows)lines+='📅 食物记录 '+days+' 天 · '+rows+' 条<br>';
+          if(wDays)lines+='⚖️ 体重记录 '+wDays+' 天<br>';
+          if(rcp)lines+='🍳 自定义菜谱 '+rcp+' 道<br>';
+          if(!lines)lines=(isCalorieFile?'':'文件里没有可识别的数据<br>');
+          if(isCalorieFile&&!lines)lines='📦 菜谱文件（仅菜谱，无记录）<br>';
+          sum.innerHTML=lines+'<span style="color:var(--text3)">请选择导入方式：</span>';
+        }
+        showModal('importChoiceModal');
+      }catch(err){showToast('导入失败: 文件格式错误')}
+    };
+    reader.readAsText(f);
+  };
+  input.click();
+}
+function doImportRestore(){
+  var d=_impData;if(!d){hideModal('importChoiceModal');return}
+  hideModal('importChoiceModal');
+  state.profile=d.profile||state.profile;
+  if(!state.profile.waist)state.profile.waist=0;
+  if(typeof state.profile.neck==='undefined')state.profile.neck=0;
+  if(typeof state.profile.hip==='undefined')state.profile.hip=0;
+  if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';
+  state.foodLogs=d.foodLogs||{};
+  state.weightRecords=d.weightRecords||{};
+  Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0}});
+  /* 菜谱还原：文件含 recipes 字段 → 整体还原；老备份(无字段)不动现有菜谱 */
+  if(Array.isArray(d.recipes)){
+    var recipes=(d.recipes).filter(function(r){return r&&!r.builtin&&r.name});
+    state.recipes=recipes.slice();
+    var cf=[];var others=[];
+    if(Array.isArray(d.customFoods))others=others.concat(d.customFoods.filter(function(x){return !(x&&x.cat==='菜肴'&&x.idr)}));
+    if(Array.isArray(d.customManual))others=others.concat(d.customManual);
+    var dishMap={};
+    recipes.forEach(function(r){
+      var totG=(r.ingrs||[]).reduce(function(s2,x){return s2+(x.gram||0)},0);
+      var k=totG>0?(100/totG):1;
+      dishMap[r.id]={idr:r.id,name:r.name,cat:'菜肴',imgkey:r.img||null,cal:Math.round((r.cal||0)*k),p:+((r.p||0)*k).toFixed(1),c:+((r.c||0)*k).toFixed(1),f:+((r.f||0)*k).toFixed(1),fi:+((r.fi||0)*k).toFixed(1),va:Math.round((r.va||0)*k),vc:+((r.vc||0)*k).toFixed(1)};
+    });
+    state.customFoods=others.concat(Object.keys(dishMap).map(function(k2){return dishMap[k2]}));
+    saveState();renderAll();
+    showToast('已整体还原（含自定义菜谱 '+recipes.length+' 道）');
+  }else{
+    saveState();renderAll();
+    showToast('已整体还原（老版备份，不含菜谱）');
+  }
+}
+function doImportRecipesOnly(){
+  var d=_impData;if(!d){hideModal('importChoiceModal');return}
+  hideModal('importChoiceModal');
+  importRecipeFile(d);
+}
+function exportRecipes(){
+  var recs=(state.recipes||[]).filter(function(r){return !r.builtin&&r.name});
+  if(!recs.length){showToast('还没有自定义菜谱可导出');return}
+  var json=JSON.stringify({type:'calorie_recipes',app:'热量营养检测',exportedAt:new Date().toISOString(),recipes:recs.map(function(r){return{name:r.name,icon:r.icon||'🍳',img:null,time:r.time||0,season:r.season||'',ingrs:(r.ingrs||[]).map(function(x){return{name:x.name,icon:x.icon||'🍽️',gram:x.gram||0}}),steps:(r.steps||[]).slice(),servingG:r.servingG||0,cal:r.cal||0,p:r.p||0,c:r.c||0,f:r.f||0,fi:r.fi||0,va:r.va||0,vc:r.vc||0,cat:r.cat||''}})},null,2);
+  const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='热量营养检测_自定义菜谱_'+getDateKey(new Date())+'.json';a.click();URL.revokeObjectURL(url);
+  showToast('已导出 '+recs.length+' 道自定义菜谱');
+}
+function importRecipeFile(d){
+  var list=(d.recipes||[]).filter(function(r){return r&&r.name});
+  if(!list.length){showToast('文件里没有菜谱');return}
+  var existing={};
+  (state.recipes||[]).forEach(function(r){if(r&&r.name)existing[r.name]=1});
+  var added=0,skip=0,now=Date.now();
+  list.forEach(function(r,idx){
+    if(existing[r.name]){skip++;return}
+    existing[r.name]=1;
+    var id='r'+now+idx;
+    /* 食材行先尝试匹配食品库（取 icon 与库值），营养最后以文件整份权威值对齐 */
+    var ingrs=(r.ingrs||[]).map(function(x){return{name:x.name,icon:x.icon||'🍽️',gram:x.gram||100}});
+    var pool=(typeof FOOD_DB!=='undefined'?FOOD_DB:[]);
+    var totG=ingrs.reduce(function(s2,x){return s2+x.gram},0)||1;
+    ingrs.forEach(function(x){
+      var hit=null;pool.forEach(function(f){if(f.name===x.name)hit=f});
+      if(hit){
+        x.icon=hit.icon||x.icon;
+        x.cal=hit.cal||0;x.p=hit.p||0;x.c=hit.c||0;x.f=hit.f||0;x.fi=hit.fi||0;x.va=hit.va||0;x.vc=hit.vc||0;
+      }else{x.cal=0;x.p=0;x.c=0;x.f=0;x.fi=0;x.va=0;x.vc=0}
+    });
+    /* 目标整份营养（文件权威） */
+    var recCal=+(r.cal||0),recP=+(r.p||0),recC=+(r.c||0),recF=+(r.f||0),recFi=+(r.fi||0),recVa=+(r.va||0),recVc=+(r.vc||0);
+    var dims=[['cal',recCal],['p',recP],['c',recC],['f',recF],['fi',recFi],['va',recVa],['vc',recVc]];
+    /* 每行库值合计（按克折算前） */
+    var sumLib={};dims.forEach(function(dm){sumLib[dm[0]]=0});
+    ingrs.forEach(function(x){dims.forEach(function(dm){sumLib[dm[0]]+=x[dm[0]]*x.gram/100})});
+    /* 每行调整为：库合计可用则按目标/库 比例对齐；库合计为0且目标>0则按克数均匀摊到每100g */
+    ingrs.forEach(function(x){
+      dims.forEach(function(dm){
+        var k=dm[0];
+        var libSum=sumLib[k];
+        if(libSum>0){
+          var sc=dm[1]/libSum;
+          x[k]=+(x[k]*sc).toFixed(2);
+        }else if(dm[1]>0){
+          x[k]=+(dm[1]*100/totG).toFixed(2);
+        }
+      });
+    });
+    /* 汇总出最终整份 */
+    var t={cal:0,p:0,c:0,f:0,fi:0,va:0,vc:0};
+    ingrs.forEach(function(x){var g=x.gram/100;t.cal+=x.cal*g;t.p+=x.p*g;t.c+=x.c*g;t.f+=x.f*g;t.fi+=x.fi*g;t.va+=x.va*g;t.vc+=x.vc*g});
+    var cat=r.cat||'';
+    if(!cat){var cp=t.p||recP,cc=t.c||recC,cfi=t.fi||recFi;if((cp+cc+cfi)>0)cat=(cp>=cc&&cp>=cfi)?'高蛋白':((cfi>=cp&&cfi>=cc)?'高纤维':'高碳水')}
+    var rec={id:id,name:r.name,icon:r.icon||'🍳',img:null,time:r.time||0,season:r.season||'',ingrs:ingrs,steps:(r.steps||[]).slice(),
+      cal:Math.round(t.cal),p:+t.p.toFixed(1),c:+t.c.toFixed(1),f:+t.f.toFixed(1),fi:+t.fi.toFixed(1),va:Math.round(t.va),vc:+t.vc.toFixed(1),cat:cat,createdAt:now};
+    state.recipes=state.recipes||[];state.recipes.push(rec);
+    var cf=state.customFoods||[];
+    var k2=ingrs.reduce(function(s2,x){return s2+(x.gram||0)},0);
+    var kk=k2>0?(100/k2):1;
+    cf.push({idr:id,name:rec.name,cat:'菜肴',imgkey:null,cal:Math.round(rec.cal*kk),p:+((rec.p||0)*kk).toFixed(1),c:+((rec.c||0)*kk).toFixed(1),f:+((rec.f||0)*kk).toFixed(1),fi:+((rec.fi||0)*kk).toFixed(1),va:Math.round((rec.va||0)*kk),vc:+((rec.vc||0)*kk).toFixed(1)});
+    state.customFoods=cf;
+    added++;
+  });
+  saveState();renderAll();
+  showToast('导入完成：新增 '+added+' 道菜谱'+(skip?'，跳过同名 '+skip+' 道':''));
+}
+async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');await clearAllPhotoData();state={profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,currentCat:'all',tempPhoto:null,theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),weightChartAll:false,chartMode:'weight',appLock:{enabled:false,method:'pattern',pattern:[]},recipes:[],customFoods:[]};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
 async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？食物记录不会被删除。'))return;await clearAllPhotoData();Object.values(state.foodLogs).forEach(foods=>foods.forEach(f=>f.hasPhoto=false));saveState();renderAll();if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({type:'CLEAR_PHOTO_CACHE'})}showToast('照片缓存已清除')}
 
 function renderWeightChart(){
@@ -3016,7 +3494,7 @@ function openCalorieBreakdown(){
   showModal('calorieModal');
 }
 
-function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}else if(n==='recipe'){renderRecipeList();recDishes()}}
+function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}else if(n==='recipe'){renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
 function hideModal(id){document.getElementById(id).classList.remove('show')}
 function showLoading(t){document.getElementById('loadingText').textContent=t||'加载中...';document.getElementById('loadingOverlay').classList.add('show')}
@@ -3025,19 +3503,76 @@ function showToast(m){const t=document.getElementById('toast');t.textContent=m;t
 function updateOnlineStatus(){const b=document.getElementById('offlineBadge');if(navigator.onLine){b.classList.remove('show')}else{b.classList.add('show')}}
 
 var patternLock={mode:'idle',firstPattern:null,dots:[],drawing:false,containerEl:null,svgEl:null,gridEl:null,dotPositions:[]};
+function renderAppLockState(){
+  var on=!!(state.appLock&&state.appLock.enabled);
+  var pill=document.getElementById('lockStatusPill');
+  if(pill){pill.style.display=on?'inline-block':'none'}
+  var t1=document.getElementById('lockStateTitle'),c1=document.getElementById('lockStateCard');
+  var t2=document.getElementById('lockMgmtTitle'),c2=document.getElementById('lockMgmtCard');
+  if(t1)t1.style.display=on?'':'none';
+  if(c1)c1.style.display=on?'':'none';
+  if(t2)t2.style.display=on?'':'none';
+  if(c2)c2.style.display=on?'':'none';
+  var tip=document.getElementById('lockHintTip');
+  if(tip){tip.style.display=on?'':'none'}
+  if(!on)return;
+  var pLen=(state.appLock.pattern&&state.appLock.pattern.length)||0;
+  var pd=document.getElementById('lockPatternDesc');
+  if(pd)pd.textContent='已设置 · '+pLen+' 个点 · 打开时按图案解锁';
+  var hasPwd=!!(state.appLock.backupPassword);
+  var pw=document.getElementById('lockPwdDesc');
+  if(pw)pw.textContent=hasPwd?'已设置 · 忘记图案时可用密码解锁':'未设置 · 忘记图案会锁在门外';
+  var lk=document.getElementById('lockPwdLink');
+  if(lk)lk.textContent=hasPwd?'修改':'设置';
+}
+function reDrawPattern(){
+  if(!(state.appLock&&state.appLock.enabled))return;
+  _lockRedraw=true;
+  showPatternLockScreen('setup','重新绘制解锁图案','连接至少4个点，需两次一致','');
+}
+function reSetupPassword(){
+  if(!(state.appLock&&state.appLock.enabled))return;
+  showModal('backupSetupModal');
+  document.getElementById('backupPasswordInput').value='';
+  document.getElementById('backupHintInput').value=state.appLock.backupHint||'';
+  document.getElementById('backupPasswordInput').focus();
+}
+function lockNow(){
+  if(!(state.appLock&&state.appLock.enabled))return;
+  showPatternLockScreen('unlock','请绘制图案解锁','连接你的解锁图案','');
+}
+function lockOff(){
+  if(!(state.appLock&&state.appLock.enabled))return;
+  if(!confirm('彻底关闭应用锁？将移除解锁图案与备用密码，下次开启需重新设置。'))return;
+  state.appLock={enabled:false,method:'pattern',pattern:[],patternLen:0,backupPassword:'',backupHint:''};
+  var t=document.getElementById('appLockToggle');if(t)t.checked=false;
+  saveState();renderSettings();
+  showToast('应用锁已关闭，图案与密码已移除');
+}
 function onAppLockToggle(){
   var toggle=document.getElementById('appLockToggle');
   if(toggle.checked){
-    enablePatternLock();
+    /* 已有图案→直接恢复启用；从未设置过→走绘制流程 */
+    var has=state.appLock&&state.appLock.pattern&&state.appLock.pattern.length>=4;
+    if(has){
+      state.appLock.enabled=true;
+      saveState();renderSettings();
+      showToast('应用锁已启用');
+    }else{
+      enablePatternLock();
+    }
   }else{
-    disableAppLock();
+    /* 只停用，保留图案与密码，下次开启一键恢复 */
+    state.appLock.enabled=false;
+    saveState();renderSettings();
+    showToast('应用锁已停用（设置已保留）');
   }
 }
 function disableAppLock(){
-  state.appLock={enabled:false,method:'pattern',pattern:[],backupPassword:'',backupHint:''};
+  state.appLock.enabled=false;
   saveState();
   renderSettings();
-  showToast('应用锁已关闭');
+  showToast('应用锁已停用（设置已保留）');
 }
 function enablePatternLock(){
   patternLock.mode='setup1';
@@ -3200,15 +3735,25 @@ function onPatternComplete(dots){
       setTimeout(function(){clearPatternDots();document.getElementById('lockPatternSvg').innerHTML='';},500);
     }else{
       if(JSON.stringify(patternLock.firstPattern)===JSON.stringify(dots)){
-        state.appLock={enabled:true,method:'pattern',pattern:dots.slice(),backupPassword:'',backupHint:''};
+        var oldLock=state.appLock||{};
+        var keepPwd=(oldLock.backupPassword!==undefined&&oldLock.backupPassword!=='')?oldLock.backupPassword:'';
+        var keepHint=(oldLock.backupHint!==undefined)?oldLock.backupHint:'';
+        /* 重绘模式(_lockRedraw)：仅更新图案，保留密码；全新开启才弹密码设置 */
+        state.appLock={enabled:true,method:'pattern',pattern:dots.slice(),patternLen:dots.length,backupPassword:keepPwd,backupHint:keepHint};
         saveState();
         hidePatternLockScreen();
-        setTimeout(function(){
-          showModal('backupSetupModal');
-          document.getElementById('backupPasswordInput').value='';
-          document.getElementById('backupHintInput').value='';
-          document.getElementById('backupPasswordInput').focus();
-        },300);
+        var redraw=_lockRedraw;_lockRedraw=false;
+        if(!redraw){
+          setTimeout(function(){
+            showModal('backupSetupModal');
+            document.getElementById('backupPasswordInput').value='';
+            document.getElementById('backupHintInput').value='';
+            document.getElementById('backupPasswordInput').focus();
+          },300);
+        }else{
+          renderSettings();
+          showToast('解锁图案已更新');
+        }
       }else{
         document.getElementById('lockScreenError').textContent='两次图案不一致，请重新设置';
         patternLock.firstPattern=null;
@@ -3247,8 +3792,11 @@ document.addEventListener('visibilitychange',function(){
 function onLockFooterBtn(){
   if(patternLock.mode==='setup'){
     hidePatternLockScreen();
+    _lockRedraw=false;
     var toggle=document.getElementById('appLockToggle');
-    if(toggle)toggle.checked=false;
+    /* 取消设置：滑块回到真实状态——重绘进入时锁本开(保持开)，首次开启时锁未开(保持关) */
+    if(toggle)toggle.checked=!!(state.appLock&&state.appLock.enabled);
+    renderSettings();
   }else if(patternLock.mode==='unlock'){
     document.getElementById('lockPatternContainer').style.display='none';
     document.getElementById('lockScreenTitle').textContent='备用密码解锁';
@@ -3276,12 +3824,13 @@ function saveBackupPassword(){
   var pwd=document.getElementById('backupPasswordInput').value.trim();
   var hint=document.getElementById('backupHintInput').value.trim();
   if(!pwd){showToast('请输入备用密码');return;}
+  var wasOn=state.appLock&&state.appLock.enabled;
   state.appLock.backupPassword=pwd;
   state.appLock.backupHint=hint;
   saveState();
   hideModal('backupSetupModal');
   renderSettings();
-  showToast('应用锁已启用');
+  showToast(wasOn?'备用密码已更新':'应用锁已启用');
 }
 function skipBackupPassword(){
   hideModal('backupSetupModal');
@@ -3315,6 +3864,96 @@ function detectPlatform(){
   }
   html.classList.add('desktop')
 }
+var _obStep=1,_obBound=false,_lockRedraw=false;
+function _obByStep(n){return document.getElementById('obStep'+n)}
+function _obSetSeg(ctlId,val){
+  var ctl=document.getElementById(ctlId);if(!ctl)return;
+  var items=ctl.querySelectorAll('.seg-item');
+  for(var i=0;i<items.length;i++){items[i].classList.toggle('active',items[i].getAttribute('data-'+ctlId.substring(2).toLowerCase())===val||items[i].getAttribute('data-gender')===val||items[i].getAttribute('data-method')===val||items[i].getAttribute('data-act')===val||items[i].getAttribute('data-goal')===val)}
+}
+function obGo(n){
+  if(n<1||n>3)return;
+  _obStep=n;
+  _obByStep(1).style.display=n===1?'':'none';
+  _obByStep(2).style.display=n===2?'':'none';
+  _obByStep(3).style.display=n===3?'':'none';
+  var back=document.getElementById('obBackBtn');
+  if(back)back.style.visibility=n>1?'visible':'hidden';
+  var skip=document.getElementById('obSkipBtn');
+  if(skip)skip.style.visibility=n===1?'hidden':'visible';
+  var dots=document.getElementById('obDots');
+  if(dots){var h='';for(var i=1;i<=3;i++){h+='<span style="display:inline-block;width:'+(i===n?18:7)+'px;height:7px;border-radius:4px;background:'+(i<=n?'var(--blue)':'rgba(118,118,128,0.25)')+';transition:all .3s"></span>'}dots.innerHTML=h}
+}
+function obBind(){
+  if(_obBound)return;_obBound=true;
+  function onInp(id,fn){var el=document.getElementById(id);if(el)el.addEventListener('input',fn)}
+  onInp('obHeight',function(){state.profile.height=parseFloat(this.value)||0;obRefreshPreview()});
+  onInp('obWeight',function(){state.profile.weight=parseFloat(this.value)||0;obRefreshPreview()});
+  onInp('obAge',function(){state.profile.age=parseInt(this.value)||25});
+  onInp('obWaist',function(){state.profile.waist=parseFloat(this.value)||0});
+  onInp('obNeck',function(){state.profile.neck=parseFloat(this.value)||0});
+  onInp('obHip',function(){state.profile.hip=parseFloat(this.value)||0});
+}
+function obShowOnboard(){
+  var ob=document.getElementById('onboard');if(!ob)return;
+  obBind();
+  /* 用现有资料预填（重放/兜底安全：不改动不覆盖已有数据） */
+  var pr=state.profile||{};
+  var V=function(id,v){var el=document.getElementById(id);if(el)el.value=v};
+  V('obHeight',pr.height||'');V('obWeight',pr.weight||'');
+  V('obAge',((pr.age>0&&(pr.height||pr.weight))?pr.age:''));
+  V('obWaist',pr.waist||'');V('obNeck',pr.neck||'');V('obHip',pr.hip||'');
+  _obSetSeg('obGender',pr.gender||'male');
+  _obSetSeg('obBf',pr.bfMethod||'auto');
+  _obSetSeg('obAct',pr.activity||'low');
+  _obSetSeg('obGoal',pr.goal||'lose');
+  var hf=document.getElementById('obHipField');if(hf)hf.style.display=(pr.gender==='female')?'block':'none';
+  _obStep=1;obGo(1);
+  ob.style.display='block';
+  document.body.style.overflow='hidden';
+  obRefreshPreview();
+}
+function obRefreshPreview(){
+  var cal=calcTargetCalories(),nt=calcNutritionTargets();
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=(v>0?v:'--')};
+  set('obCal',cal);set('obP',Math.round(nt.p));set('obC',Math.round(nt.c));set('obF',Math.round(nt.f));
+}
+function obNext(){
+  if(_obStep===1){
+    var h=parseFloat(document.getElementById('obHeight').value)||0;
+    var w=parseFloat(document.getElementById('obWeight').value)||0;
+    if(!h||!w){showToast('请先填写身高和体重');return}
+  }
+  if(_obStep<3){obGo(_obStep+1)}else{obFinish()}
+}
+function obBack(){if(_obStep>1)obGo(_obStep-1)}
+function obSetGender(g){state.profile.gender=g;_obSetSeg('obGender',g);var hf=document.getElementById('obHipField');if(hf)hf.style.display=g==='female'?'block':'none'}
+function obSetBf(m){state.profile.bfMethod=m;_obSetSeg('obBf',m)}
+function obSetAct(a){state.profile.activity=a;_obSetSeg('obAct',a);obRefreshPreview()}
+function obSetGoal(g){state.profile.goal=g;_obSetSeg('obGoal',g);obRefreshPreview()}
+function obFinish(){
+  state.profile.height=parseFloat(document.getElementById('obHeight').value)||state.profile.height;
+  var w=parseFloat(document.getElementById('obWeight').value)||0;
+  if(w>0)state.profile.weight=w;
+  state.profile.age=parseInt(document.getElementById('obAge').value)||25;
+  state.profile.waist=parseFloat(document.getElementById('obWaist').value)||0;
+  state.profile.neck=parseFloat(document.getElementById('obNeck').value)||0;
+  state.profile.hip=parseFloat(document.getElementById('obHip').value)||0;
+  if(w>0){var k=getDateKey(new Date());var cur=state.weightRecords[k];if(!cur||typeof cur!=='object'){cur={w:0,waist:0,t:new Date().toTimeString().slice(0,5)};state.weightRecords[k]=cur}cur.w=w;state.weightRecords[k]=cur}
+  state.onboarded=true;
+  saveState();
+  var ob=document.getElementById('onboard');if(ob)ob.style.display='none';
+  document.body.style.overflow='';
+  renderAll();refreshSettingsTop();
+  showToast('设置完成，开始记录你的每一餐 🎉');
+  if(location.hash.indexOf('onboard')>=0){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
+}
+function obSkipAll(){
+  state.onboarded=true;saveState();
+  var ob=document.getElementById('onboard');if(ob)ob.style.display='none';
+  document.body.style.overflow='';
+  showToast('已跳过，可在「设置」中随时完善资料');
+}
 async function init(){
   loadState();
   detectPlatform(); /* 给 <html> 打平台 class，驱动差异化玻璃参数 */
@@ -3324,9 +3963,9 @@ async function init(){
   await initPhotoDB();
   const now=new Date();const wd=['日','一','二','三','四','五','六'];
   document.getElementById('todayDate').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 星期'+wd[now.getDay()];
-  document.getElementById('setHeight').addEventListener('input',function(){state.profile.height=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
-  document.getElementById('setWeight').addEventListener('input',function(){var w=parseFloat(this.value)||0;state.profile.weight=w;if(w>0){var k=getDateKey(new Date());var cur=state.weightRecords[k];if(!cur||typeof cur!=='object'){cur={w:0,waist:0,t:new Date().toTimeString().slice(0,5)};state.weightRecords[k]=cur}cur.w=w}saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart();renderWeightChart();renderWeightPeriodLabel()});
-  document.getElementById('setAge').addEventListener('input',function(){state.profile.age=parseInt(this.value)||25;saveState();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
+  document.getElementById('setHeight').addEventListener('input',function(){state.profile.height=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart();refreshSettingsTop()});
+  document.getElementById('setWeight').addEventListener('input',function(){var w=parseFloat(this.value)||0;state.profile.weight=w;if(w>0){var k=getDateKey(new Date());var cur=state.weightRecords[k];if(!cur||typeof cur!=='object'){cur={w:0,waist:0,t:new Date().toTimeString().slice(0,5)};state.weightRecords[k]=cur}cur.w=w}saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart();renderWeightChart();renderWeightPeriodLabel();refreshSettingsTop()});
+  document.getElementById('setAge').addEventListener('input',function(){state.profile.age=parseInt(this.value)||25;saveState();renderCalorieSummary();renderNutrition();renderWeeklyChart();refreshSettingsTop()});
   var waistEl=document.getElementById('setWaist');if(waistEl)waistEl.addEventListener('input',function(){state.profile.waist=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
   var neckEl=document.getElementById('setNeck');if(neckEl)neckEl.addEventListener('input',function(){state.profile.neck=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()});
   var hipEl=document.getElementById('setHip');if(hipEl)hipEl.addEventListener('input',function(){state.profile.hip=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()});
@@ -3349,7 +3988,8 @@ async function init(){
     if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除');if(e.data&&e.data.type==='SW_UPDATED'){console.log('[App] SW已更新');var sk='sw_reloaded_'+(e.data.version||'x');if(!sessionStorage.getItem(sk)){sessionStorage.setItem(sk,'1');location.reload()}}})}).catch(function(){console.warn('[App] SW注册失败')})}
   renderAll();
   generateIcon();
-  if(!state.profile.height&&!state.profile.weight)setTimeout(()=>showToast('请在设置填写身高体重开始使用'),500)
+  var _obReplay=location.hash.indexOf('onboard')>=0;
+  if(_obReplay||(!state.onboarded&&(!state.profile.height||!state.profile.weight))){setTimeout(obShowOnboard,400)}else if(!state.profile.height&&!state.profile.weight){setTimeout(()=>showToast('请在设置填写身高体重开始使用'),500)}
 }
 function generateIcon(){const c=document.createElement('canvas');c.width=180;c.height=180;const ctx=c.getContext('2d');const g=ctx.createLinearGradient(0,0,180,180);g.addColorStop(0,'#34C759');g.addColorStop(1,'#007AFF');ctx.fillStyle=g;const r=40;ctx.beginPath();ctx.moveTo(r,0);ctx.lineTo(180-r,0);ctx.quadraticCurveTo(180,0,180,r);ctx.lineTo(180,180-r);ctx.quadraticCurveTo(180,180,180-r,180);ctx.lineTo(r,180);ctx.quadraticCurveTo(0,180,0,180-r);ctx.lineTo(0,r);ctx.quadraticCurveTo(0,0,r,0);ctx.closePath();ctx.fill();ctx.font='90px -apple-system,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🥗',90,92);const link=document.createElement('link');link.rel='apple-touch-icon';link.href=c.toDataURL();document.head.appendChild(link)}
 init();
