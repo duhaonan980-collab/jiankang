@@ -1930,16 +1930,19 @@ function renderStatsGrid(){
 }
 
 /* ========== 二级全屏导航栈 ==========
-   返回目标栈：每进一层二级视图 push 一条「返回该回哪」+ history.pushState。
-   系统返回键/popstate、‹ 按钮、边缘滑动手势统一汇到 popstate -> _navRestoreOne 弹栈恢复。
-   pushState 在 file:// 下可能失败(catch)，此时 ‹/手势靠超时兜底手动弹栈。 */
-var _navStack=[],_navWaitTimer=null,_curSetKey=null,_curRecipeDetail=null;
+   返回目标栈：每进一层二级视图 push 一条「返回该回哪」+ history.pushState（带唯一 navId）。
+   系统返回键/popstate、‹ 按钮、iOS 边缘滑动手势统一汇到 popstate -> _navRestoreOne 弹栈恢复。
+   防双弹：navId 识别重复 popstate + 300ms 恢复防抖；pushState 失败(file://)时 ‹/手势直接手动弹栈。
+   切 tab 时 _collapseSecondaries 收回二级视图并把残留条目标为死条目（只消费历史、不触发恢复）。 */
+var _navStack=[],_curSetKey=null,_curRecipeDetail=null,_navSeq=0,_navPushOk=false,_navGuardUntil=0;
 function _fsOn(){document.body.classList.add('fullscreen')}
 function _fsOff(){document.body.classList.remove('fullscreen')}
 function _pushNav(back){
-  _navStack.push(back);
+  /* 每条栈目带唯一 id：popstate 用 e.state.navId 识别重复事件 */
+  _navSeq++;
+  _navStack.push({id:_navSeq,back:back});
   var ok=false;
-  try{history.pushState({n:_navStack.length},'');ok=true}catch(e){ok=false}
+  try{history.pushState({navId:_navSeq},'');ok=true;_navPushOk=true}catch(e){ok=false}
   return ok;
 }
 function _restoreNavEntry(t){
@@ -1950,17 +1953,27 @@ function _restoreNavEntry(t){
 }
 function _navRestoreOne(){
   if(!_navStack.length)return;
+  /* 300ms 防抖：手势+系统各触发一次等双触发场景，只吃第一次 */
+  var now=Date.now();
+  if(now<_navGuardUntil)return;
+  _navGuardUntil=now+300;
   var t=_navStack.pop();
-  _restoreNavEntry(t);
+  _restoreNavEntry(t.back);
 }
-window.addEventListener('popstate',function(){
+window.addEventListener('popstate',function(e){
   /* 系统返回 / Android 返回键 / 浏览器侧滑都到这儿：弹一条恢复 */
-  if(_navWaitTimer){clearTimeout(_navWaitTimer);_navWaitTimer=null}
+  if(!_navStack.length)return;
+  /* 重复 popstate（同一历史条目再进来）：目标已在栈顶则忽略 */
+  var top=_navStack[_navStack.length-1];
+  if(e.state&&e.state.navId===top.id)return;
   _navRestoreOne();
 });
-/* iOS 边缘右滑返回：仅全屏二级视图(_navStack 非空)时拦截左缘手势 */
+/* iOS 边缘右滑返回：仅 iOS 启用（iOS PWA 无系统返回，需页面自实现）。
+   Android 上系统返回手势本身从左缘滑入，若页面也拦截会「手势+系统」双触发连弹两层 */
+var _isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&(navigator.maxTouchPoints||0)>1);
 var _swipeT=null;
 document.addEventListener('touchstart',function(e){
+  if(!_isIOS)return;
   if(!_navStack.length)return;
   var t=e.touches&&e.touches[0];if(!t)return;
   if(t.clientX>22)return;
@@ -1981,16 +1994,14 @@ document.addEventListener('touchend',function(e){
 },{passive:true});
 
 function navUiBack(){
-  /* ‹ 按钮 / iOS 边缘滑动手势：优先走 history.back() 让 popstate 处理(与系统键同步) */
+  /* ‹ 按钮 / iOS 边缘滑动手势 */
   if(_navStack.length){
-    var before=_navStack.length;
-    var fired=false;
-    try{history.back();fired=true}catch(e){fired=false}
-    if(!fired){
-      /* pushState 失败(file://)等场景：等一小会若栈没变则手动弹 */
-      _navWaitTimer=setTimeout(function(){_navWaitTimer=null;if(_navStack.length===before)_navRestoreOne()},120);
+    if(_navPushOk){
+      /* pushState 可用：交给 history.back() -> popstate 统一弹栈，不做超时兜底（会与 popstate 竞态双弹） */
+      try{history.back()}catch(e){_navRestoreOne()}
     }else{
-      _navWaitTimer=setTimeout(function(){_navWaitTimer=null;if(_navStack.length===before)_navRestoreOne()},150);
+      /* pushState 不可用(file:// 等)：无历史条目可退，直接手动弹栈 */
+      _navRestoreOne();
     }
   }else{
     /* 无栈：兜底回当前 tab 根 */
@@ -3587,7 +3598,15 @@ function openCalorieBreakdown(){
   showModal('calorieModal');
 }
 
-function switchPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}else if(n==='recipe'){renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}}
+function _collapseSecondaries(){
+  /* 切 tab 时收回二级视图：栈条目标记为死条目（back=null 只消费历史、不再触发恢复），防止跨 tab 幻影恢复 */
+  if(!_navStack.length)return;
+  for(var i=0;i<_navStack.length;i++)_navStack[i].back=null;
+  if(_curSetKey)settingsShowHome();
+  if(_curRecipeDetail)exitRecipeDetail();
+  _fsOff();
+}
+function switchPage(n){_collapseSecondaries();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}else if(n==='recipe'){renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
 document.addEventListener('click',function(e){
   var t=e.target;
