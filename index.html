@@ -1930,20 +1930,14 @@ function renderStatsGrid(){
 }
 
 /* ========== 二级全屏导航栈 ==========
-   栈与 history 一一对应：进入二级 push 一次栈 + pushState；任何「返回」
-   （‹ 按钮 / iOS 边缘滑动手势 / Android 系统返回键 / 浏览器侧滑）都让 history 退一格，
-   由 popstate 统一弹栈恢复。pushState 不可用时(file://)退化为纯栈式手动弹栈。
-   防双弹：300ms 恢复防抖；切换 tab 时 _collapseSecondaries 清空栈并 history.go(-n) 同步 history。 */
-var _navStack=[],_curSetKey=null,_curRecipeDetail=null,_navSeq=0,_navPushOk=false,_navGuardUntil=0;
+   纯 JS 栈，不碰 history API（不 pushState、不响应 popstate）。
+   系统返回键走浏览器默认行为（直接退出/关页），页面内返回只靠 ‹ 按钮和 iOS 边缘滑动手势。
+   栈条目存「返回该回哪」：‹ 触发 _navRestoreOne 弹栈恢复。 */
+var _navStack=[],_curSetKey=null,_curRecipeDetail=null;
 function _fsOn(){document.body.classList.add('fullscreen')}
 function _fsOff(){document.body.classList.remove('fullscreen')}
 function _pushNav(back){
-  /* 每条栈目带唯一 id：popstate 用 e.state.navId 识别重复事件 */
-  _navSeq++;
-  _navStack.push({id:_navSeq,back:back});
-  var ok=false;
-  try{history.pushState({navId:_navSeq},'');ok=true;_navPushOk=true}catch(e){ok=false}
-  return ok;
+  _navStack.push(back);
 }
 function _restoreNavEntry(t){
   if(!t)return;
@@ -1953,11 +1947,8 @@ function _restoreNavEntry(t){
 }
 function _navRestoreOne(){
   if(!_navStack.length)return false;
-  var now=Date.now();
-  if(now<_navGuardUntil)return false;   /* 防双触发：300ms 内只弹一次 */
-  _navGuardUntil=now+300;
   var t=_navStack.pop();
-  _restoreNavEntry(t.back);
+  _restoreNavEntry(t);
   return true;
 }
 function _navFallbackIfEmpty(){
@@ -1965,19 +1956,8 @@ function _navFallbackIfEmpty(){
   var pgEl=document.querySelector('.page.active');
   if(pgEl&&pgEl.id==='settings-page'){settingsShowHome();_fsOff()}
 }
-window.addEventListener('popstate',function(e){
-  /* 统一入口：栈与 history 一一对应。history 已退一格，我们同步弹栈。 */
-  if(_navStack.length){
-    /* 重复 popstate（同一历史条目再进来）：目标已在栈顶则忽略 */
-    var top=_navStack[_navStack.length-1];
-    if(e.state&&e.state.navId===top.id)return;
-    _navRestoreOne();
-  }else{
-    _navFallbackIfEmpty();
-  }
-});
 /* iOS 边缘右滑返回：仅 iOS 启用（iOS PWA 无系统返回，需页面自实现）。
-   Android 上系统返回手势本身从左缘滑入，若页面也拦截会「手势+系统」双触发连弹两层 */
+   Android 系统返回键不掺和导航（走浏览器默认行为），因此不做任何拦截。 */
 var _isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&(navigator.maxTouchPoints||0)>1);
 var _swipeT=null;
 document.addEventListener('touchstart',function(e){
@@ -2002,14 +1982,8 @@ document.addEventListener('touchend',function(e){
 },{passive:true});
 
 function navUiBack(){
-  /* 统一入口：栈与 history 一一对应。
-     pushState 可用 → history.back() 让 history 退一格，popstate 触发弹栈；
-     pushState 不可用(file://)→ 纯栈式直接弹栈；栈空时一律 settingsShowHome 兜底。 */
-  if(_navPushOk){
-    try{history.back()}catch(e){if(!_navRestoreOne())_navFallbackIfEmpty()}
-  }else{
-    if(!_navRestoreOne())_navFallbackIfEmpty();
-  }
+  /* ‹ 按钮 / iOS 边缘滑动手势：纯栈式弹栈，栈空时兜底收回设置主页视图 */
+  if(!_navRestoreOne())_navFallbackIfEmpty();
 }
 function _showSetSub(key){
   var home=document.getElementById('setHome');if(home)home.style.display='none';
@@ -3630,20 +3604,13 @@ function openCalorieBreakdown(){
 }
 
 function _collapseSecondaries(){
-  /* 切 tab 时收回二级视图 + 清空栈 + history.go(-n) 同步 history。
-     避免残留栈条目在其他 tab 被按返回时幻影恢复，也避免残留历史条目导致「假 back」。 */
+  /* 切 tab 时收回二级视图 + 清空栈（不碰 history：本导航栈不 pushState） */
   if(!_navStack.length)return;
-  var dead=_navStack.length;
   _navStack.length=0;
   _curSetKey=null;_curRecipeDetail=null;
   if(typeof settingsShowHome==='function')settingsShowHome();
   if(typeof exitRecipeDetail==='function')exitRecipeDetail();
   _fsOff();
-  if(_navPushOk&&dead>0&&history.length>dead+1){
-    /* 用较长的防抖窗口吞掉 history.go 派发的 N 个 popstate（栈已空，popstate 兜底不做事） */
-    _navGuardUntil=Date.now()+600;
-    try{history.go(-dead)}catch(e){}
-  }
 }
 function switchPage(n){_collapseSecondaries();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){renderWeightChart();renderWeightPeriodLabel();renderWeeklyChart();renderStatsGrid()}else if(n==='recipe'){renderRecipeList();recDishes()}else if(n==='settings'){settingsShowHome()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
