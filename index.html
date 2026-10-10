@@ -196,6 +196,19 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .set-seg{display:flex;gap:4px;background:rgba(118,118,128,0.08);border-radius:13px;padding:3px}
 .set-seg .seg-item{font-size:12.5px;padding:7px 16px;margin:0}
 .set-seg .seg-item.active{background:var(--card-bg);color:var(--blue);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+/* ===== 页面管理开关 ===== */
+.sw-row{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.sw-row+.sw-row{border-top:0.5px solid var(--card-border)}
+.sw-txt{flex:1;min-width:0}
+.sw-tt{font-size:14.5px;font-weight:600;color:var(--text)}
+.sw-st{font-size:11.5px;color:var(--text3);margin-top:2px;line-height:1.4}
+.swt{width:46px;height:27px;border-radius:14px;background:rgba(118,118,128,0.28);position:relative;flex-shrink:0;cursor:pointer;transition:background .22s;border:none;padding:0;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.swt.on{background:var(--green)}
+.swt::after{content:'';position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.18);transition:transform .22s cubic-bezier(0.32,0.72,0,1)}
+.swt.on::after{transform:translateX(19px)}
+.swt.dim{opacity:.4}
+.sw-row.dim .sw-txt{opacity:.45}
+.sw-note{font-size:11.5px;color:var(--text3);line-height:1.6;margin:2px 18px 0}
 .bf3{display:flex;gap:8px;padding:2px 14px 12px}
 .bf3 .bf{flex:1;background:rgba(118,118,128,0.05);border-radius:13px;padding:10px 6px 8px;text-align:center}
 .bf .bf-l{font-size:11.5px;color:var(--text2)}
@@ -570,7 +583,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <button onclick="openRecipeEditor()" title="新建菜谱" style="border:none;background:var(--blue);color:#fff;width:38px;height:38px;border-radius:50%;font-size:22px;font-weight:600;line-height:1;font-family:inherit;cursor:pointer">+</button>
       </div>
       <div id="rcpMenuCard" class="card" style="cursor:pointer" onclick="openMenuPage()"></div>
-      <div style="display:flex;gap:8px;align-items:center;margin:0 16px 12px">
+      <div id="rcpSearchBar" style="display:flex;gap:8px;align-items:center;margin:0 16px 12px">
         <div class="search-input-wrap" style="flex:1;margin-bottom:0">
           <span class="search-icon" style="left:12px;font-size:14px">🔍</span>
           <input class="search-input" id="rcpSearch" placeholder="搜索菜谱、食材..." oninput="renderRecipeList()" style="padding:10px 10px 10px 33px;font-size:15px">
@@ -616,6 +629,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   <!-- ===== HISTORY PAGE 历史 ===== -->
   <div id="history-page" class="page">
     <div class="page-header"><div class="page-title">历史记录</div></div>
+    <div id="histStatsWrap">
     <div class="card" style="padding:12px 16px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
         <div class="card-title" style="margin-bottom:0">体重月历</div>
@@ -632,6 +646,8 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div id="weightChartEmpty" style="display:none;text-align:center;padding:20px;color:var(--text3);font-size:14px">暂无体重记录<br>请在设置页点击「更新」记录体重</div>
       <div id="weightChartStats" style="display:none;margin-top:6px;padding-top:8px;border-top:0.5px solid var(--card-border)"></div>
     </div>
+    </div>
+    <div id="histLogWrap">
     <div class="sec-div"><div class="sec-div-line"></div><span class="sec-div-text">饮食记录</span><div class="sec-div-line"></div></div>
     <div class="card">
       <div class="card-title">饮食日历 · 点日期看当天记录</div>
@@ -639,6 +655,10 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="calendar-grid" id="calGrid"></div>
       <div id="calDetail"></div>
       <div class="cal-stats" id="calStats" style="margin-bottom:0"></div>
+    </div>
+    </div>
+    <div id="histAllOff" class="card" style="display:none">
+      <div style="font-size:13px;color:var(--text3);line-height:1.7;text-align:center;padding:6px 0">历史页内容已在设置中全部隐藏<br><span style="color:var(--blue);font-weight:600;cursor:pointer" onclick="gotoPageManage()">去页面管理打开 ›</span></div>
     </div>
   </div>
 
@@ -703,11 +723,19 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span class="se-che">›</span>
       </div>
 
+      <div class="set-gtitle">页面</div>
+      <div class="set-entry" onclick="openSettingsSub('pages')">
+        <div class="se-ico" style="background:rgba(0,122,255,0.08)">🧩</div>
+        <div style="flex:0 1 auto"><div class="se-tt">页面管理</div><div class="se-st">显示或隐藏页面与模块</div></div>
+        <div class="se-val" id="sPagesVal">全部显示</div>
+        <span class="se-che">›</span>
+      </div>
+
       <div class="set-gtitle">数据</div>
       <div class="set-entry" onclick="openSettingsSub('data')">
         <div class="se-ico" style="background:rgba(118,118,128,0.08)">🗂️</div>
         <div style="flex:0 1 auto"><div class="se-tt">通用与数据</div><div class="se-st">导出导入 · 清缓存 · 关于</div></div>
-        <div class="se-val" id="sDataVal">v3.13.7</div>
+        <div class="se-val" id="sDataVal">--</div>
         <span class="se-che">›</span>
       </div>
     </div>
@@ -880,7 +908,25 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.16</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.18</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
+    </div>
+
+    <!-- ============ 二级：页面管理 ============ -->
+    <div id="setSubPages" class="set-sub" style="display:none">
+      <div class="set-sub-head">
+        <button class="set-back" onclick="navUiBack()">‹</button>
+        <div class="set-title">页面管理</div>
+      </div>
+      <div class="set-gtitle" style="margin-top:6px">页面</div>
+      <div class="set-card" id="swPageTabs"></div>
+      <div class="sw-note">关掉的页面会从底部导航栏隐藏（首页与设置始终保留）</div>
+      <div class="set-gtitle">菜谱页内容</div>
+      <div class="set-card" id="swRcpCards"></div>
+      <div class="sw-note">「全部菜谱」关掉后页面更清爽；只要「菜谱搜索」还开着，一搜索照样出结果</div>
+      <div class="set-gtitle">历史页内容</div>
+      <div class="set-card" id="swHistCards"></div>
+      <div class="sw-note">只影响显示，记录与数据都还在，随时可以再打开</div>
+      <button onclick="resetPagePrefs()" style="display:block;width:calc(100% - 32px);margin:18px 16px 24px;padding:13px;border:1.5px solid var(--input-bd);border-radius:14px;background:var(--card-bg);color:var(--blue);font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer">全部恢复显示</button>
     </div>
   </div>
 
@@ -1214,7 +1260,8 @@ let state = {
   chartMode:'weight',
   appLock:{enabled:false,method:'pattern',pattern:[],backupPassword:'',backupHint:''},onboarded:false,
   menu:[],
-  menuPlans:[]
+  menuPlans:[],
+  pages:{recipe:true,history:true,rcpMenu:true,rcpSearch:true,rcpList:true,histStats:true,histLog:true}
 };
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
 let photoDB=null;
@@ -1265,8 +1312,8 @@ function clearAllPhotoData(){
   });
 }
 
-function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes,onboarded:!!state.onboarded,menu:state.menu||[],menuPlans:state.menuPlans||[]}))}catch(e){showToast('存储失败')}}
-function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];state.onboarded=!!d.onboarded;state.menu=d.menu||[];state.menuPlans=d.menuPlans||[];/* 兼容旧版 weightRecords: 数字 → {w,waist} */
+function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes,onboarded:!!state.onboarded,menu:state.menu||[],menuPlans:state.menuPlans||[],pages:state.pages||{}}))}catch(e){showToast('存储失败')}}
+function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];state.onboarded=!!d.onboarded;state.menu=d.menu||[];state.menuPlans=d.menuPlans||[];state.pages=d.pages||{};/* 兼容旧版 weightRecords: 数字 → {w,waist} */
 Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto'}}catch(e){console.error(e)}}
 
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -1747,7 +1794,7 @@ function changeDate(d){const dt=new Date(state.selectedDate);dt.setDate(dt.getDa
 async function deleteFood(id){const foods=state.foodLogs[state.selectedDate]||[];state.foodLogs[state.selectedDate]=foods.filter(f=>f.id!==id);saveState();await deletePhotoData(id);renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已删除')}
 function clearTodayLog(){if(!confirm('确定清空当日所有食物记录？'))return;const foods=state.foodLogs[state.selectedDate]||[];foods.forEach(f=>{if(f.hasPhoto)deletePhotoData(f.id)});state.foodLogs[state.selectedDate]=[];saveState();renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已清空')}
 
-function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeightChart();renderWeightPeriodLabel();renderCalendar();updateChartModeUI();updateWeightPeriodNav();renderMenuEntryCard()}
+function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeightChart();renderWeightPeriodLabel();renderCalendar();updateChartModeUI();updateWeightPeriodNav();renderMenuEntryCard();applyPagePrefs()}
 function animateNumber(el,to,opt){
   if(!el)return;
   opt=opt||{};
@@ -1959,6 +2006,7 @@ function renderSettings(){
   var lockToggle=document.getElementById('appLockToggle');
   if(lockToggle)lockToggle.checked=state.appLock.enabled;
   renderAppLockState();
+  renderPagesSub();
   refreshSettingsTop();
 }
 function renderBFCompare(){
@@ -2133,6 +2181,85 @@ function openSettingsSub(key){
   _showSetSub(key);
   _fsOn();
 }
+/* ===== 页面管理（v3.13.18）：底部页面与页面内模块的显隐开关 ===== */
+var PAGE_ITEMS=[
+  {k:'recipe',   g:'tab', tt:'菜谱页面', st:'底部导航的「菜谱」'},
+  {k:'history',  g:'tab', tt:'历史页面', st:'底部导航的「历史」'},
+  {k:'rcpMenu',  g:'rcp', tt:'一日菜单', st:'排一天吃什么 · 一键记录'},
+  {k:'rcpSearch',g:'rcp', tt:'菜谱搜索', st:'搜索框与分类筛选'},
+  {k:'rcpList',  g:'rcp', tt:'全部菜谱', st:'默认的整份菜谱列表'},
+  {k:'histStats',g:'hist',tt:'统计',    st:'体重月历 · 体重变化折线图'},
+  {k:'histLog',  g:'hist',tt:'饮食记录', st:'饮食日历 · 点日期看当天记录'}
+];
+var PAGE_GROUPS=[
+  {g:'tab', box:'swPageTabs'},
+  {g:'rcp', box:'swRcpCards', parent:'recipe'},
+  {g:'hist',box:'swHistCards',parent:'history'}
+];
+function pageOn(k){var p=state.pages||{};return p[k]!==false}
+function renderPagesSub(){
+  PAGE_GROUPS.forEach(function(grp){
+    var box=document.getElementById(grp.box);if(!box)return;
+    var dim=grp.parent&&!pageOn(grp.parent);
+    var h='';
+    PAGE_ITEMS.filter(function(it){return it.g===grp.g}).forEach(function(it){
+      var on=pageOn(it.k);
+      h+='<div class="sw-row'+(dim?' dim':'')+'"><div class="sw-txt"><div class="sw-tt">'+it.tt+'</div><div class="sw-st">'+it.st+'</div></div>'
+        +'<button class="swt'+(on?' on':'')+'" onclick="togglePageItem(\''+it.k+'\')" aria-label="'+it.tt+'" aria-pressed="'+(on?'true':'false')+'"></button></div>';
+    });
+    box.innerHTML=h;
+  });
+  var v=document.getElementById('sPagesVal');
+  if(v){var off=PAGE_ITEMS.filter(function(it){return !pageOn(it.k)}).length;v.textContent=off?('已隐藏 '+off+' 项'):'全部显示'}
+}
+function togglePageItem(k){
+  state.pages=state.pages||{};
+  var now=!pageOn(k);
+  state.pages[k]=now;
+  saveState();
+  applyPagePrefs();
+  renderPagesSub();
+  var it=PAGE_ITEMS.filter(function(x){return x.k===k})[0];
+  showToast((it?it.tt:'页面')+(now?' 已显示':' 已隐藏'));
+}
+function resetPagePrefs(){
+  var p={};PAGE_ITEMS.forEach(function(it){p[it.k]=true});
+  state.pages=p;
+  saveState();
+  applyPagePrefs();
+  renderPagesSub();
+  showToast('已全部恢复显示');
+}
+function applyPagePrefs(){
+  ['recipe','history'].forEach(function(n){
+    var t=document.querySelector('.tab-item[data-page="'+n+'"]');
+    if(t)t.style.display=pageOn(n)?'':'none';
+  });
+  /* 菜谱页内模块 */
+  var m=document.getElementById('rcpMenuCard');if(m)m.style.display=pageOn('rcpMenu')?'':'none';
+  var sb=document.getElementById('rcpSearchBar');if(sb)sb.style.display=pageOn('rcpSearch')?'':'none';
+  if(!pageOn('rcpSearch')){
+    /* 搜索条关掉 → 清掉残留搜索词与分类，避免列表被看不见的条件过滤 */
+    var si=document.getElementById('rcpSearch');if(si&&si.value)si.value='';
+    if(typeof _rcpCat!=='undefined'&&_rcpCat!=='all')_rcpCat='all';
+  }
+  /* 历史页内模块 */
+  var s=document.getElementById('histStatsWrap');if(s)s.style.display=pageOn('histStats')?'':'none';
+  var l=document.getElementById('histLogWrap');if(l)l.style.display=pageOn('histLog')?'':'none';
+  var off=!pageOn('histStats')&&!pageOn('histLog');
+  var h=document.getElementById('histAllOff');if(h)h.style.display=off?'':'none';
+  /* 列表卡显示条件变了（全部菜谱开关 / 搜索词），重算一次 */
+  if(typeof renderRecipeList==='function')renderRecipeList();
+  /* 当前停留的页面被关掉 → 自动回首页 */
+  var act=document.querySelector('.page.active');
+  if(act&&act.id){
+    var pid=act.id.replace('-page','');
+    if((pid==='recipe'&&!pageOn('recipe'))||(pid==='history'&&!pageOn('history'))){
+      switchPage('main');showToast('该页面已在设置中隐藏');
+    }
+  }
+}
+function gotoPageManage(){switchPage('settings');openSettingsSub('pages')}
 function settingsShowHome(){
   _curSetKey=null;
   _fsOff();
@@ -2179,6 +2306,9 @@ function refreshSettingsTop(){
   /* 应用锁 */
   var lockOn=!!(state.appLock&&state.appLock.enabled);
   T('sLockVal',lockOn?'已开启':'未开启');
+  /* 版本号：跟「关于」保持一致 */
+  var verEl=document.querySelector('.about-text .ver');
+  if(verEl)T('sDataVal',verEl.textContent.replace(/^热量营养检测\s*/,''));
   /* 资料页 BMR 信息 */
   var bmr=calcBMR(pr),tdee=calcTDEE(pr);
   if(bmr>0)T('setBMRInfo','由这些数据估算：基础代谢 '+Math.round(bmr)+' kcal · 每日消耗 '+Math.round(tdee)+' kcal');
@@ -3247,18 +3377,24 @@ function renderRecipeList(){
   else if(_rcpCat!=='all')list=list.filter(function(r){return r.cat===_rcpCat});
   if(q)list=list.filter(function(r){return (r.name||'').indexOf(q)>=0||((r.ingrs||[]).some(function(x){return (x.name||'').indexOf(q)>=0}))});
   var ti=document.getElementById('rcpListTitle'),co=document.getElementById('rcpListCount');
-  if(ti)ti.textContent=(_rcpCat==='all'?'全部菜谱':(_rcpCat==='我的'?'我的菜谱':_rcpCat+'菜谱'));
+  /* 「全部菜谱」可在设置里关掉；只要「菜谱搜索」开着，一搜索/一筛选就照常出结果 */
+  var listOn=pageOn('rcpList');
+  var searching=pageOn('rcpSearch')&&(q!==''||_rcpCat!=='all');
+  var showArea=listOn||searching;
+  if(ti){var baseTitle=(_rcpCat==='all'?'全部菜谱':(_rcpCat==='我的'?'我的菜谱':_rcpCat+'菜谱'));
+    ti.textContent=(!listOn&&searching&&q)?'搜索结果':baseTitle}
   if(co)co.textContent=list.length+' 道';
   var fb=document.getElementById('rcpFilterBtn');
   if(fb){var lb=_rcpCatLabel(_rcpCat||'all')+' ▾';if(fb.textContent!==lb)fb.textContent=lb}
   if(!all.length){
     if(card)card.style.display='none';el.innerHTML='';
-    if(emp)emp.innerHTML='<div class="card" style="text-align:center;padding:40px 24px"><div style="font-size:44px;margin-bottom:12px">🍳</div><div style="font-size:15px;color:var(--text2)">还没有菜谱</div><div style="font-size:13px;color:var(--text3);margin-top:8px;line-height:1.7">点右上角「+」创建第一道菜<br>食材从食品库选，营养自动算好并归类</div></div>';
+    if(emp)emp.innerHTML=showArea?'<div class="card" style="text-align:center;padding:40px 24px"><div style="font-size:44px;margin-bottom:12px">🍳</div><div style="font-size:15px;color:var(--text2)">还没有菜谱</div><div style="font-size:13px;color:var(--text3);margin-top:8px;line-height:1.7">点右上角「+」创建第一道菜<br>食材从食品库选，营养自动算好并归类</div></div>':'';
     return;
   }
   if(!list.length){
     if(card)card.style.display='none';el.innerHTML='';
     if(emp){
+      if(!showArea){emp.innerHTML='';return}
       var msg=(_rcpCat==='我的'&&!q)
         ? '还没有自建菜谱<br><span style="font-size:12.5px">点右上角「+」新建，或在菜谱详情里把内置菜改成你的版本</span>'
         : ('没有匹配的菜谱'+(q?'「'+q+'」':''));
@@ -3267,7 +3403,8 @@ function renderRecipeList(){
     return;
   }
   if(emp)emp.innerHTML='';
-  if(card)card.style.display='';
+  if(card)card.style.display=showArea?'':'none';
+  if(!showArea){el.innerHTML='';return}
   var html='';
   list.forEach(function(r,i){
     var chip='';
@@ -4256,7 +4393,9 @@ function _collapseSecondaries(){
   if(typeof exitRecipeDetail==='function')exitRecipeDetail();
   _fsOff();
 }
-function switchPage(n){_collapseSecondaries();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){if(!calSelectedDate)calSelectedDate=state.selectedDate;renderWeightChart();renderWeightPeriodLabel();renderCalendar()}else if(n==='recipe'){renderRecipeList();recDishes();renderMenuEntryCard()}else if(n==='settings'){settingsShowHome()}}
+function switchPage(n){
+  if((n==='recipe'||n==='history')&&typeof pageOn==='function'&&!pageOn(n)){showToast('该页面已在设置 › 页面管理中隐藏');return}
+  _collapseSecondaries();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){if(!calSelectedDate)calSelectedDate=state.selectedDate;renderWeightChart();renderWeightPeriodLabel();renderCalendar()}else if(n==='recipe'){renderRecipeList();recDishes();renderMenuEntryCard()}else if(n==='settings'){settingsShowHome()}}
 function showModal(id){document.getElementById(id).classList.add('show')}
 document.addEventListener('click',function(e){
   var t=e.target;
