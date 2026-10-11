@@ -123,7 +123,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .card-clickable{cursor:pointer;position:relative;transition:transform .15s ease}.card-clickable:active{transform:scale(0.98)}.card-clickable .card-title{display:flex;align-items:center;justify-content:space-between}.card-clickable .card-title::after{content:'›';font-size:18px;color:var(--text3);font-weight:400;transition:color .2s,transform .2s}.card-clickable:active .card-title::after{color:var(--blue);transform:translateX(2px)}
 .nutri-bar{margin-bottom:10px}.nutri-bar:last-child{margin-bottom:0}
 .nutri-bar-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
-.nutri-bar-name{color:var(--text2)}.nutri-bar-val{font-weight:600}
+.nutri-bar-name{color:var(--text2)}.nutri-bar-val{font-weight:600}.nutri-bar-val.mn-over{color:var(--red);font-weight:700}
 .nutri-bar-track{height:6px;background:rgba(118,118,128,0.12);border-radius:3px;overflow:hidden}
 .nutri-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
 .rcat{font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;border:none;background:rgba(118,118,128,0.10);color:var(--text2);font-family:inherit;cursor:pointer;flex-shrink:0}
@@ -908,7 +908,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.18</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.19</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1083,7 +1083,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
 <div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
+  <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="nbdTitle">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
 
   <!-- ===== BMI BREAKDOWN MODAL ===== -->
   <div class="modal-overlay" id="bmiModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">BMI 详细分析</div><div id="bmiBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">请先在设置页填写身高体重</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('bmiModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
@@ -3759,33 +3759,65 @@ function openMenuPage(){
 }
 function menuNutriBox(){
   var t=menuTotals(),nt=calcNutritionTargets(),cal=calcTargetCalories();
-  var rows=[
-    {k:'p',name:'蛋白质',unit:'g',target:nt.p,color:'var(--green)',dec:1,over:1.3},
-    {k:'c',name:'碳水',unit:'g',target:nt.c,color:'var(--orange)',dec:1,over:1.15},
-    {k:'f',name:'脂肪',unit:'g',target:nt.f,color:'var(--red)',dec:1,over:1.15},
-    {k:'fi',name:'膳食纤维',unit:'g',target:nt.fiber,color:'var(--cyan)',dec:1,over:1.3},
-    {k:'va',name:'维生素 A',unit:' μg',target:nt.va,color:'var(--yellow)',dec:0,over:1.5},
-    {k:'vc',name:'维生素 C',unit:' mg',target:nt.vc,color:'var(--purple)',dec:0,over:1.5}
-  ];
   var over=cal>0&&t.cal>cal;
   var pct=cal>0?Math.min(100,t.cal/cal*100):0;
   var html='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">'
     +'<span style="font-size:13px;font-weight:700">已排热量</span>'
     +'<span style="font-size:13px;font-weight:700;color:'+(over?'var(--red)':'var(--text)')+'">'+t.cal+' / '+cal+' kcal</span></div>'
-    +'<div style="height:7px;border-radius:4px;background:rgba(118,118,128,0.15);overflow:hidden;margin-bottom:12px"><div style="width:'+pct+'%;height:100%;background:'+(over?'var(--red)':'var(--blue)')+'"></div></div>';
-  html+=rows.map(function(r){
-    var v=t[r.k]||0,ratio=r.target>0?v/r.target:0,oc=ratio>(r.over||1.15);
-    return '<div style="margin-bottom:9px">'
-      +'<div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text2);margin-bottom:3px"><span>'+r.name+'</span><span style="'+(oc?'color:var(--red);font-weight:700':'')+'">'+v.toFixed(r.dec)+' / '+r.target+r.unit+'</span></div>'
-      +'<div style="height:5px;border-radius:3px;background:rgba(118,118,128,0.15);overflow:hidden"><div style="width:'+Math.min(100,ratio*100)+'%;height:100%;background:'+(oc?'var(--red)':r.color)+'"></div></div>'
-      +'</div>';
-  }).join('');
+    +'<div style="height:7px;border-radius:4px;background:rgba(118,118,128,0.15);overflow:hidden;margin-bottom:14px"><div style="width:'+pct+'%;height:100%;background:'+(over?'var(--red)':'var(--blue)')+'"></div></div>';
+  /* 两列网格：与主页「营养素摄入」同款结构（左：蛋白/碳水/脂肪，右：纤维/维A/维C） */
+  var cols=[['p','c','f'],['fi','va','vc']];
+  var defs={
+    p:{name:'蛋白质',unit:'g',dec:1,target:nt.p,color:'var(--green)',over:1.3},
+    c:{name:'碳水化合物',unit:'g',dec:1,target:nt.c,color:'var(--orange)',over:1.15},
+    f:{name:'脂肪',unit:'g',dec:1,target:nt.f,color:'var(--red)',over:1.15},
+    fi:{name:'膳食纤维',unit:'g',dec:1,target:nt.fiber,color:'var(--cyan)',over:1.3},
+    va:{name:'维生素A',unit:'μg',dec:0,target:nt.va,color:'var(--yellow)',over:1.5},
+    vc:{name:'维生素C',unit:'mg',dec:0,target:nt.vc,color:'var(--purple)',over:1.5}
+  };
+  html+='<div class="nutri-grid">';
+  cols.forEach(function(col){
+    html+='<div class="nutri-col">';
+    col.forEach(function(k){
+      var r=defs[k],v=t[k]||0;
+      var ratio=r.target>0?v/r.target:0,oc=ratio>r.over;
+      html+='<div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">'+r.name+'</span>'
+        +'<span class="nutri-bar-val'+(oc?' mn-over':'')+'">'+v.toFixed(r.dec)+' / '+r.target+r.unit+'</span></div>'
+        +'<div class="nutri-bar-track"><div class="nutri-bar-fill" style="width:'+Math.min(100,ratio*100)+'%;background:'+(oc?'var(--red)':r.color)+'"></div></div></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
   return html;
+}
+/* 菜单版营养素来源：数据源是菜单里排的食物（按折算后克数），复用主页弹窗的 tab 逻辑 */
+var _nbdSrc='today';
+function menuNbdFoods(){
+  return menuList().map(function(it){
+    var n=menuItemNutri(it),g=Math.max(0,+it.amount||0);
+    return {name:it.name,icon:it.icon||'🍽️',amount:g,meal:it.meal,
+      cal:n.cal,p:n.p,c:n.c,f:n.f,fi:n.fi,va:n.va,vc:n.vc};
+  }).filter(function(f){return f.amount>0});
+}
+function openMenuNutriDetail(){
+  _nbdSrc='menu';
+  var mt=document.getElementById('nbdTitle');if(mt)mt.textContent='已排营养素来源';
+  var foods=menuNbdFoods();
+  if(!foods.length){
+    document.getElementById('nbdContent').innerHTML='<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>菜单还是空的<br>先把想吃的排进来，再看营养来源</div>';
+    showModal('nutritionModal');
+    return;
+  }
+  renderNbdTab('protein');
+  showModal('nutritionModal');
 }
 function renderMenuPage(){
   var body=document.getElementById('menuBody');if(!body)return;
   var list=menuList();
-  var html='<div class="card" style="margin:10px 16px"><div class="card-title">已排营养</div><div id="menuNutriBox">'+menuNutriBox()+'</div>'
+  var html='<div class="card card-clickable" style="margin:10px 16px" onclick="openMenuNutriDetail()">'
+    +'<div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span>已排营养</span>'
+    +'<span style="font-size:12px;color:var(--blue);text-transform:none;letter-spacing:0;font-weight:600">营养来源 ›</span></div>'
+    +'<div id="menuNutriBox">'+menuNutriBox()+'</div>'
     +'<div style="font-size:11px;color:var(--text3);line-height:1.5">这是「打算吃」的清单，不会计入今日摄入。确认吃完了再点下方按钮记录。</div></div>';
   if(!list.length){
     html+='<div class="card" style="margin:10px 16px;text-align:center;padding:26px 16px"><div style="font-size:13.5px;color:var(--text2);line-height:1.8">菜单还是空的<br>点「添加食物」把常吃的排进来<br>再把每天固定那几样点 ☆ 设为常备</div></div>';
@@ -4181,6 +4213,8 @@ function delRecipe(id){
 
 var nbdCurrentNutri='protein';
 function openNutritionBreakdown(){
+  _nbdSrc='today';
+  var mt=document.getElementById('nbdTitle');if(mt)mt.textContent='营养素来源';
   const foods=getTodayFoods();
   if(foods.length===0){
     document.getElementById('nbdContent').innerHTML='<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物<br>添加食物后再来看营养素来源吧</div>';
@@ -4190,9 +4224,13 @@ function openNutritionBreakdown(){
 }
 function renderNbdTab(nutriKey){
   const contentEl=document.getElementById('nbdContent');
-  const foods=getTodayFoods();
+  /* 数据源：主页=今日已吃记录；一日菜单=已排清单（按折算后克数） */
+  const isMenu=typeof _nbdSrc!=='undefined'&&_nbdSrc==='menu';
+  const foods=isMenu?menuNbdFoods():getTodayFoods();
   if(!foods.length){
-    contentEl.innerHTML='<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div>';
+    contentEl.innerHTML=isMenu
+      ?'<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>菜单还是空的<br>先把想吃的排进来，再看营养来源</div>'
+      :'<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div>';
     return;
   }
   nbdCurrentNutri=nutriKey;
