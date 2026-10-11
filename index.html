@@ -567,6 +567,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         </div>
       </div>
       <div class="nutri-rec" id="nutriRec"></div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:8px">推荐值是「至少吃到」的参考量；只有超过科学安全上限（如纤维 50g、维A 3000μg）才会标红。</div>
       <div class="disclaimer" style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:10px;padding:8px 10px;background:rgba(118,118,128,0.06);border-radius:10px">本结果基于公开的营养学公式和一般健康成年人膳食建议计算，仅供日常饮食规划参考，不构成医疗诊断或个体化营养治疗建议。孕妇、哺乳期女性、未成年人、老年人及患有慢性疾病或特殊健康状况的人群，请咨询医生或注册营养师后使用。</div>
     </div>
     <div class="card">
@@ -908,7 +909,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.19</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.20</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1497,6 +1498,27 @@ function calcNutritionTargets(){
   var fiber=Math.max(25,14*e/1000);
   return{p:Math.round(protein),c:Math.round(carb),f:Math.round(fat),fiber:Math.round(fiber),va:isMale?800:700,vc:100,calories:e};
 }
+/* 营养素上限（超过才值得警示）——推荐值(RDA)是「至少吃到」，不是上限。
+   蛋白/脂肪按体重联动；碳水无官方 UL，取推荐值 2 倍作极端提醒；
+   纤维 50g 为腹胀阈值；维A 3000μg / 维C 2000mg 为中国居民可耐受最高摄入量(UL)。 */
+function calcNutriCaps(){
+  var p=state.profile||{},t=calcNutritionTargets();
+  var w=calcCalcWeight(p)||(p.weight||0)||60;
+  return{
+    p:Math.max(t.p*1.2,Math.round(w*2.5)),
+    c:t.c>0?Math.round(t.c*2):0,
+    f:Math.max(t.f,Math.round(w*1.0)),
+    fi:50,
+    va:3000,
+    vc:2000
+  };
+}
+/* 是否达到该营养素的上限（用于标红判定） */
+function nutriOverLimit(key,val){
+  var caps=calcNutriCaps(),cap=caps[key];
+  if(!cap||cap<=0)return false;
+  return val>cap;
+}
 
 function resizeImage(url,maxSize,quality,cb){
   const img=new Image();img.onload=function(){
@@ -1890,40 +1912,48 @@ function renderNutrition(){
   foods.forEach(function(f){
     tp+=f.p||0;tc+=f.c||0;tf+=f.f||0;tfi+=f.fi||0;tva+=f.va||0;tvc+=f.vc||0;
   });
-  function setNutri(valId,barId,baseColor,consumed,target,unit,decimals,overRatio){
+  function setNutri(valId,barId,baseColor,consumed,target,unit,decimals,capKey){
     var valEl=document.getElementById(valId),barEl=document.getElementById(barId);
     var ratio=target>0?consumed/target:0;
-    var over=target>0&&ratio>overRatio;
+    /* 只有真超过科学上限才标红；超推荐值本身不是错（RDA 是「至少吃到」） */
+    var over=nutriOverLimit(capKey,consumed);
     valEl.textContent=consumed.toFixed(decimals)+' / '+target+unit;
+    valEl.classList.toggle('mn-over',over);
     barEl.style.background=over?'var(--red)':baseColor;
     barEl.style.width=Math.min(100,ratio*100)+'%';
   }
-  setNutri('proteinVal','proteinBar','var(--green)',tp,t.p,'g',1,1.3);
-  setNutri('carbsVal','carbsBar','var(--orange)',tc,t.c,'g',1,1.15);
-  setNutri('fatVal','fatBar','var(--red)',tf,t.f,'g',1,1.15);
-  setNutri('fiberVal','fiberBar','var(--cyan)',tfi,t.fiber,'g',1,1.3);
-  setNutri('vitAVal','vitABar','var(--yellow)',tva,t.va,'μg',0,1.5);
-  setNutri('vitCVal','vitCBar','var(--purple)',tvc,t.vc,'mg',0,1.5);
+  setNutri('proteinVal','proteinBar','var(--green)',tp,t.p,'g',1,'p');
+  setNutri('carbsVal','carbsBar','var(--orange)',tc,t.c,'g',1,'c');
+  setNutri('fatVal','fatBar','var(--red)',tf,t.f,'g',1,'f');
+  setNutri('fiberVal','fiberBar','var(--cyan)',tfi,t.fiber,'g',1,'fi');
+  setNutri('vitAVal','vitABar','var(--yellow)',tva,t.va,'μg',0,'va');
+  setNutri('vitCVal','vitCBar','var(--purple)',tvc,t.vc,'mg',0,'vc');
   var totalConsumed=foods.reduce(function(s,f){return s+(f.cal||0)},0);
   var target=calcTargetCalories();
   if(totalConsumed>0&&target>0&&totalConsumed/target>=0.9){
     rec='';
-  }else{
+  }
+  /* 热量已达标时不再提示「不足」，但真实的超上限警示仍要显示（安全性提示不能被吞掉） */
+  {
     var rec='',issues=[];
+    var calOk=totalConsumed>0&&target>0&&totalConsumed/target>=0.9;
     var calP=tp*4,calC=tc*4,calF=tf*9;
     var totalKcal=calP+calC+calF;
     var pPct=totalKcal>0?calP/totalKcal*100:0,cPct=totalKcal>0?calC/totalKcal*100:0,fPct=totalKcal>0?calF/totalKcal*100:0;
-    if(tp<t.p*0.7)issues.push({icon:'🥩',text:'蛋白质不足，差 '+(t.p-tp).toFixed(0)+'g 达标，建议加一份鸡胸/鸡蛋/蛋白粉'});
-    else if(tp>t.p*1.3)issues.push({icon:'⚠️',text:'蛋白质偏高，可能超出日常需求'});
-    if(tfi<t.fiber*0.6)issues.push({icon:'🥬',text:'膳食纤维不足，多吃绿叶菜、粗粮、豆类'});
-    if(tc>t.c*1.15)issues.push({icon:'🌾',text:'碳水偏高（超出推荐 '+(tc-t.c).toFixed(0)+'g），注意控制主食'});
-    if(tf>t.f*1.15)issues.push({icon:'🫒',text:'脂肪偏高（超出推荐 '+(tf-t.f).toFixed(0)+'g），建议清淡烹饪'});
-    if(issues.length===0){
+    if(!calOk&&tp<t.p*0.7)issues.push({icon:'🥩',text:'蛋白质不足，差 '+(t.p-tp).toFixed(0)+'g 达标，建议加一份鸡胸/鸡蛋/蛋白粉'});
+    else if(nutriOverLimit('p',tp))issues.push({icon:'⚠️',text:'蛋白质超过长期安全上限（约 '+(calcCalcWeight(state.profile)*2.5).toFixed(0)+'g），不宜长期如此'});
+    if(!calOk&&tfi<t.fiber*0.6)issues.push({icon:'🥬',text:'膳食纤维不足，多吃绿叶菜、粗粮、豆类'});
+    else if(nutriOverLimit('fi',tfi))issues.push({icon:'🥬',text:'膳食纤维超过 50g，容易腹胀胀气，适当减点粗粮豆类'});
+    if(nutriOverLimit('c',tc))issues.push({icon:'🌾',text:'碳水摄入极高（'+(tc-t.c).toFixed(0)+'g 超出推荐），注意控制主食'});
+    if(nutriOverLimit('f',tf))issues.push({icon:'🫒',text:'脂肪超过每日安全上限（约 '+(calcCalcWeight(state.profile)*1.0).toFixed(0)+'g），建议清淡烹饪'});
+    if(nutriOverLimit('va',tva))issues.push({icon:'⚠️',text:'维生素A 超过可耐受最高摄入量 3000μg，长期过量不利健康'});
+    if(nutriOverLimit('vc',tvc))issues.push({icon:'⚠️',text:'维生素C 超过可耐受最高摄入量 2000mg，可能引起肠胃不适'});
+    if(issues.length>0){
+      rec=issues.slice(0,4).map(function(i){return i.icon+' '+i.text}).join('<br>');
+    }else if(!calOk){
       var ratio='蛋白质'+pPct.toFixed(0)+'% / 碳水'+cPct.toFixed(0)+'% / 脂肪'+fPct.toFixed(0)+'%';
       var ideal='15-20% / 50-60% / 25-30%';
       rec='✅ 今日各项营养素达标！<br><span style="font-size:12px;color:var(--text2)">当前热量比: '+ratio+'<br>推荐比: '+ideal+'</span>';
-    }else{
-      rec=issues.slice(0,4).map(function(i){return i.icon+' '+i.text}).join('<br>');
     }
   }
   document.getElementById('nutriRec').innerHTML=rec;
@@ -3768,19 +3798,19 @@ function menuNutriBox(){
   /* 两列网格：与主页「营养素摄入」同款结构（左：蛋白/碳水/脂肪，右：纤维/维A/维C） */
   var cols=[['p','c','f'],['fi','va','vc']];
   var defs={
-    p:{name:'蛋白质',unit:'g',dec:1,target:nt.p,color:'var(--green)',over:1.3},
-    c:{name:'碳水化合物',unit:'g',dec:1,target:nt.c,color:'var(--orange)',over:1.15},
-    f:{name:'脂肪',unit:'g',dec:1,target:nt.f,color:'var(--red)',over:1.15},
-    fi:{name:'膳食纤维',unit:'g',dec:1,target:nt.fiber,color:'var(--cyan)',over:1.3},
-    va:{name:'维生素A',unit:'μg',dec:0,target:nt.va,color:'var(--yellow)',over:1.5},
-    vc:{name:'维生素C',unit:'mg',dec:0,target:nt.vc,color:'var(--purple)',over:1.5}
+    p:{name:'蛋白质',unit:'g',dec:1,target:nt.p,color:'var(--green)'},
+    c:{name:'碳水化合物',unit:'g',dec:1,target:nt.c,color:'var(--orange)'},
+    f:{name:'脂肪',unit:'g',dec:1,target:nt.f,color:'var(--red)'},
+    fi:{name:'膳食纤维',unit:'g',dec:1,target:nt.fiber,color:'var(--cyan)'},
+    va:{name:'维生素A',unit:'μg',dec:0,target:nt.va,color:'var(--yellow)'},
+    vc:{name:'维生素C',unit:'mg',dec:0,target:nt.vc,color:'var(--purple)'}
   };
   html+='<div class="nutri-grid">';
   cols.forEach(function(col){
     html+='<div class="nutri-col">';
     col.forEach(function(k){
       var r=defs[k],v=t[k]||0;
-      var ratio=r.target>0?v/r.target:0,oc=ratio>r.over;
+      var ratio=r.target>0?v/r.target:0,oc=nutriOverLimit(k,v);
       html+='<div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">'+r.name+'</span>'
         +'<span class="nutri-bar-val'+(oc?' mn-over':'')+'">'+v.toFixed(r.dec)+' / '+r.target+r.unit+'</span></div>'
         +'<div class="nutri-bar-track"><div class="nutri-bar-fill" style="width:'+Math.min(100,ratio*100)+'%;background:'+(oc?'var(--red)':r.color)+'"></div></div></div>';
