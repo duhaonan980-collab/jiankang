@@ -112,6 +112,12 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .ring-svg{transform:rotate(-90deg)}
 .ring-bg-circle{fill:none;stroke:rgba(118,118,128,0.12);stroke-width:8}
 .ring-fg-circle{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .6s ease,stroke .3s}
+/* v3.13.29 圆环：红弧打底=已消耗（可多圈，往外扩同心弧），蓝弧叠上=已摄入（吃掉红） */
+.ring-leg-dot{width:8px;height:8px;border-radius:2.5px;display:inline-block;margin-right:6px;vertical-align:middle;flex-shrink:0}
+.ring-arc{fill:none;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ring-arc-burn{stroke:var(--red)}
+.ring-arc-in{stroke:var(--blue)}
+.ring-lap-tag{position:absolute;left:0;right:0;bottom:-15px;text-align:center;font-size:10.5px;font-weight:700;color:var(--red);white-space:nowrap}
 .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ring-num{font-size:22px;font-weight:800}.ring-unit{font-size:11px;color:var(--text2)}
 .calorie-info{flex:1}.calorie-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
@@ -120,6 +126,24 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .calorie-status.deficit{background:rgba(52,199,89,0.12);color:var(--green)}
 .calorie-status.surplus{background:rgba(255,59,48,0.12);color:var(--red)}
 .calorie-status.warn{background:rgba(255,204,0,0.15);color:var(--orange)}
+.ex-summary-line{margin-top:6px;font-size:12.5px;color:var(--text-secondary);line-height:1.5;word-break:break-all}
+.ex-modal-sec{margin:14px 0 6px;font-size:13px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.ex-modal-sec::before{content:'';width:3px;height:13px;border-radius:2px;background:var(--blue)}
+.ex-tag-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.ex-tag-chip{padding:7px 13px;border-radius:12px;background:var(--bg-secondary);border:1px solid var(--card-border);font-size:13.5px;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:5px;transition:transform .12s,background .2s}
+.ex-tag-chip:active{transform:scale(0.94)}
+.ex-tag-chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.ex-log-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--card-border);font-size:13.5px}
+.ex-log-row:last-child{border-bottom:none}
+.ex-log-del{color:var(--red);font-size:13px;padding:2px 8px;cursor:pointer;opacity:.85}
+.ex-big-gap{text-align:center;padding:14px 0 6px}
+.ex-big-gap .num{font-size:40px;font-weight:800;line-height:1.1;letter-spacing:-1px}
+.ex-big-gap .lab{font-size:12.5px;color:var(--text-secondary);margin-top:4px}
+.ex-kv{display:flex;justify-content:space-between;padding:5px 0;font-size:13.5px;color:var(--text-secondary)}
+.ex-kv b{color:var(--text-primary);font-weight:600}
+.ex-plan-box{background:var(--bg-secondary);border-radius:12px;padding:12px 14px;margin-top:8px;font-size:13.5px;line-height:1.7}
+.ex-plan-box .hl{color:var(--blue);font-weight:700}
+.ex-empty{font-size:13px;color:var(--text-secondary);padding:8px 0}
 .card-clickable{cursor:pointer;position:relative;transition:transform .15s ease}.card-clickable:active{transform:scale(0.98)}.card-clickable .card-title{display:flex;align-items:center;justify-content:space-between}.card-clickable .card-title::after{content:'›';font-size:18px;color:var(--text3);font-weight:400;transition:color .2s,transform .2s}.card-clickable:active .card-title::after{color:var(--blue);transform:translateX(2px)}
 .nutri-bar{margin-bottom:10px}.nutri-bar:last-child{margin-bottom:0}
 .nutri-bar-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
@@ -265,15 +289,43 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .info-modal-item:last-child{border-bottom:none}
 .info-modal-item-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
 .info-modal-item-desc{font-size:13px;color:var(--text2);line-height:1.5}
-.cal-macro-grid{display:flex;align-items:center;gap:12px;margin-top:6px}
-.cal-macro-donut{flex-shrink:0}
-.cal-breakdown-macros{flex:1;min-width:0}
-.cal-macro-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:13px}
-.cal-macro-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.cal-macro-label{flex:1;color:var(--text)}
-.cal-macro-gram{color:var(--text2);text-align:right;min-width:36px}
-.cal-macro-pct{min-width:42px;text-align:right;font-weight:600;font-size:12px}
 .cal-bmr-grid{padding:4px 0}
+/* ===== v3.13.24 减脂可视化 ===== */
+.ex-dual-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--input-bd);margin:8px 0 10px}
+.ex-dual-in{background:var(--blue);transition:width .5s cubic-bezier(.4,0,.2,1)}
+.ex-dual-out{background:var(--red);transition:width .5s cubic-bezier(.4,0,.2,1)}
+.ex-dual-legend{display:flex;flex-direction:column;gap:5px}
+.ex-dual-leg{display:flex;align-items:center;gap:7px;font-size:13px}
+.ex-dual-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;display:inline-block}
+.ex-dual-k{flex:1;color:var(--text2)}
+.ex-dual-v{font-weight:700}
+.ex-sug-box{margin-top:10px;padding:10px 11px;border-radius:11px;background:var(--bg-secondary)}
+.ex-sug-row{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:13px}
+.ex-sug-lab{flex:1;color:var(--text2);display:flex;align-items:center;gap:7px}
+.ex-sug-val{font-weight:700}
+.ex-sug-note{font-size:11px;color:var(--text3);margin-top:6px;padding-top:6px;border-top:0.5px solid var(--card-border);line-height:1.5}
+.ex-prog-head{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text3);margin-bottom:6px}
+.ex-prog-bar{position:relative;height:12px;border-radius:6px;background:var(--input-bd);overflow:visible}
+.ex-prog-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .6s cubic-bezier(.4,0,.2,1)}
+.ex-prog-knob{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--blue);transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:left .6s cubic-bezier(.4,0,.2,1)}
+.ex-prog-foot{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text2);margin-top:10px}
+.ex-prog-cur b,.ex-prog-pct b{color:var(--text)}
+.ex-bf-line{font-size:12.5px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--card-border)}
+.ex-bf-line b{color:var(--text);font-weight:700}
+.ex-remain-line{font-size:12.5px;color:var(--text2);margin-top:8px}
+.ex-remain-line b{color:var(--text);font-weight:700}
+.ex-rate-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.ex-rate-item{background:var(--bg-secondary);border-radius:11px;padding:10px 6px;text-align:center}
+.ex-rate-num{font-size:19px;font-weight:800;letter-spacing:-0.5px;line-height:1.2}
+.ex-rate-lab{font-size:10.5px;color:var(--text3);margin-top:3px}
+.ex-rate-src{font-size:10.5px;color:var(--text3);text-align:center;margin-top:7px;line-height:1.5}
+.ex-eta-box{margin-top:11px;padding:11px 13px;border-radius:12px;background:rgba(0,122,255,0.08)}
+.ex-eta-box.warn{background:rgba(255,149,0,0.1)}
+.ex-eta-main{font-size:14px;color:var(--text);line-height:1.6}
+.ex-eta-main b{font-size:17px;color:var(--blue);font-weight:800}
+.ex-eta-box.warn .ex-eta-main b{color:var(--orange)}
+.ex-eta-sub{font-size:11.5px;color:var(--text3);margin-top:4px}
+.ex-done-box{font-size:13.5px;color:var(--green);line-height:1.7;padding:10px 12px;border-radius:11px;background:rgba(52,199,89,0.1)}
 .cal-bmr-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:14px}
 .cal-bmr-label{color:var(--text2)}
 .cal-bmr-val{font-weight:600;color:var(--text)}
@@ -286,6 +338,25 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .bmi-comp-bar-fill{height:100%;border-radius:5px;transition:width .5s ease}
 .bmi-comp-rows{margin:4px 0}
 .bmi-target-range{font-size:14px;line-height:1.8;color:var(--text2)}
+/* ===== v3.13.25 身体成分 ===== */
+.bc-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;gap:2px;margin:10px 0 12px;background:var(--input-bd)}
+.bc-seg{height:100%;min-width:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.bc-rows{display:flex;flex-direction:column}
+.bc-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--card-border);font-size:13.5px}
+.bc-row:last-child{border-bottom:none}
+.bc-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.bc-name{flex:1;color:var(--text2)}
+.bc-val{color:var(--text);font-variant-numeric:tabular-nums}
+.bc-val b{font-weight:700}
+.bc-rate{color:var(--text3);font-size:11.5px;margin-left:6px}
+.bc-pill{font-size:11px;font-weight:700;padding:2.5px 8px;border-radius:9px;flex-shrink:0;min-width:34px;text-align:center}
+.bc-weight{font-size:13px;color:var(--text2);margin-bottom:2px}
+.bc-weight b{color:var(--text);font-weight:700;font-size:15px}
+.bc-hints{margin-top:11px;display:flex;flex-direction:column;gap:7px}
+.bc-hint{font-size:12.5px;color:var(--text2);line-height:1.6;padding:8px 11px;border-radius:0 10px 10px 0;background:var(--bg-secondary)}
+.bc-note{font-size:10.5px;color:var(--text3);line-height:1.6;margin-top:9px}
+.st-chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 4px}
+.st-chip{font-size:12px;font-weight:600;padding:5px 11px;border-radius:11px}
 .settings-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--card-border)}
 .settings-item:last-child{border-bottom:none}.settings-label{font-size:16px}
 .settings-input{width:80px;text-align:right;background:transparent;border:none;font-size:16px;font-weight:500;color:var(--text);font-family:inherit;outline:none}
@@ -544,11 +615,13 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <div class="card card-clickable" onclick="openCalorieBreakdown()">
       <div class="card-title">今日热量</div>
       <div class="calorie-main">
-        <div class="ring-wrap"><svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100"><circle class="ring-bg-circle" cx="50" cy="50" r="42"/><circle class="ring-fg-circle" id="ringFg" cx="50" cy="50" r="42" stroke="var(--blue)"/></svg><div class="ring-center"><div class="ring-num" id="ringNum">0</div><div class="ring-unit">kcal</div></div></div>
+        <div class="ring-wrap"><svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100" id="ringSvg"><circle class="ring-bg-circle" cx="50" cy="50" r="42"/><g id="ringLayers"></g></svg><div class="ring-center"><div class="ring-num" id="ringNum">0</div><div class="ring-unit">kcal</div></div><div class="ring-lap-tag" id="ringLapTag" style="display:none"></div></div>
         <div class="calorie-info">
-          <div class="calorie-row"><span class="calorie-row-label">已摄入</span><span class="calorie-row-val" id="consumedVal">0 kcal</span></div>
+          <div class="calorie-row"><span class="calorie-row-label"><span class="ring-leg-dot" style="background:var(--blue)"></span>已摄入</span><span class="calorie-row-val" id="consumedVal" style="color:var(--blue)">0 kcal</span></div>
+          <div class="calorie-row"><span class="calorie-row-label"><span class="ring-leg-dot" style="background:var(--red)"></span>已消耗</span><span class="calorie-row-val" id="burnedVal" style="color:var(--red)">0 kcal</span></div>
           <div class="calorie-row"><span class="calorie-row-label">推荐摄入</span><span class="calorie-row-val" id="targetVal">0 kcal</span></div>
           <div class="calorie-status deficit" id="calorieStatus"><span id="calorieStatusText">热量缺口 0 kcal</span></div>
+          <div class="ex-summary-line" id="exSummaryLine" style="display:none"></div>
         </div>
       </div>
     </div>
@@ -785,6 +858,14 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       </div>
       <div class="set-tip">💡 填腰围+颈围启用 U.S. Navy 公式（精度最高）；女性填臀围。留空则用 BMI 估算。</div>
       <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">目标体脂率</span><span class="set-pill">用于减脂预测</span></div>
+        <div class="bf3">
+          <div class="bf"><span class="bf-l">目标体脂</span><input class="bf-i" type="number" id="setTargetBF" placeholder="18" inputmode="decimal" oninput="setTargetBF(this.value)"><span class="bf-u">%</span></div>
+          <div class="bf" style="grid-column:span 2"><span class="bf-l" style="flex:1;color:var(--text3);font-size:12px" id="bfTargetHint">留空 = 按 BMI 22 健康体重推算</span></div>
+        </div>
+      </div>
+      <div class="set-tip" id="bfSuggestTip">参考：男性健康 14～18% · 女性健康 21～25%</div>
+      <div class="set-card">
         <div class="sc-head"><span class="sc-tt">体脂结果对比</span><span style="font-size:11px;color:var(--text3)">各算法同显 · 高亮为当前采用</span></div>
         <div class="algo-compare" id="algoCompareInner">
           <div class="algo-compare-item"><div class="val" id="bfNavyVal">--</div><div class="label">Navy 法</div><div class="stars">★★★★</div></div>
@@ -809,8 +890,30 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
           <div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div>
           <div class="seg-item" data-act="high" onclick="setActivity('high')">高</div>
           <div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div>
+          <div class="seg-item" data-act="custom" onclick="setActivity('custom')">自定义</div>
         </div>
         <div class="act-note" id="actNote" style="margin:0 14px 12px;background:rgba(0,122,255,0.08);border-radius:9px;padding:9px 11px"></div>
+        <div id="actCustomBox" style="display:none;margin:0 14px 12px;background:rgba(118,118,128,0.06);border-radius:12px;padding:11px 12px">
+          <div style="font-size:11.5px;color:var(--text3);line-height:1.5;margin-bottom:9px">填一个就行：知道系数就填系数；只知道自己每天大约消耗多少，就填右边那栏，会自动换算。</div>
+          <div class="set-row" style="padding:0 0 8px">
+            <span class="rl" style="flex:0 0 74px;font-size:13px">活动系数</span>
+            <span class="set-cap">
+              <input class="set-input" type="number" step="0.025" id="actFactorInput" placeholder="1.375" inputmode="decimal" oninput="setActCustom('factor',this.value)">
+            </span>
+          </div>
+          <div class="set-row" style="padding:0">
+            <span class="rl" style="flex:0 0 74px;font-size:13px">每日消耗</span>
+            <span class="set-cap">
+              <input class="set-input" type="number" id="actKcalInput" placeholder="2200" inputmode="numeric" oninput="setActCustom('kcal',this.value)"><span class="set-unit">kcal</span>
+            </span>
+          </div>
+          <div id="actCustomEcho" style="font-size:11.5px;color:var(--blue);font-weight:600;margin-top:9px;padding-top:9px;border-top:0.5px solid var(--card-border)"></div>
+        </div>
+      </div>
+      <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">我的运动标签</span><button class="sc-link" onclick="openExerciseTagEditor()">+ 新增</button></div>
+        <div style="padding:0 14px 6px;font-size:11.5px;color:var(--text3);line-height:1.5">在主页点热量环就能用这些标签记录当天运动。消耗按你自己填的参数算。</div>
+        <div id="exTagList" style="padding:0 14px 12px"></div>
       </div>
       <div class="set-card">
         <div class="sc-head"><span class="sc-tt">饮食目标</span><button class="sc-link" onclick="showGoalInfo()">说明</button></div>
@@ -909,7 +1012,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.20</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.30</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1092,6 +1195,35 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   <!-- ===== CALORIE BREAKDOWN MODAL ===== -->
   <div class="modal-overlay" id="calorieModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">热量详情</div><div id="calorieBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">暂无数据</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('calorieModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
 
+  <!-- ===== 运动记录输入 ===== -->
+  <div class="modal-overlay" id="exInputModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll">
+    <div class="modal-title" style="display:flex;align-items:center;justify-content:center;gap:8px"><span id="exInputIcon" style="font-size:20px">🏃</span><span id="exInputTitle">跑步</span></div>
+    <div class="set-card" style="margin:6px 0 12px">
+      <div class="set-row"><span class="rl" style="flex:0 0 62px">时长</span><span class="set-cap"><input class="set-input" type="number" id="exInputVal" placeholder="30" inputmode="decimal"><span class="set-unit" id="exInputUnit">分钟</span></span></div>
+    </div>
+    <div id="exInputQuick" style="display:flex;gap:7px;margin:0 0 12px"></div>
+    <div class="set-tip" id="exInputEcho" style="background:rgba(0,122,255,0.06);margin:0"></div>
+  </div><div class="modal-actions"><button class="modal-btn" onclick="exConfirmInput()" style="background:var(--blue);color:#fff;font-weight:700">记录</button><button class="modal-btn danger" onclick="hideModal('exInputModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">取消</button></div></div></div>
+
+  <!-- ===== 运动标签编辑 ===== -->
+  <div class="modal-overlay" id="exTagModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll">
+    <div class="modal-title" id="exTagTitle">新增运动标签</div>
+    <div class="set-card" style="margin:6px 0 12px">
+      <div class="set-row"><span class="rl">名称</span><span class="set-cap"><input class="set-input" id="exTagName" placeholder="如 跳绳"></span></div>
+    </div>
+    <div class="sc-head" style="padding:0 4px 6px"><span class="sc-tt" style="font-size:13px">计算方式</span></div>
+    <div class="seg-control" style="margin:0 0 12px;width:auto" id="exTagModeCtrl">
+      <div class="seg-item active" data-exmode="min" onclick="exSetMode('min')">按分钟</div>
+      <div class="seg-item" data-exmode="rep" onclick="exSetMode('rep')">按个数</div>
+      <div class="seg-item" data-exmode="step" onclick="exSetMode('step')">按步数</div>
+    </div>
+    <div class="set-card" style="margin:0 0 12px">
+      <div class="set-row"><span class="rl" id="exTagRateLabel" style="flex:0 0 84px">每分钟消耗</span><span class="set-cap"><input class="set-input" type="number" step="0.1" id="exTagRate" placeholder="10" inputmode="decimal"><span class="set-unit" id="exTagRateSuf">kcal/分</span></span></div>
+    </div>
+    <div class="set-tip" style="background:rgba(0,122,255,0.06);margin:0 0 10px">参考：散步约 0.04 kcal/步（1 万步 ≈ 400 kcal）· 跑步约 10 kcal/分 · 爬楼约 8 kcal/分 · 俯卧撑约 0.4 kcal/个 · 深蹲约 0.5 kcal/个</div>
+    <div id="exTagDelBtn" style="display:none"><button onclick="delExerciseTagFromModal()" style="width:100%;padding:12px;border:none;border-radius:14px;background:rgba(255,59,48,0.08);color:var(--red);font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer">删除这个标签</button></div>
+  </div><div class="modal-actions"><button class="modal-btn" onclick="saveExerciseTag()" style="background:var(--blue);color:#fff;font-weight:700">保存</button><button class="modal-btn danger" onclick="hideModal('exTagModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">取消</button></div></div></div>
+
   <div class="weight-full" id="weightFull">
     <div class="weight-full-stage">
       <div class="weight-full-header">
@@ -1250,7 +1382,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 <script src="weight-tips.js"></script>
 <script>
 let state = {
-  profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',activity:'low',goal:'lose'},
+  profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',targetBF:0,activity:'low',goal:'lose'},
   foodLogs:{}, weightRecords:{},
   selectedDate:getDateKey(new Date()),
   pendingFood:null, pendingMeal:null, currentCat:'all',
@@ -1262,7 +1394,10 @@ let state = {
   appLock:{enabled:false,method:'pattern',pattern:[],backupPassword:'',backupHint:''},onboarded:false,
   menu:[],
   menuPlans:[],
-  pages:{recipe:true,history:true,rcpMenu:true,rcpSearch:true,rcpList:true,histStats:true,histLog:true}
+  pages:{recipe:true,history:true,rcpMenu:true,rcpSearch:true,rcpList:true,histStats:true,histLog:true},
+  exerciseLogs:{},
+  exerciseTags:null,
+  pendingTarget:'log'
 };
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
 let photoDB=null;
@@ -1313,9 +1448,9 @@ function clearAllPhotoData(){
   });
 }
 
-function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes,onboarded:!!state.onboarded,menu:state.menu||[],menuPlans:state.menuPlans||[],pages:state.pages||{}}))}catch(e){showToast('存储失败')}}
-function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];state.onboarded=!!d.onboarded;state.menu=d.menu||[];state.menuPlans=d.menuPlans||[];state.pages=d.pages||{};/* 兼容旧版 weightRecords: 数字 → {w,waist} */
-Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto'}}catch(e){console.error(e)}}
+function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes,onboarded:!!state.onboarded,menu:state.menu||[],menuPlans:state.menuPlans||[],pages:state.pages||{},exerciseLogs:state.exerciseLogs||{},exerciseTags:state.exerciseTags||[]}))}catch(e){showToast('存储失败')}}
+function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];state.onboarded=!!d.onboarded;state.menu=d.menu||[];state.menuPlans=d.menuPlans||[];state.pages=d.pages||{};state.exerciseLogs=d.exerciseLogs||{};state.exerciseTags=Array.isArray(d.exerciseTags)?d.exerciseTags:null;/* 兼容旧版 weightRecords: 数字 → {w,waist} */
+Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';if(typeof state.profile.targetBF==='undefined')state.profile.targetBF=0}}catch(e){console.error(e)}}
 
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function formatDateLabel(k){const t=getDateKey(new Date());if(k===t)return '今天';if(k===getDateKey(new Date(Date.now()-86400000)))return '昨天';const[y,m,dd]=k.split('-');return parseInt(m)+'月'+parseInt(dd)+'日'}
@@ -1361,7 +1496,20 @@ function getBMIInfo(b){
   return{label:p.label,status:p.status,color:p.color,desc:p.msg,severity:p.severity,lockedGoals:p.lockedGoals,recGoal:p.recGoal,allowedGoals:p.allowedGoals,recActivity:p.recActivity,bmiLevel:p.bmiLevel};
 }
 function calcBMR(p){if(!p.height||!p.weight||!p.age)return 0;const b=10*p.weight+6.25*p.height-5*p.age;return p.gender==='male'?b+5:b-161}
-function calcTDEE(p){const b=calcBMR(p);if(!b)return 0;const f={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};return b*(f[p.activity]||1.2)}
+var ACT_FACTORS={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
+function actFactor(p){
+  p=p||state.profile||{};
+  if(p.activity==='custom'){
+    var c=p.activityCustom||{},v=parseFloat(c.factor);
+    /* 自定义：也可用「每天消耗 kcal」÷ BMR 反推 */
+    var kcal=parseFloat(c.kcal);
+    if(kcal>0){var b=calcBMR(p);if(b>0)v=kcal/b}
+    if(!isFinite(v)||v<=0)return 1.2;
+    return Math.min(3,Math.max(0.8,v));
+  }
+  return ACT_FACTORS[p.activity]||1.2;
+}
+function calcTDEE(p){const b=calcBMR(p);if(!b)return 0;return b*actFactor(p)}
 function calcTargetCalories(){
  const tdee=calcTDEE(state.profile);if(!tdee)return 0;
  const bmr=calcBMR(state.profile);
@@ -1426,6 +1574,90 @@ function calcBodyFatAll(p){
     hybrid:calcBodyFatHybrid(p),
     bmi:calcBodyFatBMI(p)
   };
+}
+/* ===== v3.13.25 身体成分估算（对标市面体脂秤）=====
+   模型：FFM（去脂体重）= 体重×(1-体脂%)；
+   FFM ≈ 水分73% + 蛋白质19% + 骨量7% + 其他1%；
+   肌肉总量 ≈ 体重×42%（男）/36%（女）—— 含骨骼肌+平滑肌+心肌；
+   骨骼肌 ≈ 肌肉总量×78%（男）/76%（女），即约 3/4 强；
+   血液 ≈ 体重×7.5%（属水分一部分，仅作参考行） */
+function bodyComposition(){
+  var p=state.profile||{};
+  var w=parseFloat(p.weight),bf=calcBodyFat(p);
+  if(!(w>0)||!(bf>0))return null;
+  var male=p.gender!=='female';
+  var ffm=w*(1-bf/100);
+  var water=ffm*0.73,bone=ffm*0.07;
+  /* 肌肉总量：占体重固定比例（体脂越高肌肉占比越低，随体重同步变化） */
+  var muscle=w*(male?0.42:0.36);
+  var smm=muscle*(male?0.78:0.76);   /* 骨骼肌 = 肌肉总量 × 78%/76% */
+  var pct=function(v){return Math.round(v/w*1000)/10};
+  /* 肌肉量指数：kg / 身高²，男 7.0~11.0 正常，女 5.7~9.5 */
+  var hh=parseFloat(p.height)/100;
+  var mmi=(hh>0)?Math.round(muscle/(hh*hh)*10)/10:0;
+  return {
+    weight:w,male:male,
+    fat:Math.round(w*bf/100*10)/10,fatRate:Math.round(bf*10)/10,
+    ffm:Math.round(ffm*10)/10,
+    muscle:Math.round(muscle*10)/10,muscleRate:pct(muscle),mmi:mmi,
+    smm:Math.round(smm*10)/10,smmRate:pct(smm),
+    water:Math.round(water*10)/10,waterRate:pct(water),
+    bone:Math.round(bone*10)/10,
+    blood:Math.round(w*0.075*10)/10,
+    bloodL:Math.round(w*0.075/1.06*10)/10
+  };
+}
+/* 成分等级：返回 {level:'high'|'normal'|'low',label,color} */
+function bcGrade(key,c){
+  var m=c.male;
+  var v;
+  switch(key){
+    case 'fat': v=c.fatRate; return bfGradeByRate(v,m);
+    /* 肌肉总量占体重比：男 <36 偏低 / 36~48 正常 / >48 偏高；女 <30 / 30~42 / >42 */
+    case 'muscle': v=c.muscleRate;
+      if(v<(m?36:30))return{level:'low',label:'偏低',color:'var(--orange)'};
+      if(v>(m?48:42))return{level:'high',label:'偏高',color:'var(--blue)'};
+      return{level:'normal',label:'正常',color:'var(--green)'};
+    case 'water': v=c.waterRate;
+      if(v<(m?50:45))return{level:'low',label:'偏低',color:'var(--orange)'};
+      if(v>(m?65:60))return{level:'high',label:'偏高',color:'var(--cyan)'};
+      return{level:'normal',label:'正常',color:'var(--green)'};
+    /* 骨骼肌占体重比：男 <29 偏低 / 29~38 正常 / >38 偏高；女 <24 / 24~33 / >33 */
+    case 'protein': v=c.smmRate;
+      if(v<(m?29:24))return{level:'low',label:'偏低',color:'var(--orange)'};
+      if(v>(m?38:33))return{level:'high',label:'偏高',color:'var(--blue)'};
+      return{level:'normal',label:'正常',color:'var(--green)'};
+    case 'bone':
+      v=c.bone;
+      var lo=m?2.6:1.8,hi=m?4.5:3.2;
+      if(v<lo)return{level:'low',label:'偏低',color:'var(--orange)'};
+      if(v>hi)return{level:'high',label:'偏高',color:'var(--purple)'};
+      return{level:'normal',label:'正常',color:'var(--green)'};
+  }
+  return{level:'normal',label:'正常',color:'var(--green)'};
+}
+function bfGradeByRate(v,male){
+  /* 男性：<6 极低 / 6-14 运动员 / 14-18 健康 / 18-25 普通 / 25-30 偏高 / ≥30 肥胖
+     女性：<14 偏低 / 14-21 运动型 / 21-25 健康 / 25-32 普通 / 32-37 偏高 / ≥37 肥胖 */
+  var t=male?[[6,'极低','var(--red)','low'],[14,'运动员','var(--green)','normal'],[18,'健康','var(--green)','normal'],[25,'普通','var(--blue)','info'],[30,'偏高','var(--orange)','high']]
+            :[[14,'偏低','var(--cyan)','low'],[21,'运动型','var(--green)','normal'],[25,'健康','var(--blue)','normal'],[32,'普通','var(--blue)','info'],[37,'偏高','var(--orange)','high']];
+  for(var i=0;i<t.length;i++){
+    if(v<t[i][0])return{level:t[i][3],label:t[i][1],color:t[i][2]};
+  }
+  return{level:'high',label:'肥胖',color:'var(--red)'};
+}
+/* 成分建议文案：挑出需要关注的项，最多 3 条 */
+function bcHints(c){
+  var out=[];
+  if(!c)return out;
+  var fatG=bcGrade('fat',c),musG=bcGrade('muscle',c),watG=bcGrade('water',c),smmG=bcGrade('protein',c),bonG=bcGrade('bone',c);
+  if(fatG.level==='high')out.push({color:'var(--red)',text:'体脂偏高：控精制碳水+油炸，每周 3~5 次有氧，缺口别超过 800 kcal/天'});
+  else if(fatG.level==='low'&&c.male)out.push({color:'var(--cyan)',text:'体脂偏低：别再刻意减脂，注意必需脂肪酸（鱼油、坚果）'});
+  if(musG.level==='low')out.push({color:'var(--orange)',text:'肌肉量偏低：每餐足量蛋白（体重×1.2~1.6g）+ 每周 2~3 次力量训练'});
+  if(watG.level==='low')out.push({color:'var(--orange)',text:'水分偏低：每天 1.5~2L 水，脱水会掩盖真实减脂效果'});
+  if(smmG.level==='low')out.push({color:'var(--blue)',text:'骨骼肌偏低：优先深蹲/硬拉等大肌群动作，减脂期保住肌肉才不掉代谢'});
+  if(bonG.level==='low')out.push({color:'var(--purple)',text:'骨量偏低：补钙+维D，快走/爬楼等负重运动有助维持骨密度'});
+  return out.slice(0,3);
 }
 function calcBodyFat(p){
   const m=p.bfMethod||'auto';
@@ -1816,7 +2048,7 @@ function changeDate(d){const dt=new Date(state.selectedDate);dt.setDate(dt.getDa
 async function deleteFood(id){const foods=state.foodLogs[state.selectedDate]||[];state.foodLogs[state.selectedDate]=foods.filter(f=>f.id!==id);saveState();await deletePhotoData(id);renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已删除')}
 function clearTodayLog(){if(!confirm('确定清空当日所有食物记录？'))return;const foods=state.foodLogs[state.selectedDate]||[];foods.forEach(f=>{if(f.hasPhoto)deletePhotoData(f.id)});state.foodLogs[state.selectedDate]=[];saveState();renderFoodLog();renderCalorieSummary();renderNutrition();showToast('已清空')}
 
-function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeightChart();renderWeightPeriodLabel();renderCalendar();updateChartModeUI();updateWeightPeriodNav();renderMenuEntryCard();applyPagePrefs()}
+function renderAll(){renderBMI();renderCalorieSummary();renderNutrition();renderFoodLog();renderSettings();renderWeightChart();renderWeightPeriodLabel();renderCalendar();updateChartModeUI();updateWeightPeriodNav();renderMenuEntryCard();applyPagePrefs();renderExerciseSummary()}
 function animateNumber(el,to,opt){
   if(!el)return;
   opt=opt||{};
@@ -1876,33 +2108,95 @@ function renderCalorieSummary(){
   const foods=getTodayFoods();
   const total=foods.reduce((s,f)=>s+f.cal,0);
   const target=calcTargetCalories();
+  /* v3.13.27 已消耗 = 基础代谢 BMR + 今日运动；日常活动不计入（按较少算） */
+  const bmr=Math.round(calcBMR(state.profile));
+  const exBurn=exTotal();
+  const burnedTotal=bmr+exBurn;
   animateNumber(document.getElementById('ringNum'),total,{decimals:0});
   document.getElementById('consumedVal').textContent=total+' kcal';
   document.getElementById('targetVal').textContent=target+' kcal';
-  const circumference=2*Math.PI*42;
-  const ringEl=document.getElementById('ringFg');
-  const pct=target>0?Math.min(1,total/target):0;
-  ringEl.style.strokeDasharray=circumference;
-  ringEl.style.strokeDashoffset=circumference*(1-pct);
-  const diff=total-target;
+  var burnedEl=document.getElementById('burnedVal');
+  if(burnedEl)burnedEl.textContent=burnedTotal+' kcal';
+  /* ===== v3.13.29 圆环：红弧打底=已消耗（可多圈往外扩），蓝弧叠上=已摄入 =====
+     基准 = 推荐摄入 target（一圈代表"推荐摄入"这么多热量）。
+     红圈数 = ceil(消耗 / target)，最后一圈按剩余比例画；
+     蓝弧沿同一个起点顺时针叠加，吃多少就盖住多少红。 */
+  renderCalorieRing(total,burnedTotal,target);
   const statusEl=document.getElementById('calorieStatus');
   const textEl=document.getElementById('calorieStatusText');
-  if(total===0){
-    ringEl.style.stroke='var(--blue)';
+  /* 缺口口径：目标 − 净摄入（净摄入 = 摄入 − 运动），BMR 属消耗侧，不抵摄入 */
+  const netIn=total-exBurn;
+  const gap=target-netIn;
+  if(total===0&&exBurn===0){
     statusEl.className='calorie-status deficit';
     textEl.textContent='还未摄入食物';
-  }else if(total<target*0.9){
-    ringEl.style.stroke='var(--green)';
+  }else if(target>0&&gap>0){
     statusEl.className='calorie-status deficit';
-    textEl.textContent='↓ 热量缺口 '+(-diff)+' kcal';
-  }else if(total<=target*1.1){
-    ringEl.style.stroke='var(--orange)';
+    textEl.textContent='↓ 热量缺口 '+gap+' kcal';
+  }else if(target>0&&gap<=0&&gap>=-target*0.1){
     statusEl.className='calorie-status warn';
     textEl.textContent='热量平衡';
-  }else{
-    ringEl.style.stroke='var(--red)';
+  }else if(target>0){
     statusEl.className='calorie-status surplus';
-    textEl.textContent='↑ 热量盈余 '+diff+' kcal';
+    textEl.textContent='↑ 热量盈余 '+(-gap)+' kcal';
+  }else{
+    statusEl.className='calorie-status deficit';
+    textEl.textContent='已摄入 '+total+' kcal';
+  }
+}
+/* 画圆环：base=一圈代表多少 kcal（推荐摄入）；burn 红打底，intake 蓝叠加 */
+var _ringLastKey='';
+function renderCalorieRing(intake,burn,base){
+  var g=document.getElementById('ringLayers');
+  if(!g)return;
+  if(!(base>0)){if(_ringLastKey!==''){g.innerHTML='';_ringLastKey=''}return}
+  var CX=50,CY=50;
+  var laps=Math.max(1,Math.ceil(burn/base));      /* 消耗占几圈 */
+  var MAXR=42,STEP=7;                             /* 往外扩的半径步长 */
+  /* 需要的总圈数：消耗圈数 与 摄入圈数 的较大值 */
+  var inLaps=Math.max(1,Math.ceil(intake/base));
+  var totalLaps=Math.max(laps,inLaps);
+  /* 参数没变就不重写 DOM（renderAll 常被连续调用） */
+  var key=intake+'|'+burn+'|'+base+'|'+totalLaps;
+  if(key===_ringLastKey){ringLapTagUpdate(laps);return}
+  var parts=[];   /* 用数组拼接再 join，避免 += 在长字符串下的开销 */
+  /* 最外圈画「不满的那一圈」（余数），往里依次是画满的整圈——观感更顺 */
+  for(var k=0;k<totalLaps;k++){
+    var r=MAXR-k*STEP;                             /* k=0 最外圈 */
+    if(r<12)break;
+    var C=2*Math.PI*r;
+    var sw=r>=34?8:6;
+    /* 第 k 圈对应的「层」：最外圈装余数，往内递减 */
+    var lapIdx=totalLaps-1-k;                      /* 0-based 圈序：0=最内/第一圈 */
+    /* 红弧：这一圈承载的消耗量 */
+    var burnRemain=burn-lapIdx*base;
+    var burnHere=Math.max(0,Math.min(base,burnRemain));
+    if(burnHere>0){
+      var pB=burnHere/base;
+      parts.push('<circle class="ring-arc ring-arc-burn" cx="'+CX+'" cy="'+CY+'" r="'+r+'" stroke-width="'+sw+'" stroke-dasharray="'+C.toFixed(2)+'" stroke-dashoffset="'+(C*(1-pB)).toFixed(2)+'"/>');
+    }
+    /* 蓝弧：这一圈承载的摄入量，叠在红之上 */
+    var inRemain=intake-lapIdx*base;
+    var inHere=Math.max(0,Math.min(base,inRemain));
+    if(inHere>0){
+      var pI=inHere/base;
+      parts.push('<circle class="ring-arc ring-arc-in" cx="'+CX+'" cy="'+CY+'" r="'+r+'" stroke-width="'+sw+'" stroke-dasharray="'+C.toFixed(2)+'" stroke-dashoffset="'+(C*(1-pI)).toFixed(2)+'"/>');
+    }
+  }
+  g.innerHTML=parts.join('');
+  _ringLastKey=key;
+  ringLapTagUpdate(laps);
+}
+/* 超过 1 圈时在圆环下方标圈数 */
+function ringLapTagUpdate(laps){
+  var tagEl=document.getElementById('ringLapTag');
+  if(!tagEl)return;
+  if(laps>1){
+    var txt='消耗 ≈ '+laps+' 圈';
+    if(tagEl.textContent!==txt)tagEl.textContent=txt;
+    tagEl.style.display='block';
+  }else if(tagEl.style.display!=='none'){
+    tagEl.style.display='none';
   }
 }
 function renderNutrition(){
@@ -1930,9 +2224,6 @@ function renderNutrition(){
   setNutri('vitCVal','vitCBar','var(--purple)',tvc,t.vc,'mg',0,'vc');
   var totalConsumed=foods.reduce(function(s,f){return s+(f.cal||0)},0);
   var target=calcTargetCalories();
-  if(totalConsumed>0&&target>0&&totalConsumed/target>=0.9){
-    rec='';
-  }
   /* 热量已达标时不再提示「不足」，但真实的超上限警示仍要显示（安全性提示不能被吞掉） */
   {
     var rec='',issues=[];
@@ -1995,14 +2286,18 @@ async function loadPhotosForContainer(container,foods){
     if(photo){const el=container.querySelector('[data-food-id="'+f.id+'"] .food-photo');if(el){el.style.backgroundImage='url('+photo+')';el.style.backgroundSize='cover';el.innerHTML=''}}
   }
 }
-function renderSettings(){
-  document.getElementById('setHeight').value=state.profile.height||'';
-  document.getElementById('setWeight').value=state.profile.weight||'';
-  document.getElementById('setAge').value=state.profile.age||'';
+function renderSettings(src){
+  /* v3.13.30 防「打字被吞」：判断某个输入框当前是否正被输入，正在输入的不回写 value，
+     否则光标会跳到末尾（手机上表现为打着字突然断掉）。默认不传参 = 全部回写，
+     手动调用 renderSettings() 无需改动。 */
+  function busy(id){return document.activeElement===document.getElementById(id)}
+  if(!busy('setHeight'))document.getElementById('setHeight').value=state.profile.height||'';
+  if(!busy('setWeight'))document.getElementById('setWeight').value=state.profile.weight||'';
+  if(!busy('setAge'))document.getElementById('setAge').value=state.profile.age||'';
   document.querySelectorAll('#genderControl .seg-item, [data-gender]').forEach(el=>el.classList.toggle('active',el.dataset.gender===state.profile.gender));
-  var waistEl=document.getElementById('setWaist');if(waistEl)waistEl.value=state.profile.waist||'';
-  var neckEl=document.getElementById('setNeck');if(neckEl)neckEl.value=state.profile.neck||'';
-  var hipEl=document.getElementById('setHip');if(hipEl)hipEl.value=state.profile.hip||'';
+  var waistEl=document.getElementById('setWaist');if(waistEl&&!busy('setWaist'))waistEl.value=state.profile.waist||'';
+  var neckEl=document.getElementById('setNeck');if(neckEl&&!busy('setNeck'))neckEl.value=state.profile.neck||'';
+  var hipEl=document.getElementById('setHip');if(hipEl&&!busy('setHip'))hipEl.value=state.profile.hip||'';
   var hipField=document.getElementById('hipField');
   if(hipField)hipField.style.display=state.profile.gender==='female'?'block':'none';
   document.querySelectorAll('#bfMethodControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.method===state.profile.bfMethod));
@@ -2010,6 +2305,7 @@ function renderSettings(){
   renderBFCompare();
   document.querySelectorAll('#activityControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.act===state.profile.activity));
   updateActNotes();
+  renderExTags();renderActCustomEcho();
   document.querySelectorAll('#goalControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.goal===state.profile.goal));
   document.querySelectorAll('#themeControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.theme===state.theme));
   var cal=calcTargetCalories();
@@ -2059,6 +2355,19 @@ function renderBFCompare(){
     if(activeMethod==='navy'&&items[0])items[0].classList.add('active');
     else if(activeMethod==='hybrid'&&items[1])items[1].classList.add('active');
     else if(activeMethod==='bmi'&&items[2])items[2].classList.add('active');
+  }
+  /* v3.13.24 目标体脂率输入与提示 */
+  var tb=document.getElementById('setTargetBF');
+  if(tb&&document.activeElement!==tb)tb.value=(state.profile.targetBF>0)?state.profile.targetBF:'';
+  var hint=document.getElementById('bfTargetHint');
+  if(hint){
+    var tw=targetWeightByBF();
+    hint.textContent=tw>0?('按此目标 → 目标体重约 '+tw+' kg'):'留空 = 按 BMI 22 健康体重推算';
+  }
+  var st=document.getElementById('bfSuggestTip');
+  if(st){
+    var g=(state.profile||{}).gender==='female';
+    st.textContent=g?'参考：女性健康 21～25% · 运动员 14～21%':'参考：男性健康 14～18% · 运动员 6～14%';
   }
 }
 function applyUIConstraints(info){
@@ -2346,7 +2655,128 @@ function refreshSettingsTop(){
 }
 function setBFMethod(m){state.profile.bfMethod=m;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
 function setGender(g){state.profile.gender=g;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
-function setActivity(a){state.profile.activity=a;saveState();renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart()}
+function setActivity(a){
+  state.profile.activity=a;saveState();
+  /* 进自定义档时把当前系数带上，避免空着 */
+  if(a==='custom'){
+    state.profile.activityCustom=state.profile.activityCustom||{};
+    var c=state.profile.activityCustom;
+    if(!parseFloat(c.factor)&&!parseFloat(c.kcal))c.factor=1.375;
+    saveState();
+  }
+  renderSettings();renderCalorieSummary();renderNutrition();renderExerciseSummary();
+}
+function setActCustom(key,val){
+  state.profile.activityCustom=state.profile.activityCustom||{};
+  var n=parseFloat(val);
+  state.profile.activityCustom[key]=(isNaN(n)||n<0)?'':n;
+  saveState();
+  renderActCustomEcho();
+  renderCalorieSummary();renderNutrition();renderExerciseSummary();refreshSettingsTop();
+}
+/* ===== 运动标签：设置页维护，主页热量弹窗使用 ===== */
+var DEFAULT_EX_TAGS=[
+  {id:'et_walk',name:'散步',icon:'🚶',mode:'step',rate:0.04},
+  {id:'et_run', name:'跑步',icon:'🏃',mode:'min',rate:10},
+  {id:'et_stair',name:'爬楼',icon:'🪜',mode:'min',rate:8},
+  {id:'et_pushup',name:'俯卧撑',icon:'💪',mode:'rep',rate:0.4},
+  {id:'et_squat',name:'深蹲',icon:'🏋️',mode:'rep',rate:0.5}
+];
+function exTags(){
+  if(!Array.isArray(state.exerciseTags))state.exerciseTags=DEFAULT_EX_TAGS.slice();
+  /* v3.13.22 迁移：早期版本「散步」是按分钟存的（4 kcal/分），改为按步数（0.04 kcal/步）。
+     只迁移默认那条（id=et_walk 且仍是 4 kcal/分），用户自己改过的不动。 */
+  var w=state.exerciseTags.filter(function(t){return t&&t.id==='et_walk'})[0];
+  if(w&&w.mode==='min'&&Math.abs((+w.rate||0)-4)<0.001){w.mode='step';w.rate=0.04}
+  return state.exerciseTags;
+}
+var EX_MODES={
+  min:{unit:'分钟',rateLabel:'每分钟消耗',ph:'10',suf:'kcal/分',short:'分',qty:'分钟'},
+  rep:{unit:'个',rateLabel:'每个消耗',ph:'0.4',suf:'kcal/个',short:'个',qty:'个数'},
+  step:{unit:'步',rateLabel:'每步消耗',ph:'0.04',suf:'kcal/步',short:'步',qty:'步数'}
+};
+function renderExTags(){
+  var box=document.getElementById('exTagList');if(!box)return;
+  var list=exTags();
+  if(!list.length){box.innerHTML='<div style="text-align:center;padding:14px;color:var(--text3);font-size:12.5px">还没有运动标签，点右上角「+ 新增」</div>';return}
+  box.innerHTML=list.map(function(t,i){
+    var m=EX_MODES[t.mode]||EX_MODES.min;
+    return '<div style="display:flex;align-items:center;gap:9px;padding:9px 0'+(i?'':';border-top:none')+(i<list.length-1?';border-bottom:0.5px solid var(--card-border)':'')+'">'
+      +'<span style="font-size:19px;flex-shrink:0">'+(t.icon||'🏃')+'</span>'
+      +'<span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+_planEsc(t.name)+'</span>'
+      +'<span style="display:block;font-size:11px;color:var(--text3);margin-top:1px">'+t.rate+' kcal/'+m.short+'</span></span>'
+      +'<button onclick="openExerciseTagEditor(\''+t.id+'\')" style="border:none;background:none;color:var(--blue);font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;padding:4px 6px">编辑</button>'
+      +'<button onclick="delExerciseTag(\''+t.id+'\')" style="border:none;background:none;color:var(--text3);font-size:14px;cursor:pointer;padding:4px 6px">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function delExerciseTag(id){
+  var t=exTags().filter(function(x){return x.id===id})[0];if(!t)return;
+  if(!confirm('删除运动标签「'+t.name+'」？已记录的历史不受影响。'))return;
+  state.exerciseTags=exTags().filter(function(x){return x.id!==id});
+  saveState();renderExTags();renderExerciseSummary();showToast('已删除标签');
+}
+function openExerciseTagEditor(id){
+  var t=id?exTags().filter(function(x){return x.id===id})[0]:null;
+  _exEditId=t?t.id:null;
+  document.getElementById('exTagTitle').textContent=t?'编辑运动标签':'新增运动标签';
+  document.getElementById('exTagName').value=t?t.name:'';
+  document.getElementById('exTagRate').value=t?t.rate:'';
+  _exSetMode(t?t.mode:'min');
+  renderExTagDel(t?true:false);
+  showModal('exTagModal');
+}
+function _exSetMode(m){
+  _exMode=m;
+  document.querySelectorAll('#exTagModeCtrl .seg-item').forEach(function(el){el.classList.toggle('active',el.dataset.exmode===m)});
+  var cfg=EX_MODES[m]||EX_MODES.min;
+  document.getElementById('exTagRateLabel').textContent=cfg.rateLabel;
+  document.getElementById('exTagRateSuf').textContent=cfg.suf;
+  var inp=document.getElementById('exTagRate');
+  inp.placeholder=cfg.ph;
+  inp.step=(m==='step')?'0.01':'0.1';
+}
+function exSetMode(m){_exSetMode(m)}
+function renderExTagDel(show){
+  var el=document.getElementById('exTagDelBtn');if(el)el.style.display=show?'':'none';
+}
+function saveExerciseTag(){
+  var name=(document.getElementById('exTagName').value||'').trim();
+  var rate=parseFloat(document.getElementById('exTagRate').value);
+  if(!name){showToast('请填写标签名称');return}
+  if(!(rate>0)){showToast('请填写大于 0 的消耗值');return}
+  var list=exTags();
+  if(_exEditId){
+    var t=list.filter(function(x){return x.id===_exEditId})[0];
+    if(t){t.name=name;t.rate=rate;t.mode=_exMode}
+  }else{
+    var same=list.filter(function(x){return x.name===name})[0];
+    if(same){same.rate=rate;same.mode=_exMode;showToast('已更新同名标签「'+name+'」')}
+    else list.push({id:'et'+Date.now()+Math.floor(Math.random()*900),name:name,icon:'🏃',mode:_exMode,rate:rate});
+  }
+  state.exerciseTags=list;saveState();
+  renderExTags();renderExerciseSummary();
+  hideModal('exTagModal');
+  showToast(_exEditId?'已保存修改':'已添加「'+name+'」');
+}
+function delExerciseTagFromModal(){
+  if(!_exEditId)return;
+  hideModal('exTagModal');
+  delExerciseTag(_exEditId);
+}
+var _exEditId=null,_exMode='min';
+function renderActCustomEcho(){
+  var box=document.getElementById('actCustomEcho'),wrap=document.getElementById('actCustomBox');
+  if(!box||!wrap)return;
+  var isCustom=(state.profile&&state.profile.activity==='custom');
+  wrap.style.display=isCustom?'':'none';
+  if(!isCustom)return;
+  var p=state.profile,f=parseFloat((p.activityCustom||{}).factor),k=parseFloat((p.activityCustom||{}).kcal);
+  var b=calcBMR(p);
+  var eff=actFactor(p);
+  var src=k>0?('由每日消耗 '+k+' kcal ÷ 基础代谢 '+Math.round(b)+' kcal 反推'):(f>0?'按你填的系数':'未填写，暂用 1.375');
+  box.textContent='实际采用：×'+eff.toFixed(3)+' · 每日总消耗约 '+Math.round(b*eff)+' kcal（'+src+'）';
+}
 /* 活动量按每日步数表述（只改文案，系数/档位/state 值一律不动） */
 var ACT_INFO={
   low:['偏低 ≈ 每天 5000 步以下','久坐办公、学生、基本不出门'],
@@ -2695,7 +3125,7 @@ function importRecipeFile(d){
   saveState();renderAll();
   showToast('导入完成：新增 '+added+' 道菜谱'+(skip?'，跳过同名 '+skip+' 道':''));
 }
-async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');await clearAllPhotoData();state={profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,currentCat:'all',theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),weightChartAll:false,chartMode:'weight',appLock:{enabled:false,method:'pattern',pattern:[]},recipes:[],customFoods:[],menu:[]};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
+async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');await clearAllPhotoData();/* 重置为与页面初始化完全一致的空态（字段缺一个都可能在后续渲染里踩空） */state={profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',targetBF:0,activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,pendingTarget:'log',currentCat:'all',theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),weightChartAll:false,chartMode:'weight',appLock:{enabled:false,method:'pattern',pattern:[],backupPassword:'',backupHint:''},onboarded:false,recipes:[],customFoods:[],menu:[],menuPlans:[],pages:{recipe:true,history:true,rcpMenu:true,rcpSearch:true,rcpList:true,histStats:true,histLog:true},exerciseLogs:{},exerciseTags:null};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
 async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？食物记录不会被删除。'))return;await clearAllPhotoData();Object.values(state.foodLogs).forEach(foods=>foods.forEach(f=>f.hasPhoto=false));saveState();renderAll();if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({type:'CLEAR_PHOTO_CACHE'})}showToast('照片缓存已清除')}
 
 function renderWeightChart(){
@@ -4294,38 +4724,84 @@ function openBmiBreakdown(){
     return;
   }
   const info=getBMIInfo(bmi);
-  const bf=calcBodyFat(state.profile);
   const profile=state.profile;
   const gender=profile.gender||'male';
+  const bc=bodyComposition();
+  /* ===== ① BMI 定位：分段圆角色带 + 数值药丸指针 ===== */
   const bmiMin=10,bmiMax=35,bmiRange=bmiMax-bmiMin;
-  var bmiGaugeSvg='<svg width="100%" height="48" viewBox="0 0 300 48" style="display:block;margin:8px 0">'+
-    '<defs><linearGradient id="bmiGrad" x1="0" y1="0" x2="1" y2="0">'+
-      '<stop offset="'+(15-bmiMin)/bmiRange*100+'%" stop-color="var(--red)"/>'+
-      '<stop offset="'+(15-bmiMin)/bmiRange*100+'%" stop-color="var(--cyan)"/>'+
-      '<stop offset="'+(18.5-bmiMin)/bmiRange*100+'%" stop-color="var(--cyan)"/>'+
-      '<stop offset="'+(18.5-bmiMin)/bmiRange*100+'%" stop-color="var(--green)"/>'+
-      '<stop offset="'+(24-bmiMin)/bmiRange*100+'%" stop-color="var(--green)"/>'+
-      '<stop offset="'+(24-bmiMin)/bmiRange*100+'%" stop-color="var(--orange)"/>'+
-      '<stop offset="'+(28-bmiMin)/bmiRange*100+'%" stop-color="var(--orange)"/>'+
-      '<stop offset="'+(28-bmiMin)/bmiRange*100+'%" stop-color="var(--red)"/>'+
-      '<stop offset="100%" stop-color="var(--red)"/>'+
-    '</linearGradient></defs>'+
-    '<rect x="4" y="16" width="280" height="12" rx="6" fill="url(#bmiGrad)" opacity="0.6"/>'+
-    '<text x="4" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">10</text>'+
-    '<text x="'+(4+(18.5-bmiMin)/bmiRange*280)+'" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">18.5</text>'+
-    '<text x="'+(4+(24-bmiMin)/bmiRange*280)+'" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">24</text>'+
-    '<text x="'+(4+(28-bmiMin)/bmiRange*280)+'" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">28</text>'+
-    '<text x="284" y="44" font-size="8" fill="var(--text3)" text-anchor="middle">35</text>'+
-    '<text x="20" y="12" font-size="7" fill="var(--text3)" text-anchor="middle">偏瘦</text>'+
-    '<text x="'+(4+((18.5+24)/2-bmiMin)/bmiRange*280)+'" y="12" font-size="7" fill="var(--green)" text-anchor="middle">健康</text>'+
-    '<text x="'+(4+((24+28)/2-bmiMin)/bmiRange*280)+'" y="12" font-size="7" fill="var(--orange)" text-anchor="middle">超重</text>'+
-    '<text x="274" y="12" font-size="7" fill="var(--red)" text-anchor="middle">肥胖</text>';
-  var clampBmi=Math.max(bmiMin+0.5,Math.min(bmiMax-0.5,bmi));
-  var markerX=4+(clampBmi-bmiMin)/bmiRange*280;
-  bmiGaugeSvg+='<polygon points="'+(markerX-6)+',16 '+markerX+',10 '+(markerX+6)+',16" fill="'+info.color+'" stroke="'+info.color+'" stroke-width="1"/>'+
-    '<text x="'+markerX+'" y="8" font-size="9" font-weight="700" fill="'+info.color+'" text-anchor="middle">'+bmi.toFixed(1)+'</text>'+
-    '</svg>';
+  const px=function(v){return 6+(v-bmiMin)/bmiRange*288};
+  var zones=[
+    {a:bmiMin,b:18.5,color:'var(--cyan)',name:'偏瘦'},
+    {a:18.5,b:24,color:'var(--green)',name:'正常'},
+    {a:24,b:28,color:'var(--orange)',name:'超重'},
+    {a:28,b:bmiMax,color:'var(--red)',name:'肥胖'}
+  ];
+  var gauge='<svg width="100%" height="66" viewBox="0 0 300 66" style="display:block;margin:6px 0 2px">';
+  zones.forEach(function(z){
+    var x1=px(z.a)+1.5,x2=px(z.b)-1.5;
+    gauge+='<rect x="'+x1.toFixed(1)+'" y="30" width="'+(x2-x1).toFixed(1)+'" height="12" rx="6" fill="'+z.color+'" opacity="'+(bmi>=z.a&&bmi<z.b?'1':'0.35')+'"/>';
+    gauge+='<text x="'+((x1+x2)/2).toFixed(1)+'" y="24" font-size="8.5" fill="'+(bmi>=z.a&&bmi<z.b?z.color:'var(--text3)')+'" text-anchor="middle" font-weight="'+(bmi>=z.a&&bmi<z.b?'700':'400')+'">'+z.name+'</text>';
+  });
+  [10,18.5,24,28,35].forEach(function(v){
+    var lx=px(v);if(v===10)lx=8;if(v===35)lx=292;
+    gauge+='<text x="'+lx+'" y="56" font-size="8" fill="var(--text3)" text-anchor="middle">'+v+'</text>';
+  });
+  var clampX=Math.max(24,Math.min(276,px(bmi)));
+  gauge+='<line x1="'+clampX.toFixed(1)+'" y1="38" x2="'+clampX.toFixed(1)+'" y2="46" stroke="'+info.color+'" stroke-width="2"/>';
+  gauge+='<rect x="'+(clampX-19).toFixed(1)+'" y="2" width="38" height="18" rx="9" fill="'+info.color+'"/>';
+  gauge+='<polygon points="'+(clampX-5).toFixed(1)+',20 '+(clampX+5).toFixed(1)+',20 '+clampX.toFixed(1)+',27" fill="'+info.color+'"/>';
+  gauge+='<text x="'+clampX.toFixed(1)+'" y="15" font-size="10" font-weight="800" fill="#fff" text-anchor="middle">'+bmi.toFixed(1)+'</text>';
+  gauge+='</svg>';
+  var gaugeHtml='<div class="info-modal-item"><div class="info-modal-item-title">📊 BMI 定位</div>'
+    +'<div class="info-modal-item-desc" style="padding:0">'+gauge+'</div>'
+    +'<div style="text-align:center;font-size:12px;color:var(--text2);margin-top:2px">'+info.label+'</div></div>';
 
+  /* ===== ② 身体成分分析 ===== */
+  var compHtml='';
+  if(bc){
+    var rows=[
+      {dot:'var(--red)',name:'脂肪',kg:bc.fat,rate:bc.fatRate+'%',g:bcGrade('fat',bc)},
+      {dot:'var(--orange)',name:'肌肉',kg:bc.muscle,rate:bc.muscleRate+'%',g:bcGrade('muscle',bc)},
+      {dot:'var(--blue)',name:'骨骼肌',kg:bc.smm,rate:bc.smmRate+'%',g:bcGrade('protein',bc)},
+      {dot:'var(--cyan)',name:'体水分',kg:bc.water,rate:bc.waterRate+'%',g:bcGrade('water',bc)},
+      {dot:'var(--purple)',name:'骨量',kg:bc.bone,rate:(bc.bone/bc.weight*100).toFixed(1)+'%',g:bcGrade('bone',bc)},
+      {dot:'var(--text3)',name:'血液(参考)',kg:bc.blood,rate:'≈'+bc.bloodL+' L',g:null}
+    ];
+    /* 堆叠条：脂肪/肌肉/水分/骨量 占体重比 */
+    var segs=[
+      {w:bc.fatRate,color:'var(--red)'},
+      {w:bc.muscleRate,color:'var(--orange)'},
+      {w:bc.waterRate,color:'var(--cyan)'},
+      {w:(bc.bone/bc.weight*100),color:'var(--purple)'}
+    ];
+    var bar='<div class="bc-bar">';
+    segs.forEach(function(s){bar+='<div class="bc-seg" style="width:'+s.w.toFixed(1)+'%;background:'+s.color+'"></div>'});
+    bar+='</div>';
+    var rowsHtml=rows.map(function(r){
+      var pill=r.g?('<span class="bc-pill" style="color:'+r.g.color+';background:color-mix(in srgb,'+r.g.color+' 12%, transparent)">'+r.g.label+'</span>'):'<span class="bc-pill" style="color:var(--text3)">参考</span>';
+      return '<div class="bc-row"><span class="bc-dot" style="background:'+r.dot+'"></span>'
+        +'<span class="bc-name">'+r.name+'</span>'
+        +'<span class="bc-val"><b>'+r.kg+'</b> kg<span class="bc-rate">'+r.rate+'</span></span>'
+        +pill+'</div>';
+    }).join('');
+    var hints=bcHints(bc);
+    var hintHtml=hints.length?('<div class="bc-hints">'+hints.map(function(h){
+      return '<div class="bc-hint" style="border-left:3px solid '+h.color+'">'+h.text+'</div>';
+    }).join('')+'</div>')
+    :'<div class="bc-hints"><div class="bc-hint" style="border-left:3px solid var(--green)">各项都在正常范围，继续保持！</div></div>';
+    compHtml='<div class="info-modal-item"><div class="info-modal-item-title">🧬 身体成分分析</div>'
+      +'<div class="bc-weight">当前体重 <b>'+bc.weight+'</b> kg · 去脂体重 <b>'+bc.ffm+'</b> kg</div>'
+      +bar
+      +'<div class="bc-rows">'+rowsHtml+'</div>'
+      +hintHtml
+      +'<div class="bc-note">成分按体重+体脂率估算（去脂体重按水分 73%、骨量 7% 固定比例拆分，肌肉按体重比例推算），与体脂秤实测会有出入，趋势参考即可。血液属水分的一部分，单独列出仅供参考。</div>'
+      +'</div>';
+  }else{
+    compHtml='<div class="info-modal-item"><div class="info-modal-item-title">🧬 身体成分分析</div>'
+      +'<div class="bc-weight" style="color:var(--text3)">填好身高体重后这里会给出脂肪/肌肉/骨骼肌/水分/骨量等成分拆分；填腰围颈围用 Navy 公式更准。</div></div>';
+  }
+
+  /* ===== ③ 目标体重范围 ===== */
   var minW=(18.5*Math.pow(hh/100,2)).toFixed(1);
   var maxW=(24*Math.pow(hh/100,2)).toFixed(1);
   var idealW=Math.round(22*Math.pow(hh/100,2));
@@ -4338,27 +4814,212 @@ function openBmiBreakdown(){
     (toLose==0&&toGain==0?'<br><span style="color:var(--green)">✅ 当前体重已在健康范围内</span>':'')+
     '<br><span style="color:var(--text2);font-size:12px">理想体重 '+(profile.goal==='gain'?idealW+' kg (BMI 22)<br>增肌期建议 '+(idealW+5)+'~'+(idealW+10)+' kg':idealW+' kg')+'</span></div>';
 
+  /* ===== ④ 状态：标签墙 + 一句话 ===== */
+  var chips=[];
+  if(bc){
+    var fg=bcGrade('fat',bc);
+    chips.push({c:fg.color,t:'体脂 '+bc.fatRate+'% · '+fg.label});
+    chips.push({c:bcGrade('muscle',bc).color,t:'骨骼肌 '+bc.muscleRate+'%'});
+    chips.push({c:bcGrade('water',bc).color,t:'水分 '+bc.waterRate+'%'});
+    chips.push({c:bcGrade('bone',bc).color,t:'骨量 '+bc.bone+' kg'});
+  }
+  chips.push({c:info.color,t:'BMI '+bmi.toFixed(1)+' · '+info.label});
+  var chipsHtml='<div class="st-chips">'+chips.map(function(ch){
+    return '<span class="st-chip" style="color:'+ch.c+';background:color-mix(in srgb,'+ch.c+' 12%, transparent);border:0.5px solid color-mix(in srgb,'+ch.c+' 35%, transparent)">'+ch.t+'</span>';
+  }).join('')+'</div>';
+  var bfVal=bc?bc.fatRate:null;
   var fusionHtml='';
-  if(bf!==null&&bf>0){
+  if(bfVal!==null){
     var bmiOk=bmi>=18.5&&bmi<25.0;
-    var bfOk=gender==='male'?(bf>=14&&bf<25):(bf>=21&&bf<32);
-    var fusion=getFusionType(bmi,bf,bmiOk,bfOk,gender);
+    var bfOk=gender==='male'?(bfVal>=14&&bfVal<25):(bfVal>=21&&bfVal<32);
+    var fusion=getFusionType(bmi,bfVal,bmiOk,bfOk,gender);
     if(fusion){
-      fusionHtml='<div class="cal-status-box" style="background:rgba(118,118,128,0.06)"><div class="cal-status-icon">'+(fusion.icon||'💪')+'</div><div><div class="cal-status-title" style="color:'+(fusion.color||'var(--text)')+'">'+(fusion.label||'')+'</div><div class="cal-status-desc" style="color:var(--text2)">'+(fusion.msg||'')+'</div></div></div>';
+      fusionHtml='<div class="cal-status-box" style="background:rgba(118,118,128,0.06);margin-top:10px"><div class="cal-status-icon">'+(fusion.icon||'💪')+'</div><div><div class="cal-status-title" style="color:'+(fusion.color||'var(--text)')+'">'+(fusion.label||'')+'</div><div class="cal-status-desc" style="color:var(--text2)">'+(fusion.msg||'')+'</div></div></div>';
     }
   }
+  var statusHtml='<div class="info-modal-item" style="border-bottom:none"><div class="info-modal-item-title">🩺 综合状态</div>'
+    +chipsHtml+fusionHtml+'</div>';
 
   content='<div class="info-modal-body">'+
-    '<div class="info-modal-item"><div class="info-modal-item-title">📊 BMI 定位</div><div class="info-modal-item-desc" style="padding:0">'+
-      bmiGaugeSvg+
-    '</div></div>'+
+    gaugeHtml+
+    compHtml+
     '<div class="info-modal-item"><div class="info-modal-item-title">🎯 目标体重范围</div>'+
       weightRangeHtml+
     '</div>'+
-    (fusionHtml?'<div class="info-modal-item" style="border-bottom:none">'+fusionHtml+'</div>':'')+
+    statusHtml+
   '</div>';
   document.getElementById('bmiBreakdownContent').innerHTML=content;
   showModal('bmiModal');
+}
+/* ===== 运动记录（当天）与缺口换算 ===== */
+function exLogs(dk){
+  dk=dk||state.selectedDate;
+  if(!state.exerciseLogs)state.exerciseLogs={};
+  if(!Array.isArray(state.exerciseLogs[dk]))state.exerciseLogs[dk]=[];
+  return state.exerciseLogs[dk];
+}
+function exTotal(dk){
+  return exLogs(dk).reduce(function(s,e){return s+(+e.kcal||0)},0);
+}
+function exAdd(tagId,amount){
+  var t=exTags().filter(function(x){return x.id===tagId})[0];if(!t)return false;
+  var amt=parseFloat(amount);
+  if(!(amt>0)){showToast('请填写大于 0 的'+((EX_MODES[t.mode]||EX_MODES.min).qty));return false}
+  var kc=Math.round(amt*(+t.rate||0));
+  if(kc<=0){showToast('这个标签的消耗参数是 0，先去设置里改一下');return false}
+  exLogs().push({id:'ex'+Date.now()+Math.floor(Math.random()*900),tagId:t.id,name:t.name,icon:t.icon||'🏃',
+    mode:t.mode,amount:amt,kcal:kc,at:new Date().toTimeString().slice(0,5)});
+  saveState();
+  return true;
+}
+function exDel(id){
+  var dk=state.selectedDate;
+  state.exerciseLogs[dk]=exLogs(dk).filter(function(e){return e.id!==id});
+  saveState();renderExerciseSummary();refreshCalorieModal();showToast('已删除这条运动');
+}
+/* 健康体重区间：BMI 22 反推（若用户设了目标体重则优先） */
+function healthyWeight(){
+  var h=(state.profile.height||0)/100;
+  if(!h)return 0;
+  return Math.round(22*h*h*10)/10;
+}
+function targetWeightForPlan(){
+  var p=state.profile||{},tw=parseFloat(p.targetWeight);
+  /* v3.13.24：优先按目标体脂率反推体重（去脂体重不变假设） */
+  var byBf=targetWeightByBF();
+  if(byBf)return byBf;
+  return tw>0?tw:healthyWeight();
+}
+/* 按目标体脂率反推目标体重：去脂体重(FFM)在减脂过程中视为不变，
+   目标体重 = FFM / (1 - 目标体脂/100)。数据不足返回 0。 */
+function currentBodyFat(){
+  var p=state.profile||{};
+  if(!p.height||!p.weight||!p.age)return 0;
+  var v=calcBodyFat(p);
+  return (isFinite(v)&&v>0)?Math.round(v*10)/10:0;
+}
+function targetWeightByBF(){
+  var p=state.profile||{},tbf=parseFloat(p.targetBF);
+  if(!(tbf>0)||tbf>=70)return 0;
+  var w=parseFloat(p.weight),bf=currentBodyFat();
+  if(!(w>0)||!(bf>0))return 0;
+  var ffm=w*(1-bf/100);
+  /* 已达/低于目标体脂：目标体重就是当前体重（不能再往下掉肌肉） */
+  if(bf<=tbf)return Math.round(w*10)/10;
+  var tw=ffm/(1-tbf/100);
+  if(!isFinite(tw)||tw<=0)return 0;
+  return Math.round(tw*10)/10;
+}
+function setTargetBF(v){
+  var p=state.profile||{};
+  var n=parseFloat(v);
+  p.targetBF=(isNaN(n)||n<=0)?0:Math.min(60,n);
+  saveState();renderBFCompare();renderCalorieSummary();
+  var h=document.getElementById('bfTargetHint');
+  if(h){
+    var tw=targetWeightByBF();
+    h.textContent=tw>0?('按此目标 → 目标体重约 '+tw+' kg'):'留空 = 按 BMI 22 健康体重推算';
+  }
+}
+/* 缺口换算：理论掉重 + 到目标所需时间 */
+var KCAL_PER_KG=7700;
+function exGapInfo(){
+  var foods=getTodayFoods();
+  var consumed=foods.reduce(function(s,f){return s+(f.cal||0)},0);
+  var burned=exTotal();
+  var target=calcTargetCalories();
+  /* v3.13.27：已消耗 = 基础代谢 BMR + 今日运动（日常活动按较少算，不叠 TDEE 系数） */
+  var bmr=Math.round(calcBMR(state.profile)||0);
+  var burnedAll=bmr+burned;
+  var net=consumed-burned;            /* 净摄入：只扣运动，BMR 是「消耗侧」不抵摄入 */
+  var gap=target-net;                 /* 正=缺口，负=盈余 */
+  var lostG=Math.round(Math.abs(gap)/KCAL_PER_KG*1000); /* 理论掉重(或增重)克 */
+  return {consumed:consumed,burned:burned,bmr:bmr,burnedAll:burnedAll,
+    net:net,netAll:consumed-burnedAll,target:target,gap:gap,
+    lostG:lostG,over:gap<0,
+    curW:+((state.profile||{}).weight||0),tw:targetWeightForPlan(),
+    isHealthyTarget:!(parseFloat((state.profile||{}).targetWeight)>0)};
+}
+/* 到目标预测：返回剩余公斤、按当前缺口的预计天数、以及按期达标的每日推荐缺口 */
+function exPlanInfo(){
+  var g=exGapInfo();
+  var curW=g.curW,tw=g.tw;
+  /* 起始体重：用于算进度。优先取最早一条体重记录，没有就用目标+剩余 */
+  var startW=planStartWeight(curW,tw);
+  if(!(curW>0)||!(tw>0)||curW<=tw){
+    /* 已达标 / 无目标：仍返回速度信息用于可视化 */
+    return {remain:0,needKcal:0,days:0,speed:0,curW:curW,tw:tw,startW:startW,
+      done:true,progress:100,
+      healthyDaily:Math.round(0.5*KCAL_PER_KG/7),planDays:0,planWeeks:0,
+      dietPart:0,exPart:0,refTag:null,exMinutes:0,
+      dailyLoss:0,weeklyLoss:0,monthlyLoss:0,etaDate:null,
+      totalWeeksAtCurrent:0,bf:currentBodyFat(),targetBF:parseFloat((state.profile||{}).targetBF)||0};
+  }
+  var remain=Math.round((curW-tw)*10)/10;
+  var needKcal=Math.round(remain*KCAL_PER_KG);
+  /* 按当前缺口速度 */
+  var speed=g.gap>0?g.gap:0;
+  var days=speed>0?Math.ceil(needKcal/speed):0;
+  /* 健康速率：每周 0.5kg → 每天缺口 550 kcal */
+  var healthyDaily=Math.round(0.5*KCAL_PER_KG/7);
+  var planDays=Math.ceil(needKcal/healthyDaily);
+  /* 建议拆分：饮食 + 运动 */
+  var dietPart=Math.round(healthyDaily*0.6),exPart=healthyDaily-dietPart;
+  /* 推荐运动：折算成分钟数（用最常用的跑步标签） */
+  var minTags=exTags().filter(function(t){return t.mode==='min'&&(+t.rate>0)});
+  var ref=minTags.sort(function(a,b){return b.rate-a.rate})[0];
+  var exMinutes=ref?Math.ceil(exPart/(+ref.rate)):0;
+  /* 减重速度可视化：按 1kg≈7700kcal 折算 */
+  var dailyLoss=speed/KCAL_PER_KG;
+  var weeklyLoss=dailyLoss*7, monthlyLoss=weeklyLoss*30/7;
+  var etaDate=days>0?addDaysStr(new Date(),days):null;
+  /* 进度：起始体重 → 目标体重 */
+  var total=startW-tw;
+  var progress=total>0?Math.min(100,Math.max(0,(startW-curW)/total*100)):0;
+  return {remain:remain,needKcal:needKcal,days:days,speed:speed,curW:curW,tw:tw,startW:startW,
+    hasHistory:hasWeightHistory(curW),
+    done:false,progress:Math.round(progress*10)/10,
+    healthyDaily:healthyDaily,planDays:planDays,planWeeks:Math.round(planDays/7*10)/10,
+    dietPart:dietPart,exPart:exPart,refTag:ref,exMinutes:exMinutes,
+    dailyLoss:Math.round(dailyLoss*1000)/1000,
+    weeklyLoss:Math.round(weeklyLoss*100)/100,
+    monthlyLoss:Math.round(monthlyLoss*10)/10,
+    etaDate:etaDate,
+    totalWeeksAtCurrent:speed>0?Math.round(days/7*10)/10:0,
+    bf:currentBodyFat(),targetBF:parseFloat((state.profile||{}).targetBF)||0};
+}
+/* 起始体重：取最早一条体重记录（>=当前体重且合理）；没有则按「当前+已减」兜底 */
+function hasWeightHistory(curW){
+  var recs=state.weightRecords||{},vals=[];
+  Object.keys(recs).forEach(function(k){
+    var v=recs[k];var w=v&&typeof v==='object'?parseFloat(v.w):parseFloat(v);
+    if(w>0)vals.push(w);
+  });
+  if(!vals.length)return false;
+  return Math.max.apply(null,vals)>=curW;
+}
+function planStartWeight(curW,tw){
+  var recs=state.weightRecords||{},vals=[];
+  Object.keys(recs).sort().forEach(function(k){
+    var v=recs[k];var w=v&&typeof v==='object'?parseFloat(v.w):parseFloat(v);
+    if(w>0)vals.push(w);
+  });
+  if(vals.length){
+    var mx=Math.max.apply(null,vals);
+    if(mx>=curW)return Math.round(mx*10)/10;
+  }
+  /* 没有历史体重时，把当前体重当起点（进度 0%），不虚构起点 */
+  return Math.round(curW*10)/10;
+}
+function addDaysStr(base,n){
+  var d=new Date(base.getTime());d.setDate(d.getDate()+n);
+  return (d.getMonth()+1)+'月'+d.getDate()+'日';
+}
+function renderExerciseSummary(){
+  var el=document.getElementById('exSummaryLine');if(!el)return;
+  var g=exGapInfo();
+  if(g.burned<=0){el.innerHTML='';return}
+  el.innerHTML='今日运动 <span style="color:var(--red);font-weight:700">−'+g.burned+'</span> kcal · 净摄入 '+g.net+' / '+g.target+' kcal';
 }
 function openCalorieBreakdown(){
   const foods=getTodayFoods();
@@ -4372,55 +5033,17 @@ function openCalorieBreakdown(){
     showModal('calorieModal');
     return;
   }
-  const tp=foods.reduce((s,f)=>s+(f.p||0),0);
-  const tc=foods.reduce((s,f)=>s+(f.c||0),0);
-  const tf=foods.reduce((s,f)=>s+(f.f||0),0);
-  const calP=tp*4,calC=tc*4,calF=tf*9;
-  const totalMacroKcal=calP+calC+calF;
-  const pPct=totalMacroKcal>0?calP/totalMacroKcal*100:0;
-  const cPct=totalMacroKcal>0?calC/totalMacroKcal*100:0;
-  const fPct=totalMacroKcal>0?calF/totalMacroKcal*100:0;
   const bmr=calcBMR(profile);
   const tdee=calcTDEE(profile);
-  const actLabels={low:'偏低',normal:'正常',medium:'稍高',high:'高',extreme:'极高'};
+  const actLabels={low:'偏低',normal:'正常',medium:'稍高',high:'高',extreme:'极高',custom:'自定义'};
   const actFactors={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
+  const realFactor=actFactor(profile);
   const goalLabels={buddha:'佛系',lose:'减脂',maintain:'维持',gain:'增肌'};
   const diff=target-consumed;
-  function donutArc(pct,color,rotStart){
-    var r=37,cx=50,cy=50,sw=11;
-    var circ=2*Math.PI*r;
-    var len=circ*pct/100;
-    var off=-rotStart/100*circ;
-    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-dasharray="'+len.toFixed(1)+' '+(circ-len).toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
-  }
-  var donutSvg='<svg width="100" height="100" viewBox="0 0 100 100">';
-  if(totalMacroKcal>0){
-    donutSvg+=donutArc(pPct,'var(--green)',0);
-    donutSvg+=donutArc(cPct,'var(--orange)',pPct);
-    donutSvg+=donutArc(fPct,'var(--red)',pPct+cPct);
-  }else{
-    donutSvg+='<circle cx="50" cy="50" r="37" fill="none" stroke="var(--text3)" stroke-width="11" stroke-dasharray="240 11" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>';
-  }
-  donutSvg+='<circle cx="50" cy="50" r="30" fill="var(--bg)"/>';
-  donutSvg+='<text x="50" y="47" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text)">'+consumed+'</text>';
-  donutSvg+='<text x="50" y="60" text-anchor="middle" font-size="9" fill="var(--text2)">kcal</text>';
-  donutSvg+='</svg>';
-  var macroDetailHtml='';
-  if(totalMacroKcal>0){
-    macroDetailHtml='<div class="cal-breakdown-macros">'+
-      '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--green)"></span><span class="cal-macro-label">蛋白质</span><span class="cal-macro-gram">'+tp.toFixed(0)+'g</span><span class="cal-macro-pct" style="color:var(--green)">'+pPct.toFixed(1)+'%</span></div>'+
-      '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--orange)"></span><span class="cal-macro-label">碳水</span><span class="cal-macro-gram">'+tc.toFixed(0)+'g</span><span class="cal-macro-pct" style="color:var(--orange)">'+cPct.toFixed(1)+'%</span></div>'+
-      '<div class="cal-macro-row"><span class="cal-macro-dot" style="background:var(--red)"></span><span class="cal-macro-label">脂肪</span><span class="cal-macro-gram">'+tf.toFixed(0)+'g</span><span class="cal-macro-pct" style="color:var(--red)">'+fPct.toFixed(1)+'%</span></div>'+
-      '<div class="cal-macro-row" style="border-top:1px solid var(--card-border);padding-top:6px;margin-top:4px"><span></span><span class="cal-macro-label" style="color:var(--text2)">合计</span><span class="cal-macro-gram" style="color:var(--text)">'+totalMacroKcal.toFixed(0)+'kcal</span><span class="cal-macro-pct" style="color:var(--text2)">100%</span></div>'+
-    '</div>';
-  }else{
-    macroDetailHtml='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px">暂无食物记录</div>';
-  }
-  var macroSection='<div class="info-modal-item"><div class="cal-macro-header"><span class="info-modal-item-title">🥗 宏量营养素分布</span></div><div class="cal-macro-grid"><div class="cal-macro-donut">'+donutSvg+'</div>'+macroDetailHtml+'</div></div>';
   var bmrSection='<div class="info-modal-item"><div class="info-modal-item-title">🔥 基础代谢 vs 总消耗</div><div class="cal-bmr-grid">'+
-    '<div class="cal-bmr-item"><span class="cal-bmr-label">基础代谢 BMR</span><span class="cal-bmr-val">'+bmr+' kcal</span></div>'+
-    '<div class="cal-bmr-item"><span class="cal-bmr-label">活动系数</span><span class="cal-bmr-val">'+(actLabels[profile.activity]||'未知')+' ×'+(actFactors[profile.activity]||'1.2')+'</span></div>'+
-    '<div class="cal-bmr-item" style="border-top:1px solid var(--card-border);padding-top:8px"><span class="cal-bmr-label" style="font-weight:700">总消耗 TDEE</span><span class="cal-bmr-val" style="font-weight:700">'+tdee+' kcal</span></div>'+
+    '<div class="cal-bmr-item"><span class="cal-bmr-label">基础代谢 BMR</span><span class="cal-bmr-val">'+Math.round(bmr)+' kcal</span></div>'+
+    '<div class="cal-bmr-item"><span class="cal-bmr-label">活动系数</span><span class="cal-bmr-val">'+(actLabels[profile.activity]||'未知')+' ×'+realFactor.toFixed(3)+'</span></div>'+
+    '<div class="cal-bmr-item" style="border-top:1px solid var(--card-border);padding-top:8px"><span class="cal-bmr-label" style="font-weight:700">总消耗 TDEE</span><span class="cal-bmr-val" style="font-weight:700">'+Math.round(tdee)+' kcal</span></div>'+
     '<div class="cal-bmr-item"><span class="cal-bmr-label">目标调节</span><span class="cal-bmr-val" style="color:var(--text2)">'+(goalLabels[profile.goal]||'维持')+' → '+target+' kcal</span></div>'+
   '</div></div>';
   var statusHtml='';
@@ -4443,13 +5066,164 @@ function openCalorieBreakdown(){
       '<div class="cal-status-desc">已摄入 <strong>'+consumed+' kcal</strong>，超出目标 <strong>'+Math.abs(diff)+' kcal</strong>（'+overPct.toFixed(0)+'%）</div></div></div>';
   }
 
+  var g=exGapInfo(),plan=exPlanInfo();
+  /* ① 今日总账 */
+  var ledgerSection='<div class="info-modal-item"><div class="info-modal-item-title">📒 今日总账</div>'
+    +'<div class="cal-bmr-grid">'
+    +'<div class="cal-bmr-item"><span class="cal-bmr-label"><span class="ring-leg-dot" style="background:var(--blue)"></span>摄入热量</span><span class="cal-bmr-val" style="color:var(--blue)">'+g.consumed+' kcal</span></div>'
+    +'<div class="cal-bmr-item"><span class="cal-bmr-label"><span class="ring-leg-dot" style="background:var(--red)"></span>基础代谢</span><span class="cal-bmr-val" style="color:var(--red)">'+(g.bmr>0?('−'+g.bmr):'--')+' kcal</span></div>'
+    +'<div class="cal-bmr-item"><span class="cal-bmr-label"><span class="ring-leg-dot" style="background:var(--red)"></span>运动消耗</span><span class="cal-bmr-val" style="color:var(--red)">'+(g.burned>0?('−'+g.burned):'0')+' kcal</span></div>'
+    +'<div class="cal-bmr-item" style="border-top:1px solid var(--card-border);padding-top:8px"><span class="cal-bmr-label" style="font-weight:700">已消耗合计</span><span class="cal-bmr-val" style="font-weight:700;color:var(--red)">'+g.burnedAll+' kcal</span></div>'
+    +'<div class="cal-bmr-item"><span class="cal-bmr-label">净摄入</span><span class="cal-bmr-val">'+g.net+' kcal</span></div>'
+    +'<div class="cal-bmr-item"><span class="cal-bmr-label">目标线</span><span class="cal-bmr-val" style="color:var(--text2)">'+g.target+' kcal</span></div>'
+    +'</div></div>';
+  /* ② 热量缺口大数字 */
+  var gapColor=g.over?'var(--red)':'var(--green)';
+  var gapSection='<div class="info-modal-item"><div class="info-modal-item-title">'+(g.over?'⚖️ 今日热量盈余':'🎯 今日热量缺口')+'</div>'
+    +'<div style="display:flex;align-items:baseline;gap:6px;margin:2px 0 8px">'
+    +'<span style="font-size:30px;font-weight:800;color:'+gapColor+';letter-spacing:-0.5px">'+Math.abs(g.gap)+'</span>'
+    +'<span style="font-size:13px;color:var(--text2)">kcal</span></div>'
+    +'<div style="font-size:11.5px;color:var(--text3);line-height:1.6">'
+    +(g.over?('净摄入比目标多了 '+Math.abs(g.gap)+' kcal，今天算是盈余')
+            :('净摄入比目标少了 '+g.gap+' kcal，这就是今天的热量缺口'))
+    +'</div></div>';
+  /* ③ 运动标签记录 */
+  var tagBtns=exTags().map(function(t){
+    return '<button onclick="openExInput(\''+t.id+'\')" style="border:1.5px solid var(--input-bd);border-radius:12px;background:var(--card-bg);color:var(--text);font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;padding:8px 12px">'+(t.icon||'🏃')+' '+_planEsc(t.name)+'</button>';
+  }).join('');
+  var logs=exLogs();
+  var logHtml=logs.length?logs.map(function(e){
+    return '<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-top:0.5px solid var(--card-border)">'
+      +'<span style="font-size:17px;flex-shrink:0">'+(e.icon||'🏃')+'</span>'
+      +'<span style="flex:1;min-width:0"><span style="display:block;font-size:13.5px;font-weight:600">'+_planEsc(e.name)+'</span>'
+      +'<span style="display:block;font-size:11px;color:var(--text3);margin-top:1px">'+e.amount+' '+((EX_MODES[e.mode]||EX_MODES.min).unit)+' · '+e.at+'</span></span>'
+      +'<span style="font-size:13.5px;font-weight:700;color:var(--green);flex-shrink:0">−'+e.kcal+' kcal</span>'
+      +'<button onclick="exDel(\''+e.id+'\')" style="border:none;background:none;color:var(--text3);font-size:14px;cursor:pointer;padding:2px 4px">✕</button>'
+      +'</div>';
+  }).join(''):'<div style="padding:12px 0;text-align:center;color:var(--text3);font-size:12.5px">今天还没记录运动，点上面的标签加一条</div>';
+  var exSection='<div class="info-modal-item"><div class="info-modal-item-title">🏃 今日运动</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 10px">'+tagBtns
+    +'<button onclick="switchPage(\'settings\');openSettingsSub(\'goal\')" style="border:1.5px dashed var(--input-bd);border-radius:12px;background:none;color:var(--text3);font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;padding:8px 12px">+ 管理标签</button></div>'
+    +'<div id="exLogList">'+logHtml+'</div>'
+    +(logs.length?('<div style="display:flex;justify-content:space-between;padding-top:9px;border-top:0.5px solid var(--card-border);font-size:13px"><span style="color:var(--text2)">今日运动合计</span><span style="font-weight:700;color:var(--green)">−'+g.burned+' kcal</span></div>'):'')
+    +'</div>';
+  /* ④ 可视化：实际摄入 vs 实际消耗（颜色区分） */
+  var dayTotal=g.consumed+g.burned;
+  var inPct=dayTotal>0?g.consumed/dayTotal*100:0;
+  var burnPct=dayTotal>0?g.burned/dayTotal*100:0;
+  var dualBarHtml='<div class="ex-dual-bar">'
+    +(g.consumed>0?('<div class="ex-dual-in" style="width:'+inPct.toFixed(1)+'%"></div>'):'')
+    +(g.burned>0?('<div class="ex-dual-out" style="width:'+burnPct.toFixed(1)+'%"></div>'):'')
+    +'</div>';
+  var dualLegend='<div class="ex-dual-legend">'
+    +'<div class="ex-dual-leg"><span class="ex-dual-dot" style="background:var(--blue)"></span>'
+      +'<span class="ex-dual-k">实际摄入</span><span class="ex-dual-v" style="color:var(--blue)">'+g.consumed+' kcal</span></div>'
+    +'<div class="ex-dual-leg"><span class="ex-dual-dot" style="background:var(--red)"></span>'
+      +'<span class="ex-dual-k">运动消耗</span><span class="ex-dual-v" style="color:var(--red)">'+g.burned+' kcal</span></div>'
+    +'</div>';
+  /* 建议摄入 vs 建议消耗 */
+  var sugIn=target, sugOut=plan?(plan.exPart||0):0;
+  var sugBox='<div class="ex-sug-box">'
+    +'<div class="ex-sug-row"><span class="ex-sug-lab"><span class="ex-dual-dot" style="background:var(--blue)"></span>建议摄入</span>'
+      +'<span class="ex-sug-val" style="color:var(--blue)">'+sugIn+' kcal</span></div>'
+    +'<div class="ex-sug-row"><span class="ex-sug-lab"><span class="ex-dual-dot" style="background:var(--red)"></span>建议运动消耗</span>'
+      +'<span class="ex-sug-val" style="color:var(--red)">'+(sugOut>0?('≥ '+sugOut+' kcal'):'--')+'</span></div>'
+    +(plan?('<div class="ex-sug-note">目标缺口 '+plan.healthyDaily+' kcal/天 · 饮食省 '+plan.dietPart+' + 运动烧 '+plan.exPart+'</div>'):'')
+    +'</div>';
+  var dualSection='<div class="info-modal-item"><div class="info-modal-item-title">📊 今日摄入 vs 消耗</div>'
+    +dualBarHtml+dualLegend+sugBox+'</div>';
+  /* ⑤ 减脂进度可视化 */
+  var vizSection='';
+  if(plan){
+    if(plan.done){
+      vizSection='<div class="info-modal-item"><div class="info-modal-item-title">🏁 减脂进度</div>'
+        +'<div class="ex-done-box">✅ 当前体重 '+plan.curW+' kg 已在健康范围内，保持就好，不用再减。</div></div>';
+    }else{
+      var bfHtml='';
+      if(plan.bf>0){
+        bfHtml='<div class="ex-bf-line">当前体脂 <b>'+plan.bf+'%</b>'
+          +(plan.targetBF>0?(' → 目标 <b>'+plan.targetBF+'%</b>'):'')
+          +'</div>';
+      }else{
+        bfHtml='<div class="ex-bf-line" style="color:var(--text3)">填腰围+颈围可显示体脂进度</div>';
+      }
+      /* 进度条：起始 → 当前 → 目标 */
+      var prog=plan.progress;
+      vizSection='<div class="info-modal-item"><div class="info-modal-item-title">📈 减脂进度</div>'
+        +'<div class="ex-prog-head"><span>'+(plan.hasHistory?('起始 '+plan.startW+' kg'):'从今天起算')+'</span><span>目标 '+plan.tw+' kg</span></div>'
+        +'<div class="ex-prog-bar"><div class="ex-prog-fill" style="width:'+prog.toFixed(1)+'%"></div>'
+          +'<div class="ex-prog-knob" style="left:'+prog.toFixed(1)+'%"></div></div>'
+        +'<div class="ex-prog-foot"><span class="ex-prog-cur">当前 <b>'+plan.curW+' kg</b></span>'
+          +'<span class="ex-prog-pct">'+(plan.hasHistory?('已完成 <b>'+prog.toFixed(1)+'%</b>'):('距目标 <b>'+plan.remain+' kg</b>'))+'</span></div>'
+        +bfHtml
+        +'<div class="ex-remain-line">还需减 <b>'+plan.remain+' kg</b>（约 '+plan.needKcal+' kcal）</div>'
+        /* 速度三宫格 */
+        +'<div class="ex-rate-grid">'
+          +'<div class="ex-rate-item"><div class="ex-rate-num" style="color:var(--blue)">'+(plan.dailyLoss>=0.01?plan.dailyLoss.toFixed(3):'0')+'</div><div class="ex-rate-lab">kg / 每天</div></div>'
+          +'<div class="ex-rate-item"><div class="ex-rate-num" style="color:var(--blue)">'+(plan.weeklyLoss>=0.01?plan.weeklyLoss.toFixed(2):'0')+'</div><div class="ex-rate-lab">kg / 每周</div></div>'
+          +'<div class="ex-rate-item"><div class="ex-rate-num" style="color:var(--blue)">'+(plan.monthlyLoss>=0.1?plan.monthlyLoss.toFixed(1):'0')+'</div><div class="ex-rate-lab">kg / 每月</div></div>'
+        +'</div>'
+        +'<div class="ex-rate-src">按今日缺口 '+plan.speed+' kcal/天 折算 · 1 kg ≈ 7700 kcal</div>'
+        /* 预计时间 */
+        +(plan.days>0?('<div class="ex-eta-box">'
+          +'<div class="ex-eta-main">按这个节奏，预计 <b>'+plan.days+' 天</b> 后达标</div>'
+          +'<div class="ex-eta-sub">约 '+plan.totalWeeksAtCurrent+' 周 · 大概 '+plan.etaDate+'</div>'
+          +'</div>'):'<div class="ex-eta-box warn"><div class="ex-eta-main">今天没有缺口，体重不会往下走</div>'
+          +'<div class="ex-eta-sub">先把缺口做出来（少吃或动起来）再看预测</div></div>')
+        +'</div>';
+    }
+  }
   content='<div class="info-modal-body">'+
-    macroSection+
+    vizSection+
+    gapSection+
+    dualSection+
+    ledgerSection+
+    exSection+
     bmrSection+
     statusHtml+
   '</div>';
   document.getElementById('calorieBreakdownContent').innerHTML=content;
   showModal('calorieModal');
+  renderExerciseSummary();
+}
+function refreshCalorieModal(){
+  var m=document.getElementById('calorieModal');
+  if(m&&m.classList.contains('show'))openCalorieBreakdown();
+}
+/* 运动输入弹窗 */
+function openExInput(tagId){
+  var t=exTags().filter(function(x){return x.id===tagId})[0];if(!t)return;
+  _exInputTag=tagId;
+  var m=EX_MODES[t.mode]||EX_MODES.min;
+  document.getElementById('exInputIcon').textContent=t.icon||'🏃';
+  document.getElementById('exInputTitle').textContent=t.name;
+  document.getElementById('exInputUnit').textContent=m.unit;
+  document.getElementById('exInputVal').value='';
+  var quick='';
+  if(t.mode==='step'){
+    [3000,5000,8000,10000].forEach(function(n){
+      quick+='<button onclick="exQuickVal('+n+')" style="border:1.5px solid var(--input-bd);border-radius:11px;background:var(--card-bg);color:var(--blue);font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;padding:8px 0;flex:1">'+n+' 步</button>';
+    });
+  }else{
+    var opts=t.mode==='rep'?[10,20,30,50]:[15,30,45,60];
+    opts.forEach(function(n){
+      quick+='<button onclick="exQuickVal('+n+')" style="border:1.5px solid var(--input-bd);border-radius:11px;background:var(--card-bg);color:var(--blue);font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;padding:8px 0;flex:1">'+n+' '+m.short+'</button>';
+    });
+  }
+  document.getElementById('exInputQuick').innerHTML=quick;
+  document.getElementById('exInputEcho').textContent='按 '+t.rate+' kcal/'+m.short+' 计算';
+  showModal('exInputModal');
+}
+var _exInputTag=null;
+function exQuickVal(n){document.getElementById('exInputVal').value=n}
+function exConfirmInput(){
+  var v=document.getElementById('exInputVal').value;
+  if(exAdd(_exInputTag,v)){
+    hideModal('exInputModal');
+    var t=exTags().filter(function(x){return x.id===_exInputTag})[0];
+    showToast('已记录：'+t.name+' '+v+' '+((EX_MODES[t.mode]||EX_MODES.min).unit));
+    refreshCalorieModal();renderExerciseSummary();
+  }
 }
 
 function _collapseSecondaries(){
@@ -4463,8 +5237,10 @@ function _collapseSecondaries(){
 }
 function switchPage(n){
   if((n==='recipe'||n==='history')&&typeof pageOn==='function'&&!pageOn(n)){showToast('该页面已在设置 › 页面管理中隐藏');return}
-  _collapseSecondaries();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(n+'-page').classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="'+n+'"]').classList.add('active');if(n==='history'){if(!calSelectedDate)calSelectedDate=state.selectedDate;renderWeightChart();renderWeightPeriodLabel();renderCalendar()}else if(n==='recipe'){renderRecipeList();recDishes();renderMenuEntryCard()}else if(n==='settings'){settingsShowHome()}}
-function showModal(id){document.getElementById(id).classList.add('show')}
+  var pageEl=document.getElementById(n+'-page'),tabEl=document.querySelector('[data-page="'+n+'"]');
+  if(!pageEl||!tabEl)return;   /* 页面名非法（如 'home' 应为 'main'）时静默忽略，避免抛错 */
+  _collapseSecondaries();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));pageEl.classList.add('active');document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));tabEl.classList.add('active');if(n==='history'){if(!calSelectedDate)calSelectedDate=state.selectedDate;renderWeightChart();renderWeightPeriodLabel();renderCalendar()}else if(n==='recipe'){renderRecipeList();recDishes();renderMenuEntryCard()}else if(n==='settings'){settingsShowHome()}}
+function showModal(id){var m=document.getElementById(id);if(m)m.classList.add('show')}
 document.addEventListener('click',function(e){
   var t=e.target;
   if(t&&t.classList&&t.classList.contains('modal-overlay')&&!t.classList.contains('show'))return;
@@ -4478,7 +5254,7 @@ document.addEventListener('click',function(e){
     t.classList.remove('show');
   }
 });
-function hideModal(id){document.getElementById(id).classList.remove('show')}
+function hideModal(id){var m=document.getElementById(id);if(m)m.classList.remove('show')}
 function showLoading(t){document.getElementById('loadingText').textContent=t||'加载中...';document.getElementById('loadingOverlay').classList.add('show')}
 function hideLoading(){document.getElementById('loadingOverlay').classList.remove('show')}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),2500)}
@@ -4949,9 +5725,9 @@ async function init(){
   document.getElementById('setHeight').addEventListener('input',function(){state.profile.height=parseFloat(this.value)||0;saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart();refreshSettingsTop()});
   document.getElementById('setWeight').addEventListener('input',function(){var w=parseFloat(this.value)||0;state.profile.weight=w;if(w>0){var k=getDateKey(new Date());var cur=state.weightRecords[k];if(!cur||typeof cur!=='object'){cur={w:0,waist:0,t:new Date().toTimeString().slice(0,5)};state.weightRecords[k]=cur}cur.w=w}saveState();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart();renderWeightChart();renderWeightPeriodLabel();refreshSettingsTop()});
   document.getElementById('setAge').addEventListener('input',function(){state.profile.age=parseInt(this.value)||25;saveState();renderCalorieSummary();renderNutrition();renderWeeklyChart();refreshSettingsTop()});
-  var waistEl=document.getElementById('setWaist');if(waistEl)waistEl.addEventListener('input',function(){state.profile.waist=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
-  var neckEl=document.getElementById('setNeck');if(neckEl)neckEl.addEventListener('input',function(){state.profile.neck=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()});
-  var hipEl=document.getElementById('setHip');if(hipEl)hipEl.addEventListener('input',function(){state.profile.hip=parseFloat(this.value)||0;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()});
+  var waistEl=document.getElementById('setWaist');if(waistEl)waistEl.addEventListener('input',function(){state.profile.waist=parseFloat(this.value)||0;saveState();refreshSettingsTop();renderBMI();renderCalorieSummary();renderNutrition();renderWeeklyChart()});
+  var neckEl=document.getElementById('setNeck');if(neckEl)neckEl.addEventListener('input',function(){state.profile.neck=parseFloat(this.value)||0;saveState();refreshSettingsTop();renderBMI();renderCalorieSummary();renderNutrition();renderBFCompare()});
+  var hipEl=document.getElementById('setHip');if(hipEl)hipEl.addEventListener('input',function(){state.profile.hip=parseFloat(this.value)||0;saveState();refreshSettingsTop();renderBMI();renderCalorieSummary();renderNutrition();renderBFCompare()});
   updateOnlineStatus();window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);
   var wfEl=document.getElementById('weightFull');
   function rerenderFullChart(){applyWFRotation();if(wfEl&&wfEl.classList.contains('show'))setTimeout(function(){refreshWeightFull()},60)}
