@@ -117,16 +117,22 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .ring-arc{fill:none;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
 .ring-arc-burn{stroke:var(--red)}
 .ring-arc-in{stroke:var(--blue)}
-.ring-lap-tag{position:absolute;left:0;right:0;bottom:-15px;text-align:center;font-size:10.5px;font-weight:700;color:var(--red);white-space:nowrap}
+.calorie-main{display:flex;align-items:center;gap:16px;padding-bottom:13px}
+.ring-lap-tag{position:absolute;left:-16px;right:-16px;bottom:-13px;text-align:center;font-size:10.5px;font-weight:700;color:var(--red);white-space:nowrap}
 .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring-num{font-size:22px;font-weight:800}.ring-unit{font-size:11px;color:var(--text2)}
-.calorie-info{flex:1}.calorie-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
-.calorie-row-label{font-size:14px;color:var(--text2)}.calorie-row-val{font-size:16px;font-weight:700}
-.calorie-status{margin-top:8px;padding:8px 12px;border-radius:10px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
-.calorie-status.deficit{background:rgba(52,199,89,0.12);color:var(--green)}
-.calorie-status.surplus{background:rgba(255,59,48,0.12);color:var(--red)}
-.calorie-status.warn{background:rgba(255,204,0,0.15);color:var(--orange)}
-.ex-summary-line{margin-top:6px;font-size:12.5px;color:var(--text-secondary);line-height:1.5;word-break:break-all}
+.ring-num{font-size:22px;font-weight:800;line-height:1.15}.ring-unit{font-size:10.5px;color:var(--text3);letter-spacing:.2px}
+/* v3.13.32 卡片重排：结论上位（大字），明细行在下，与 BMI 卡片同模式 */
+.calorie-info{flex:1;min-width:0}
+.calorie-verdict{font-size:15px;font-weight:700;line-height:1.35;padding-bottom:7px;margin-bottom:4px;border-bottom:0.5px solid var(--card-border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calorie-verdict.deficit{color:var(--green)}
+.calorie-verdict.surplus{color:var(--red)}
+.calorie-verdict.warn{color:var(--orange)}
+.calorie-verdict.none{color:var(--text2);font-weight:600}
+.calorie-rows{display:flex;flex-direction:column}
+.calorie-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0}
+.calorie-row-label{font-size:13.5px;color:var(--text2);display:flex;align-items:center;min-width:0}
+.calorie-row-val{font-size:15px;font-weight:700;white-space:nowrap}
+.calorie-row-sub{font-size:10.5px;color:var(--text3);padding:0 0 3px 14px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ex-modal-sec{margin:14px 0 6px;font-size:13px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
 .ex-modal-sec::before{content:'';width:3px;height:13px;border-radius:2px;background:var(--blue)}
 .ex-tag-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -312,6 +318,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .ex-prog-cur b,.ex-prog-pct b{color:var(--text)}
 .ex-bf-line{font-size:12.5px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--card-border)}
 .ex-bf-line b{color:var(--text);font-weight:700}
+.ex-bf-note{font-size:11px;color:var(--orange);margin-top:5px;line-height:1.5}
 .ex-remain-line{font-size:12.5px;color:var(--text2);margin-top:8px}
 .ex-remain-line b{color:var(--text);font-weight:700}
 .ex-rate-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
@@ -355,8 +362,12 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .bc-hints{margin-top:11px;display:flex;flex-direction:column;gap:7px}
 .bc-hint{font-size:12.5px;color:var(--text2);line-height:1.6;padding:8px 11px;border-radius:0 10px 10px 0;background:var(--bg-secondary)}
 .bc-note{font-size:10.5px;color:var(--text3);line-height:1.6;margin-top:9px}
-.st-chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 4px}
-.st-chip{font-size:12px;font-weight:600;padding:5px 11px;border-radius:11px}
+/* v3.13.31 估算说明折叠：默认收起，想看依据再展开 */
+.bc-more{margin-top:10px}
+.bc-more summary{font-size:11.5px;color:var(--text3);cursor:pointer;list-style:none;outline:none;padding:2px 0}
+.bc-more summary::-webkit-details-marker{display:none}
+.bc-more summary::before{content:'ⓘ '}
+.bc-more[open] summary{color:var(--text2)}
 .settings-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--card-border)}
 .settings-item:last-child{border-bottom:none}.settings-label{font-size:16px}
 .settings-input{width:80px;text-align:right;background:transparent;border:none;font-size:16px;font-weight:500;color:var(--text);font-family:inherit;outline:none}
@@ -615,13 +626,14 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <div class="card card-clickable" onclick="openCalorieBreakdown()">
       <div class="card-title">今日热量</div>
       <div class="calorie-main">
-        <div class="ring-wrap"><svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100" id="ringSvg"><circle class="ring-bg-circle" cx="50" cy="50" r="42"/><g id="ringLayers"></g></svg><div class="ring-center"><div class="ring-num" id="ringNum">0</div><div class="ring-unit">kcal</div></div><div class="ring-lap-tag" id="ringLapTag" style="display:none"></div></div>
+        <div class="ring-wrap"><svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100" id="ringSvg"><circle class="ring-bg-circle" cx="50" cy="50" r="42"/><g id="ringLayers"></g></svg><div class="ring-center"><div class="ring-num" id="ringNum">0</div><div class="ring-unit">已摄入 kcal</div></div><div class="ring-lap-tag" id="ringLapTag" style="display:none"></div></div>
         <div class="calorie-info">
-          <div class="calorie-row"><span class="calorie-row-label"><span class="ring-leg-dot" style="background:var(--blue)"></span>已摄入</span><span class="calorie-row-val" id="consumedVal" style="color:var(--blue)">0 kcal</span></div>
-          <div class="calorie-row"><span class="calorie-row-label"><span class="ring-leg-dot" style="background:var(--red)"></span>已消耗</span><span class="calorie-row-val" id="burnedVal" style="color:var(--red)">0 kcal</span></div>
-          <div class="calorie-row"><span class="calorie-row-label">推荐摄入</span><span class="calorie-row-val" id="targetVal">0 kcal</span></div>
-          <div class="calorie-status deficit" id="calorieStatus"><span id="calorieStatusText">热量缺口 0 kcal</span></div>
-          <div class="ex-summary-line" id="exSummaryLine" style="display:none"></div>
+          <div class="calorie-verdict none" id="calorieVerdict">还未摄入食物</div>
+          <div class="calorie-rows">
+            <div class="calorie-row"><span class="calorie-row-label"><span class="ring-leg-dot" style="background:var(--red)"></span>已消耗</span><span class="calorie-row-val" id="burnedVal" style="color:var(--red)">0 kcal</span></div>
+            <div class="calorie-row-sub" id="burnSplitLine"></div>
+            <div class="calorie-row"><span class="calorie-row-label"><span class="ring-leg-dot" style="background:var(--text3)"></span>推荐摄入</span><span class="calorie-row-val" id="targetVal">0 kcal</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1012,7 +1024,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.30</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.32</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法</div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1190,7 +1202,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="nbdTitle">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
 
   <!-- ===== BMI BREAKDOWN MODAL ===== -->
-  <div class="modal-overlay" id="bmiModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">BMI 详细分析</div><div id="bmiBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">请先在设置页填写身高体重</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('bmiModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
+  <div class="modal-overlay" id="bmiModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">BMI 详细分析</div><div id="bmiBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">请先在设置页填写身高体重</div></div></div><div class="modal-actions" style="display:flex;gap:8px"><button class="modal-btn primary" style="flex:1;width:auto" onclick="hideModal('bmiModal');switchPage('settings');openSettingsSub('goal')">去设置目标</button><button class="modal-btn danger" style="flex:1;width:auto;margin-top:0;background:rgba(118,118,128,0.1);color:var(--text2)" onclick="hideModal('bmiModal')">关闭</button></div></div></div></div></div>
 
   <!-- ===== CALORIE BREAKDOWN MODAL ===== -->
   <div class="modal-overlay" id="calorieModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">热量详情</div><div id="calorieBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">暂无数据</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('calorieModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
@@ -2112,36 +2124,33 @@ function renderCalorieSummary(){
   const bmr=Math.round(calcBMR(state.profile));
   const exBurn=exTotal();
   const burnedTotal=bmr+exBurn;
+  /* 圆环中心 = 已摄入（与蓝色弧一一对应，是全卡唯一一处该值，不再重复出现） */
   animateNumber(document.getElementById('ringNum'),total,{decimals:0});
-  document.getElementById('consumedVal').textContent=total+' kcal';
   document.getElementById('targetVal').textContent=target+' kcal';
   var burnedEl=document.getElementById('burnedVal');
   if(burnedEl)burnedEl.textContent=burnedTotal+' kcal';
+  /* 已消耗拆解由 renderExerciseSummary() 统一刷新（见该函数） */
   /* ===== v3.13.29 圆环：红弧打底=已消耗（可多圈往外扩），蓝弧叠上=已摄入 =====
      基准 = 推荐摄入 target（一圈代表"推荐摄入"这么多热量）。
      红圈数 = ceil(消耗 / target)，最后一圈按剩余比例画；
      蓝弧沿同一个起点顺时针叠加，吃多少就盖住多少红。 */
   renderCalorieRing(total,burnedTotal,target);
-  const statusEl=document.getElementById('calorieStatus');
-  const textEl=document.getElementById('calorieStatusText');
-  /* 缺口口径：目标 − 净摄入（净摄入 = 摄入 − 运动），BMR 属消耗侧，不抵摄入 */
-  const netIn=total-exBurn;
-  const gap=target-netIn;
-  if(total===0&&exBurn===0){
-    statusEl.className='calorie-status deficit';
-    textEl.textContent='还未摄入食物';
-  }else if(target>0&&gap>0){
-    statusEl.className='calorie-status deficit';
-    textEl.textContent='↓ 热量缺口 '+gap+' kcal';
-  }else if(target>0&&gap<=0&&gap>=-target*0.1){
-    statusEl.className='calorie-status warn';
-    textEl.textContent='热量平衡';
-  }else if(target>0){
-    statusEl.className='calorie-status surplus';
-    textEl.textContent='↑ 热量盈余 '+(-gap)+' kcal';
-  }else{
-    statusEl.className='calorie-status deficit';
-    textEl.textContent='已摄入 '+total+' kcal';
+  renderExerciseSummary();
+  /* ===== v3.13.32 结论上位：原来缩在绿色小条里的缺口/盈余，提为卡片主结论 =====
+     口径不变：净摄入 = 摄入 − 运动，缺口 = 推荐摄入 − 净摄入（BMR 属消耗侧，不抵摄入） */
+  var vEl=document.getElementById('calorieVerdict');
+  if(vEl){
+    const netIn=total-exBurn;
+    const gap=target-netIn;
+    var vCls='none',vTxt='';
+    if(total===0&&exBurn===0){vCls='none';vTxt='还未摄入食物';}
+    else if(target>0&&gap>0){vCls='deficit';vTxt='↓ 热量缺口 '+gap+' kcal';}
+    else if(target>0&&gap<=0&&gap>=-target*0.1){vCls='warn';vTxt='热量平衡';}
+    else if(target>0){vCls='surplus';vTxt='↑ 热量盈余 '+(-gap)+' kcal';}
+    else{vCls='none';vTxt='已摄入 '+total+' kcal';}
+    if(vEl.textContent!==vTxt)vEl.textContent=vTxt;
+    var vWant='calorie-verdict '+vCls;
+    if(vEl.className!==vWant)vEl.className=vWant;
   }
 }
 /* 画圆环：base=一圈代表多少 kcal（推荐摄入）；burn 红打底，intake 蓝叠加 */
@@ -2194,9 +2203,11 @@ function ringLapTagUpdate(laps){
   if(laps>1){
     var txt='消耗 ≈ '+laps+' 圈';
     if(tagEl.textContent!==txt)tagEl.textContent=txt;
-    tagEl.style.display='block';
-  }else if(tagEl.style.display!=='none'){
-    tagEl.style.display='none';
+    if(tagEl.style.display!=='block')tagEl.style.display='block';
+  }else{
+    if(tagEl.style.display!=='none')tagEl.style.display='none';
+    /* v3.13.32 隐藏时一并清空文本，否则 DOM 里会残留上一轮的「消耗 ≈ N 圈」 */
+    if(tagEl.textContent!=='')tagEl.textContent='';
   }
 }
 function renderNutrition(){
@@ -4752,9 +4763,38 @@ function openBmiBreakdown(){
   gauge+='<polygon points="'+(clampX-5).toFixed(1)+',20 '+(clampX+5).toFixed(1)+',20 '+clampX.toFixed(1)+',27" fill="'+info.color+'"/>';
   gauge+='<text x="'+clampX.toFixed(1)+'" y="15" font-size="10" font-weight="800" fill="#fff" text-anchor="middle">'+bmi.toFixed(1)+'</text>';
   gauge+='</svg>';
-  var gaugeHtml='<div class="info-modal-item"><div class="info-modal-item-title">📊 BMI 定位</div>'
+  /* v3.13.31 BMI×体脂 交叉判断：只在两者结论【不一致】时才展示。
+     一致时（ideal / overweight）它说的就是下面 desc 那句，纯复读。 */
+  var bfVal=bc?bc.fatRate:null;
+  var bfByNavy=(calcBodyFatNavy(profile)!==null);   /* 有围度才算实测，否则是 BMI 粗估 */
+  var fusionHtml='';
+  /* 关键：只在体脂来自围度实测时才做交叉判断。
+     若体脂是 BMI 粗估（误差 ±4~8%），据此说「你是肌肉型、无需减脂」可能把真需要减脂的人劝退。 */
+  if(bfVal!==null&&bfByNavy){
+    var bmiOk=bmi>=18.5&&bmi<25.0;
+    var bfOk=gender==='male'?(bfVal>=14&&bfVal<25):(bfVal>=21&&bfVal<32);
+    var fusion=getFusionType(bmi,bfVal,bmiOk,bfOk,gender);
+    if(fusion&&fusion.type!=='ideal'&&fusion.type!=='overweight'){
+      fusionHtml='<div class="cal-status-box" style="background:rgba(118,118,128,0.06);margin-top:10px">'
+        +'<div class="cal-status-icon">'+(fusion.icon||'💪')+'</div>'
+        +'<div><div class="cal-status-title" style="color:'+(fusion.color||'var(--text)')+'">'+(fusion.label||'')+'</div>'
+        +'<div class="cal-status-desc" style="color:var(--text2)">'+(fusion.msg||'')+'</div></div></div>';
+    }
+  }
+  /* v3.13.31 融合类型与 BMI 单项结论【方向相反】时（肌肉型/运动员型），
+     desc（BMI 单项的政策文案，如「必须执行减脂管理」）会与它自相矛盾，让位给综合判断。 */
+  var bfConflict=!!(fusion&&(fusion.type==='muscular'||fusion.type==='athletic'));
+  /* 结论优先：仪表 → 单项结论(label+status) → 建议(desc) → 交叉修正 */
+  var gaugeHtml='<div class="info-modal-item">'
+    +'<div class="info-modal-item-title">📊 BMI 定位</div>'
     +'<div class="info-modal-item-desc" style="padding:0">'+gauge+'</div>'
-    +'<div style="text-align:center;font-size:12px;color:var(--text2);margin-top:2px">'+info.label+'</div></div>';
+    +'<div style="text-align:center;margin-top:4px">'
+      +'<span style="font-size:13.5px;font-weight:700;color:'+info.color+'">'+info.label+'</span>'
+      +(info.status?'<span style="font-size:12px;color:var(--text2);margin-left:7px">'+info.status+'</span>':'')
+    +'</div>'
+    +(bfConflict?'':('<div style="font-size:12.5px;color:var(--text2);line-height:1.65;margin-top:9px;padding:9px 11px;border-radius:10px;background:var(--bg-secondary)">'+info.desc+'</div>'))
+    +fusionHtml
+  +'</div>';
 
   /* ===== ② 身体成分分析 ===== */
   var compHtml='';
@@ -4794,59 +4834,76 @@ function openBmiBreakdown(){
       +bar
       +'<div class="bc-rows">'+rowsHtml+'</div>'
       +hintHtml
-      +'<div class="bc-note">成分按体重+体脂率估算（去脂体重按水分 73%、骨量 7% 固定比例拆分，肌肉按体重比例推算），与体脂秤实测会有出入，趋势参考即可。血液属水分的一部分，单独列出仅供参考。</div>'
+      +'<details class="bc-more"><summary>这些数字是怎么估出来的</summary>'
+        +'<div class="bc-note" style="margin-top:4px">成分按体重+体脂率估算（去脂体重按水分 73%、骨量 7% 固定比例拆分，肌肉按体重比例推算），与体脂秤实测会有出入，趋势参考即可。血液属水分的一部分，单独列出仅供参考。</div>'
+      +'</details>'
       +'</div>';
   }else{
     compHtml='<div class="info-modal-item"><div class="info-modal-item-title">🧬 身体成分分析</div>'
       +'<div class="bc-weight" style="color:var(--text3)">填好身高体重后这里会给出脂肪/肌肉/骨骼肌/水分/骨量等成分拆分；填腰围颈围用 Navy 公式更准。</div></div>';
   }
 
-  /* ===== ③ 目标体重范围 ===== */
-  var minW=(18.5*Math.pow(hh/100,2)).toFixed(1);
-  var maxW=(24*Math.pow(hh/100,2)).toFixed(1);
+  /* ===== ② 目标与进度（行动优先，放到成分明细前面） ===== */
+  var minW=+(18.5*Math.pow(hh/100,2)).toFixed(1);
+  var maxW=+(24*Math.pow(hh/100,2)).toFixed(1);
   var idealW=Math.round(22*Math.pow(hh/100,2));
   var wwNum=parseFloat(ww);
-  var toLose=wwNum>maxW?(wwNum-maxW).toFixed(1):0;
-  var toGain=wwNum<minW?(minW-wwNum).toFixed(1):0;
-  var weightRangeHtml='<div class="bmi-target-range">健康体重范围: <strong>'+minW+' ~ '+maxW+' kg</strong>'+
-    (toLose>0?'<br><span style="color:var(--orange)">需要减 <strong>'+toLose+' kg</strong> 进入健康区间</span>':'')+
-    (toGain>0?'<br><span style="color:var(--green)">需要增 <strong>'+toGain+' kg</strong> 进入健康区间</span>':'')+
-    (toLose==0&&toGain==0?'<br><span style="color:var(--green)">✅ 当前体重已在健康范围内</span>':'')+
-    '<br><span style="color:var(--text2);font-size:12px">理想体重 '+(profile.goal==='gain'?idealW+' kg (BMI 22)<br>增肌期建议 '+(idealW+5)+'~'+(idealW+10)+' kg':idealW+' kg')+'</span></div>';
-
-  /* ===== ④ 状态：标签墙 + 一句话 ===== */
-  var chips=[];
-  if(bc){
-    var fg=bcGrade('fat',bc);
-    chips.push({c:fg.color,t:'体脂 '+bc.fatRate+'% · '+fg.label});
-    chips.push({c:bcGrade('muscle',bc).color,t:'骨骼肌 '+bc.muscleRate+'%'});
-    chips.push({c:bcGrade('water',bc).color,t:'水分 '+bc.waterRate+'%'});
-    chips.push({c:bcGrade('bone',bc).color,t:'骨量 '+bc.bone+' kg'});
-  }
-  chips.push({c:info.color,t:'BMI '+bmi.toFixed(1)+' · '+info.label});
-  var chipsHtml='<div class="st-chips">'+chips.map(function(ch){
-    return '<span class="st-chip" style="color:'+ch.c+';background:color-mix(in srgb,'+ch.c+' 12%, transparent);border:0.5px solid color-mix(in srgb,'+ch.c+' 35%, transparent)">'+ch.t+'</span>';
-  }).join('')+'</div>';
-  var bfVal=bc?bc.fatRate:null;
-  var fusionHtml='';
-  if(bfVal!==null){
-    var bmiOk=bmi>=18.5&&bmi<25.0;
-    var bfOk=gender==='male'?(bfVal>=14&&bfVal<25):(bfVal>=21&&bfVal<32);
-    var fusion=getFusionType(bmi,bfVal,bmiOk,bfOk,gender);
-    if(fusion){
-      fusionHtml='<div class="cal-status-box" style="background:rgba(118,118,128,0.06);margin-top:10px"><div class="cal-status-icon">'+(fusion.icon||'💪')+'</div><div><div class="cal-status-title" style="color:'+(fusion.color||'var(--text)')+'">'+(fusion.label||'')+'</div><div class="cal-status-desc" style="color:var(--text2)">'+(fusion.msg||'')+'</div></div></div>';
+  var toLose=wwNum>maxW?+(wwNum-maxW).toFixed(1):0;
+  var toGain=wwNum<minW?+(minW-wwNum).toFixed(1):0;
+  var tw=targetWeightForPlan();
+  /* 体重轴：把「当前 / 健康区间 / 目标」画在同一根轴上 */
+  var lo=Math.min(wwNum,minW)-(maxW-minW)*0.28;
+  var hi=Math.max(wwNum,maxW)+(maxW-minW)*0.28;
+  if(tw>0){lo=Math.min(lo,tw-(maxW-minW)*0.15);hi=Math.max(hi,tw+(maxW-minW)*0.15)}
+  var spanW=(hi-lo)||1;
+  var ax=function(v){return 14+(v-lo)/spanW*272};
+  var axT=function(v){return Math.max(36,Math.min(264,ax(v)))};
+  var twDot=(tw>0&&Math.abs(tw-wwNum)>0.05);
+  var axSvg='<svg width="100%" height="72" viewBox="0 0 300 72" style="display:block;margin:4px 0 0">'
+    +'<rect x="12" y="36" width="276" height="8" rx="4" fill="var(--input-bd)"/>'
+    +'<rect x="'+ax(minW).toFixed(1)+'" y="36" width="'+Math.max(4,ax(maxW)-ax(minW)).toFixed(1)+'" height="8" rx="4" fill="var(--green)" opacity="0.75"/>'
+    +(twDot?('<text x="'+axT(tw).toFixed(1)+'" y="65" font-size="11" font-weight="700" fill="var(--orange)" text-anchor="middle">目标 '+tw+' kg</text>'
+      +'<circle cx="'+ax(tw).toFixed(1)+'" cy="40" r="5" fill="#fff" stroke="var(--orange)" stroke-width="2.5"/>'):'')
+    +'<text x="'+axT(wwNum).toFixed(1)+'" y="24" font-size="11" font-weight="700" fill="var(--blue)" text-anchor="middle">当前 '+wwNum+' kg</text>'
+    +'<circle cx="'+ax(wwNum).toFixed(1)+'" cy="40" r="6" fill="#fff" stroke="var(--blue)" stroke-width="2.5"/>'
+    +'</svg>';
+  /* 体脂进度（复用热量弹窗的 ex-bf-line 样式，风格保持一致）
+     注意：calcBodyFat() 在没围度时会 fallback 到 BMI 法，所以 bfVal 几乎总有值。
+     但「Navy 实测」与「BMI 粗估」精度差一档，必须标出来，不能让人误当实测值。 */
+  var bfProg='';
+  if(bfVal!==null&&bfVal>0){
+    var tbf=parseFloat(profile.targetBF);
+    var line='当前体脂 <b>'+bfVal+'%</b>'+(bfByNavy?'':'<span style="color:var(--orange)">（估算）</span>');
+    if(tbf>0){
+      var dGap=+(bfVal-tbf).toFixed(1);
+      line+=' → 目标 <b>'+tbf+'%</b>'
+        +(dGap>0?('<span style="color:var(--text3)">　还需降 '+dGap+' 个百分点</span>'):('<span style="color:var(--green)">　已达标</span>'));
+    }else{
+      line+='<span style="color:var(--text3)">　未设目标体脂（设置 › 身体测量与体脂）</span>';
     }
+    bfProg='<div class="ex-bf-line">'+line+'</div>'
+      +(bfByNavy?'':'<div class="ex-bf-note">体脂按 BMI 粗估（误差 ±4~8%），填腰围+颈围用 Navy 公式更准</div>');
+  }else{
+    bfProg='<div class="ex-bf-line" style="color:var(--text3)">体脂暂无法估算，填腰围+颈围即可显示</div>';
   }
-  var statusHtml='<div class="info-modal-item" style="border-bottom:none"><div class="info-modal-item-title">🩺 综合状态</div>'
-    +chipsHtml+fusionHtml+'</div>';
+  var targetHtml='<div class="info-modal-item">'
+    +'<div class="info-modal-item-title">🎯 目标与进度</div>'
+    +axSvg
+    +'<div class="bmi-target-range" style="margin-top:8px">'
+      +'健康体重 <strong>'+minW+' ~ '+maxW+' kg</strong>'
+      +(toLose>0?'<br><span style="color:var(--orange)">还需减 <strong>'+toLose+' kg</strong> 进入健康区间</span>'+(bfConflict?'<span style="color:var(--text3);font-size:11.5px">（BMI 标准 · 肌肉量大时会高估）</span>':''):'')
+      +(toGain>0?'<br><span style="color:var(--green)">还需增 <strong>'+toGain+' kg</strong> 进入健康区间</span>':'')
+      +(toLose===0&&toGain===0?'<br><span style="color:var(--green)">✅ 当前体重已在健康范围内</span>':'')
+      +'<br><span style="color:var(--text2);font-size:12px">理想体重 '+(profile.goal==='gain'?(idealW+' kg（BMI 22）<br>增肌期建议 '+(idealW+5)+'~'+(idealW+10)+' kg'):(idealW+' kg'))+'</span>'
+    +'</div>'
+    +bfProg
+  +'</div>';
 
+  /* 顺序：定位 → 目标与进度 → 成分明细（明细是细则，放最后） */
   content='<div class="info-modal-body">'+
     gaugeHtml+
+    targetHtml+
     compHtml+
-    '<div class="info-modal-item"><div class="info-modal-item-title">🎯 目标体重范围</div>'+
-      weightRangeHtml+
-    '</div>'+
-    statusHtml+
   '</div>';
   document.getElementById('bmiBreakdownContent').innerHTML=content;
   showModal('bmiModal');
@@ -5015,11 +5072,17 @@ function addDaysStr(base,n){
   var d=new Date(base.getTime());d.setDate(d.getDate()+n);
   return (d.getMonth()+1)+'月'+d.getDate()+'日';
 }
+/* v3.13.32 修 Bug：原来这里往 #exSummaryLine 里写内容，
+   但那个元素在 HTML 里写死了 style="display:none" 且从没人打开过 —— 实测内容有、高度 0、
+   offsetParent 为 null，也就是「今日运动 −532 kcal · 净摄入 1100 / 2072」从来没显示过。
+   而卡片的缺口算式（推荐 − (摄入 − 运动)）又依赖运动这个数，等于给了一个算不出来的结论。
+   现在运动并进「已消耗」的拆解副行：基础 1773 + 运动 532，算式即可自验。
+   函数名与全部调用点保持不变，零改动风险。 */
 function renderExerciseSummary(){
-  var el=document.getElementById('exSummaryLine');if(!el)return;
+  var el=document.getElementById('burnSplitLine');if(!el)return;
   var g=exGapInfo();
-  if(g.burned<=0){el.innerHTML='';return}
-  el.innerHTML='今日运动 <span style="color:var(--red);font-weight:700">−'+g.burned+'</span> kcal · 净摄入 '+g.net+' / '+g.target+' kcal';
+  var txt=g.burned>0?('基础 '+g.bmr+' + 运动 '+g.burned):('基础代谢 '+g.bmr);
+  if(el.textContent!==txt)el.textContent=txt;
 }
 function openCalorieBreakdown(){
   const foods=getTodayFoods();
