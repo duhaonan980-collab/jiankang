@@ -338,25 +338,62 @@
   ];
 
   function byName(n){var hit=null;((typeof FOOD_DB!=='undefined'?FOOD_DB:[])||[]).forEach(function(f){if(f.name===n)hit=f});return hit}
+
+  /* v3.13.33 食物库换成 USDA 生鲜库后，原来「取 FOOD_DB 同名菜肴」的取数方式失效
+     （184 条菜肴已随旧库移除，若不改则 150 道菜谱营养全部变成 0）。
+     改为：按配料逐项映射到 USDA 生鲜条目，用每 100g 官方值 × 克重现算整份营养。
+     映射表见 ing-alias.js；映射不到的主食/调味料在 USDA 生鲜库里确实没有，
+     按 0 计 —— 做法与用量展示不受影响。 */
+  var ALIAS=(typeof window!=='undefined'&&window.INGR_ALIAS)?window.INGR_ALIAS:{};
+  function resolveIngr(name){
+    if(ALIAS[name]!=null)return byName(ALIAS[name]);
+    var direct=byName(name);if(direct)return direct;
+    var base=String(name).replace(/（生）\$/,'');
+    var m=new RegExp('^'+base.replace(/[.*+?^\${}()|[\]\\\\]/g,'\\\\\$&')+'（生）\$');
+    var hit=null;((typeof FOOD_DB!=='undefined'?FOOD_DB:[])||[]).forEach(function(f){if(m.test(f.name))hit=f});
+    return hit;
+  }
+
   function catOf(p,c,fi){p=+p||0;c=+c||0;fi=+fi||0;if(p+c+fi<=0)return '';if(p>=c&&p>=fi)return '高蛋白';if(fi>=p&&fi>=c)return '高纤维';return '高碳水'}
-  /* 配料只用于做法展示；整份营养取 FOOD_DB 同名菜肴权威每100g × 整份估重 */
   var out=[];
   RAW.forEach(function(r,idx){
-    var dish=byName(r.name);
-    if(!dish)console.warn('[recipes.js] 未找到同名菜肴(营养按0):',r.name);
-    var per={cal:dish?(dish.cal||0):0,p:dish?(dish.p||0):0,c:dish?(dish.c||0):0,f:dish?(dish.f||0):0,fi:dish?(dish.fi||0):0,va:dish?(dish.va||0):0,vc:dish?(dish.vc||0):0};
-    var ingrs=(r.ingrs||[]).map(function(x){
-      var db=byName(x.name);
-      return{name:x.name,icon:(db&&db.icon)||'🍽️',gram:x.gram};
+    /* 先把配料解析成 USDA 条目 */
+    var resolved=(r.ingrs||[]).map(function(x){return{name:x.name,gram:x.gram,db:resolveIngr(x.name)}});
+    /* v3.13.33 修正口径：RAW 里的 ingrs 是「整锅」的量（如红烧肉 400g 猪肉），
+       而 servingG 是「一份」的量（如 250g）。所以：
+       先算出整锅的总营养，再按 servingG/整锅总克数 折算成「每份」。
+       原来直接 per×servingG/100 会把 5 斤猪肉的热量全算进一份里 —— 实测
+       红烧肉算出 1831kcal/份，是真实值的 3 倍多。 */
+    var totG=resolved.reduce(function(s,x){return s+x.gram},0)||1;
+    /* v3.13.34：营养累加扩展到全部 22 项。之前只累加 7 项，
+       「更多营养素」页对菜谱算出来会全是 0。 */
+    var EXT=['water','ash','sugar','na','ca','fe','mg','phos','k','zn','cu','mn','b1','b2','b3','b6','fol'];
+    var tot={cal:0,p:0,c:0,f:0,fi:0,va:0,vc:0};
+    EXT.forEach(function(n){tot[n]=0});
+    resolved.forEach(function(x){
+      if(!x.db)return;
+      var k=x.gram/100;
+      tot.cal+=(x.db.cal||0)*k;tot.p+=(x.db.p||0)*k;tot.c+=(x.db.c||0)*k;
+      tot.f+=(x.db.f||0)*k;tot.fi+=(x.db.fi||0)*k;tot.va+=(x.db.va||0)*k;tot.vc+=(x.db.vc||0)*k;
+      EXT.forEach(function(n){tot[n]+=(x.db[n]||0)*k});
     });
-    var totG=ingrs.reduce(function(s,x){return s+x.gram},0)||1;
+    /* 每 100g 可食部的营养（供 UI 展示与比例计算） */
+    var per={cal:tot.cal/totG*100,p:tot.p/totG*100,c:tot.c/totG*100,f:tot.f/totG*100,
+             fi:tot.fi/totG*100,va:tot.va/totG*100,vc:tot.vc/totG*100};
+    EXT.forEach(function(n){per[n]=tot[n]/totG*100});
+    /* 做法展示用：保留原配料名，图标从 USDA 条目借 */
+    var ingrs=resolved.map(function(x){return{name:x.name,icon:(x.db&&x.db.icon)||'🍽️',gram:x.gram}});
     var servingG=r.servingG||totG;
-    var k=servingG/100;
+    /* 每份 = 整锅 × (servingG / 整锅总克数) */
+    var k=servingG/totG;
     var rec={id:'b'+(idx+1),builtin:true,name:r.name,icon:r.icon||'🍳',img:null,time:r.time||10,season:r.season||'',ingrs:ingrs,steps:(r.steps||[]).slice(),servingG:servingG,
-      cal:Math.round(per.cal*k),p:+(per.p*k).toFixed(1),c:+(per.c*k).toFixed(1),f:+(per.f*k).toFixed(1),fi:+(per.fi*k).toFixed(1),va:Math.round(per.va*k),vc:+(per.vc*k).toFixed(1),
-      cat:catOf(per.p*k,per.c*k,per.fi*k),createdAt:0,_per:per};
+      cal:Math.round(tot.cal*k),p:+(tot.p*k).toFixed(1),c:+(tot.c*k).toFixed(1),f:+(tot.f*k).toFixed(1),fi:+(tot.fi*k).toFixed(1),va:Math.round(tot.va*k),vc:+(tot.vc*k).toFixed(1),
+      cat:catOf(tot.p*k,tot.c*k,tot.fi*k),createdAt:0,_per:per};
+    /* 扩展项按「每份」另存一份（x_ 前缀），供「更多营养素」页直接读取 */
+    EXT.forEach(function(n){rec['x_'+n]=+(tot[n]*k).toFixed(2)});
     out.push(rec);
   });
   window.BUILTIN_RECIPES=out;
-  console.log('[recipes.js] 内置菜谱加载',out.length,'道');
+  var zeroN=out.filter(function(x){return x.cal===0}).length;
+  console.log('[recipes.js] 内置菜谱加载',out.length,'道；营养按 USDA 生鲜配料现算，0 热量道数：',zeroN);
 })();
