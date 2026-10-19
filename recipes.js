@@ -381,8 +381,10 @@
     var per={cal:tot.cal/totG*100,p:tot.p/totG*100,c:tot.c/totG*100,f:tot.f/totG*100,
              fi:tot.fi/totG*100,va:tot.va/totG*100,vc:tot.vc/totG*100};
     EXT.forEach(function(n){per[n]=tot[n]/totG*100});
-    /* 做法展示用：保留原配料名，图标从 USDA 条目借 */
-    var ingrs=resolved.map(function(x){return{name:x.name,icon:(x.db&&x.db.icon)||'🍽️',gram:x.gram}});
+    /* 做法展示用：保留原配料名，图标从 USDA 条目借。
+       v3.13.38：_no=1 标记「USDA 生鲜库无对应条目，营养未计入」，
+       详情页配料行会给它加个灰色角标，避免让人误以为这份菜谱算全了。 */
+    var ingrs=resolved.map(function(x){return{name:x.name,icon:(x.db&&x.db.icon)||'🍽️',gram:x.gram,_no:x.db?0:1}});
     var servingG=r.servingG||totG;
     /* 每份 = 整锅 × (servingG / 整锅总克数) */
     var k=servingG/totG;

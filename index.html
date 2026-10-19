@@ -180,6 +180,10 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .rcat{font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;border:none;background:rgba(118,118,128,0.10);color:var(--text2);font-family:inherit;cursor:pointer;flex-shrink:0}
 .rcat.active{background:var(--blue);color:#fff}
 .rcat-chip{font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px}
+/* v3.13.38 菜谱配料「未计营养」中性灰角标（不抢眼，只作说明） */
+.rcp-no-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;background:rgba(118,118,128,0.14);color:var(--text3);vertical-align:1px;white-space:nowrap}
+/* v3.13.40 一日菜单里「认不出在新库」的旧食材标记 */
+.menu-old-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;background:rgba(var(--orange-rgb,255,149,0),.14);color:var(--orange);vertical-align:1px;white-space:nowrap}
 .rcp-sub-title{font-size:13px;font-weight:600;color:var(--text2);display:flex;align-items:center;justify-content:space-between;margin:16px 0 6px;padding-top:10px;border-top:0.5px solid var(--card-border)}
 .rcp-f{width:100%;border:1.5px solid var(--input-bd);border-radius:10px;background:var(--card-bg);color:var(--text);padding:10px 12px;font-size:15px;outline:none;font-family:inherit;box-sizing:border-box;-webkit-appearance:none}
 .search-input{border:1.5px solid var(--input-bd);background:var(--card-bg)}
@@ -1076,7 +1080,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.37</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.42</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1226,7 +1230,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   <div class="modal-overlay" id="amountModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="amountModalTitle">确认食物信息</div><div class="food-preview"><span class="food-preview-icon" id="amountIcon">🍽️</span><div class="food-preview-name" id="amountName">食物名称</div></div><div class="amount-input-wrap"><input class="amount-input" type="number" id="amountInput" value="100" step="0.5" inputmode="decimal" oninput="updateAmountResult()"><span class="amount-unit" id="amountUnit">克</span></div><div class="amount-quick" id="amountQuick"><button class="amount-quick-btn" onclick="setAmount(50,this)">50g</button><button class="amount-quick-btn active" onclick="setAmount(100,this)">100g</button><button class="amount-quick-btn" onclick="setAmount(150,this)">150g</button><button class="amount-quick-btn" onclick="setAmount(200,this)">200g</button><button class="amount-quick-btn" onclick="setAmount(300,this)">300g</button></div><div class="amount-tip" id="amountTip">💡 估不准重量？</div><div class="amount-result">热量约 <strong id="amountCalories">0</strong> kcal</div><div class="meal-select"><div class="seg-control" id="mealControl"><div class="seg-item" data-meal="breakfast" onclick="setMeal('breakfast')">早餐</div><div class="seg-item" data-meal="lunch" onclick="setMeal('lunch')">午餐</div><div class="seg-item" data-meal="dinner" onclick="setMeal('dinner')">晚餐</div><div class="seg-item" data-meal="snack" onclick="setMeal('snack')">加餐</div></div></div></div><div class="modal-actions"><button class="modal-btn primary" id="amountConfirmBtn" onclick="confirmAddFood()">添加到今日记录</button><button class="modal-btn danger" onclick="closeAmountModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="searchModalTitle">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="search-source-note">数据来自美国农业部（USDA FoodData Central）· 每 100 克生鲜食材</div><div class="cat-filter" id="catFilter"></div><div class="search-results" id="searchResults"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:0">关闭</button></div></div></div></div></div>
+  <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="searchModalTitle">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="search-source-note">数据来自美国农业部（USDA FoodData Central）· 每 100 克可食部</div><div class="cat-filter" id="catFilter"></div><div class="search-results" id="searchResults"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:0">关闭</button></div></div></div></div></div>
   <div class="modal-overlay" id="recAllModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll">
     <div class="modal-title">全部推荐</div>
     <div class="search-input-wrap" style="margin:2px 0 8px"><span class="search-icon">🔍</span><input class="search-input" id="recAllSearch" placeholder="搜索你的菜…" oninput="renderRecAllList()"></div>
@@ -1251,7 +1255,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
 <div class="modal-overlay" id="backupSetupModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">设置备用密码</div><div style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:16px">忘记图案时可用备用密码解锁</div><div style="margin-bottom:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">备用密码（数字或汉字）</div><input class="backup-setup-input" id="backupPasswordInput" type="text" placeholder="输入备用密码" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('backupHintInput').focus()"></div><div style="margin-bottom:16px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">密码提示（帮助回忆密码）</div><input class="backup-setup-input" id="backupHintInput" type="text" placeholder="输入提示，如：我的生日" style="width:100%;padding:10px 14px;font-size:17px;border-radius:12px;border:1.5px solid rgba(118,118,128,0.2);background:var(--card);color:var(--text);font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveBackupPassword()"></div></div><div class="modal-actions"><button class="modal-btn primary" onclick="saveBackupPassword()">保存</button><button class="modal-btn danger" onclick="skipBackupPassword()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">跳过</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="nbdTitle">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button><button class="nutri-breakdown-tab" data-nbd-nutri="more" onclick="switchNbdTab('more')">更多营养素</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
+  <div class="modal-overlay" id="nutritionModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="nbdTitle">营养素来源</div><div class="nutri-breakdown-tabs" id="nbdTabs"><button class="nutri-breakdown-tab active" data-nbd-nutri="more" onclick="switchNbdTab('more')">更多营养素</button><button class="nutri-breakdown-tab" data-nbd-nutri="protein" onclick="switchNbdTab('protein')">蛋白质</button><button class="nutri-breakdown-tab" data-nbd-nutri="carbs" onclick="switchNbdTab('carbs')">碳水</button><button class="nutri-breakdown-tab" data-nbd-nutri="fat" onclick="switchNbdTab('fat')">脂肪</button><button class="nutri-breakdown-tab" data-nbd-nutri="fiber" onclick="switchNbdTab('fiber')">纤维</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitA" onclick="switchNbdTab('vitA')">维A</button><button class="nutri-breakdown-tab" data-nbd-nutri="vitC" onclick="switchNbdTab('vitC')">维C</button></div><div class="nbd-content" id="nbdContent"><div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物</div></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="hideModal('nutritionModal')" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:8px">关闭</button></div></div></div></div></div>
 
   <!-- ===== BMI BREAKDOWN MODAL ===== -->
   <div class="modal-overlay" id="bmiModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title">BMI 详细分析</div><div id="bmiBreakdownContent"><div style="text-align:center;padding:40px;color:var(--text3)">请先在设置页填写身高体重</div></div></div><div class="modal-actions" style="display:flex;gap:8px"><button class="modal-btn primary" style="flex:1;width:auto" onclick="hideModal('bmiModal');switchPage('settings');openSettingsSub('goal')">去设置目标</button><button class="modal-btn danger" style="flex:1;width:auto;margin-top:0;background:rgba(118,118,128,0.1);color:var(--text2)" onclick="hideModal('bmiModal')">关闭</button></div></div></div></div></div>
@@ -1513,8 +1517,8 @@ function clearAllPhotoData(){
   });
 }
 
-function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes,onboarded:!!state.onboarded,menu:state.menu||[],menuPlans:state.menuPlans||[],pages:state.pages||{},exerciseLogs:state.exerciseLogs||{},exerciseTags:state.exerciseTags||[]}))}catch(e){showToast('存储失败')}}
-function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];state.onboarded=!!d.onboarded;state.menu=d.menu||[];state.menuPlans=d.menuPlans||[];state.pages=d.pages||{};state.exerciseLogs=d.exerciseLogs||{};state.exerciseTags=Array.isArray(d.exerciseTags)?d.exerciseTags:null;/* 兼容旧版 weightRecords: 数字 → {w,waist} */
+function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes,onboarded:!!state.onboarded,menu:state.menu||[],menuPlans:state.menuPlans||[],menuLib:state.menuLib||'',pages:state.pages||{},exerciseLogs:state.exerciseLogs||{},exerciseTags:state.exerciseTags||[]}))}catch(e){showToast('存储失败')}}
+function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];state.onboarded=!!d.onboarded;state.menu=d.menu||[];state.menuPlans=d.menuPlans||[];state.menuLib=d.menuLib||'';state.pages=d.pages||{};state.exerciseLogs=d.exerciseLogs||{};state.exerciseTags=Array.isArray(d.exerciseTags)?d.exerciseTags:null;/* 兼容旧版 weightRecords: 数字 → {w,waist} */
 Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';if(typeof state.profile.targetBF==='undefined')state.profile.targetBF=0}}catch(e){console.error(e)}}
 
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -2014,7 +2018,7 @@ function openSearchModal(target){
 function closeSearchModal(){hideModal('searchModal')}
 /* v3.13.33 食物库换成 USDA 生鲜库后，分类随库走：蔬菜/水果/肉类/水产/主食/蛋奶（+自定义），
    原来的 饮料/零食/菜肴/原料 已随旧库一起移除 */
-function renderCatFilter(){const cats=['all','蔬菜','水果','肉类','水产','主食','蛋奶','自定义'];document.getElementById('catFilter').innerHTML=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('')}
+function renderCatFilter(){const cats=['all','蔬菜','水果','肉类','水产','主食','蛋奶','坚果','种子','油脂','糖类','酒类','自定义'];document.getElementById('catFilter').innerHTML=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('')}
 function setCat(c){state.currentCat=c;renderCatFilter();searchFood()}
 function getAllFoods(){
   /* 自定义菜肴(菜谱同步)同名时"顶替"食品库内置菜肴：主页搜索只保留修改后的版本 */
@@ -4314,13 +4318,16 @@ function openRecipeDetail(id){
   }
   var chip='';
   if(rec.cat){var cc=_rcpChip(rec.cat);chip='<span class="rcat-chip" style="background:'+cc[0]+';color:'+cc[1]+';font-size:13px;padding:4px 12px">'+rec.cat+'</span>'}
+  var _noList=(rec.ingrs||[]).filter(function(x){return x._no===1}).map(function(x){return x.name});
   var ingrRows=(rec.ingrs||[]).map(function(x,i){
-    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--card-border)">'
+    var no=x._no===1;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--card-border)'+(no?';opacity:.62':'')+'">'
       +'<span style="font-size:18px">'+(x.icon||'🍽️')+'</span>'
-      +'<span style="flex:1;font-size:14px">'+x.name+'</span>'
+      +'<span style="flex:1;font-size:14px">'+x.name+(no?' <span class="rcp-no-tag">未计营养</span>':'')+'</span>'
       +'<span data-sg="'+i+'" style="font-size:13px;color:var(--text2)">'+x.gram+'g</span></div>';
   }).join('');
   if(!ingrRows)ingrRows='<div style="color:var(--text3);font-size:13px;padding:6px 0">未填食材</div>';
+  var noNote=_noList.length?'<div style="font-size:12px;line-height:1.6;color:var(--text3);padding:8px 2px 0">ℹ️ <b style="color:var(--text2)">'+_noList.length+' 样食材 USDA 生鲜库无对应条目，营养未计入</b>：'+_noList.join('、')+'。做法与用量不受影响。</div>':'';
   var stepHtml=(rec.steps&&rec.steps.length)?rec.steps.map(function(s,i){
     return '<div style="display:flex;gap:10px;padding:9px 0"><span style="width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</span><div style="font-size:14px;line-height:1.6;padding-top:1px;flex:1" data-si="'+i+'">'+s+'</div></div>';
   }).join(''):'<div style="color:var(--text3);font-size:13px;padding:6px 0">还没写步骤</div>';
@@ -4347,7 +4354,7 @@ function openRecipeDetail(id){
       +'<div style="font-size:11px;color:var(--text3);margin-top:7px;line-height:1.5">默认一份 = 原材料合计 '+_rcpG0+'g。输入今次要做的总重（如 100g），各食材与营养自动等比缩放；调料请按同比例自行减量。</div>'
     +'</div>'
     +(rec.season?'<div class="card" style="margin:10px 0"><div class="card-title">调料</div><div style="font-size:14px;line-height:1.6">'+rec.season+'</div></div>':'')
-    +'<div class="card" style="margin:10px 0"><div class="card-title" id="rcpIngrTitle">食材 · '+_rcpG0+'g</div>'+ingrRows+'</div>'
+    +'<div class="card" style="margin:10px 0"><div class="card-title" id="rcpIngrTitle">食材 · '+_rcpG0+'g</div>'+ingrRows+noNote+'</div>'
     +'<div class="card" style="margin:10px 0"><div class="card-title">步骤</div>'+stepHtml+'</div>'
     +(rec.builtin?'':'<button onclick="delRecipeFromDetail()" style="width:100%;margin:20px 0 0;border:0.5px solid rgba(255,59,48,0.35);border-radius:14px;background:transparent;color:var(--red);font-size:14px;font-weight:600;font-family:inherit;padding:13px;cursor:pointer">删除这道菜</button>')
     +'</div>';
@@ -4392,7 +4399,10 @@ function setRecipeCat(cat){pickRecipeCat(cat)}
 /* ===== 一日饮食菜单：独立的「打算吃」清单，不计入今日摄入统计 =====
    item = {id,name,icon,cat,amount,unit,meal,sc,per{cal,p,c,f,fi,va,vc},staple,img}
    per 为「每 sc 单位」的基准值（普通食物 sc=100 即每100g；菜谱 sc=1 即每份），折算 = per × amount/sc
-   staple=true 为常备项：每天固定要吃，不随「只留常备」被清掉 */
+   staple=true 为常备项：每天固定要吃，不随「只留常备」被清掉
+
+   v3.13.40 食材库换 USDA 后，存量菜单项的 per 是**旧库快照**，名称也可能是旧的。
+   下面 migrateMenuToNewLib() 在启动时把能认出来的项按名字回新库重取营养值。 */
 var _MENU_MEALS=[{key:'breakfast',name:'早餐',icon:'🌅'},{key:'lunch',name:'午餐',icon:'☀️'},{key:'dinner',name:'晚餐',icon:'🌙'},{key:'snack',name:'加餐',icon:'🍪'}];
 function menuList(){if(!state.menu)state.menu=[];return state.menu}
 function _menuGuessMeal(){var h=new Date().getHours();return h<10?'breakfast':(h<15?'lunch':(h<20?'dinner':'snack'))}
@@ -4405,6 +4415,148 @@ function menuItemNutri(it){
   EXT_NUTRI_KEYS.forEach(function(n){o[n]=Math.round(((+p[n]||0)*k)*100)/100});
   return o;
 }
+/* ---------- v3.13.40 菜单存量项对齐新食材库 ----------
+   问题：菜单项把营养值 per「烤」进了 localStorage。换 USDA 库后，存量项
+   仍是旧库名称 + 旧库营养（例如旧库「鸡胸肉」条目、已删除的「红烧肉」菜肴）。
+   做法：按名字回新库重取；认不出来的打 _old 标记，UI 显示「旧库」角标，
+   数据一律不删（老杜的菜单是他的资产，只做标记和尽力修复）。 */
+function _menuFindInNewLib(name){
+  var i;
+  var F=(typeof FOOD_DB!=='undefined'?FOOD_DB:[])||[];
+  /* 1) 精确同名 */
+  for(i=0;i<F.length;i++){if(F[i].name===name){return{k:'food',f:F[i]}}}
+  /* 2) 自定义食物（用户自己录的，永远有效） */
+  var cf=(state.customFoods||[]).filter(function(x){return x.name===name})[0];
+  if(cf)return{k:'food',f:cf};
+  /* 3) 内置菜谱 / 自建菜谱 —— 走「每份」口径，营养不从 FOOD_DB 取 */
+  var br=((typeof BUILTIN_RECIPES!=='undefined'?BUILTIN_RECIPES:[])||[]).filter(function(x){return x.name===name})[0];
+  if(!br)br=(state.recipes||[]).filter(function(x){return x.name===name})[0];
+  if(br)return{k:'recipe',f:br};
+  /* 4) 别名表：旧库口语名 → USDA 标准名 */
+  var A=(typeof window!=='undefined'&&window.INGR_ALIAS)?window.INGR_ALIAS:null;
+  if(A&&A[name]){
+    for(i=0;i<F.length;i++){if(F[i].name===A[name])return{k:'food',f:F[i]}}
+  }
+  /* 5) 旧库的「XX(熟)」式名字 → 去掉后缀再试（如「西红柿(熟)」→「西红柿（生）」）*/
+  var base=String(name).replace(/\((熟|生)\)$/,'').replace(/（(熟|生)）$/,'');
+  if(base&&base!==name){
+    for(i=0;i<F.length;i++){if(F[i].name===base||F[i].name===base+'（生）')return{k:'food',f:F[i]}}
+  }
+  return null;   /* null = 认不出 */
+}
+/* ---------- v3.13.41：按来源精确回溯（优先于按名字猜） ----------
+   菜单项现在带 src/rid：
+     src='lib'    rid=USDA-FDC 编号 → 用编号找，最准（改名也不怕）
+     src='custom' rid=null         → 在自定义食物里按名字找
+     src='rcp'    rid=菜谱 id       → 先按 id 找，找不到再按名字
+   老数据没有 src 的，才走上面的按名字猜（_menuFindInNewLib）。 */
+function _menuResolveBySrc(it){
+  var s=it.src;
+  if(!s)return null;                      /* 老数据：无来源信息 */
+  var F=(typeof FOOD_DB!=='undefined'?FOOD_DB:[])||[],i;
+  if(s==='lib'){
+    if(!it.rid)return null;
+    var tag='USDA-FDC:'+it.rid;
+    for(i=0;i<F.length;i++){if(F[i].src===tag)return{k:'food',f:F[i]}}
+    return null;                          /* 编号失效（库里被删/改名） */
+  }
+  if(s==='custom'){
+    var cf=(state.customFoods||[]).filter(function(x){return x.name===it.name})[0];
+    return cf?{k:'food',f:cf}:null;
+  }
+  if(s==='rcp'){
+    var B=((typeof BUILTIN_RECIPES!=='undefined'?BUILTIN_RECIPES:[])||[]);
+    var hit=null;
+    if(it.rid){hit=B.filter(function(x){return x.id===it.rid})[0]}
+    if(!hit)hit=B.filter(function(x){return x.name===it.name})[0];       /* 内置菜谱 */
+    if(!hit)hit=(state.recipes||[]).filter(function(x){return x.id===it.rid||x.name===it.name})[0];  /* 我的菜谱 */
+    return hit?{k:'recipe',f:hit}:null;
+  }
+  return null;
+}
+/* 单项修复。
+   ⚠️ 关键：**不能只看名字**。旧库「红烧肉」是道菜（cat=菜肴），
+   而新库恰好有同名**菜谱**，只看名字会误判成「已对齐」，
+   可菜单项里的营养其实是旧库那道菜的数值。
+   v3.13.41 起优先用 src/rid 精确定位；只有老数据没 src 时才靠单位兜底：
+   份量口径(unit='份'/sc=1)才算菜谱；克数口径必须在 FOOD_DB 命中同名食材，否则判旧。 */
+function _menuFixItem(it){
+  if(it._old)return false;
+  if(it._lib==='usda344')return false;          /* 已处理过，保证幂等 */
+  var r=_menuResolveBySrc(it);
+  var hadSrc=!!it.src;
+  if(!r&&hadSrc){                                /* 有来源但按来源找不到 */
+    var byName=_menuFindInNewLib(it.name);        /* 退一步按名字试（改名/编号变了） */
+    if(byName&&!(byName.k==='recipe'&&(it.unit!=='份'&&+it.sc!==1))){r=byName}
+  }
+  if(!r)r=_menuFindInNewLib(it.name);
+  var byServing=(it.unit==='份')||(+it.sc===1);
+  if(r&&r.k==='recipe'){
+    if(byServing){                                  /* 真份量项 → 按菜谱刷新营养 */
+      var rec=r.f;
+      it.per=_menuPer(rec);
+      it.sc=1;it.unit='份';it.amount=1;
+      it.icon=rec.icon||it.icon;it.cat=rec.cat||it.cat;
+      it.src='rcp';it.rid=rec.id||null;
+      it._old=0;it._lib='usda344';
+      return true;
+    }
+    it._old=1;it._lib='usda344';                   /* 克数项撞上菜谱名 → 旧库条目 */
+    return false;
+  }
+  if(r&&r.k==='food'){
+    it.per=_menuPer(r.f);
+    it.icon=r.f.icon||it.icon;
+    it.cat=r.f.cat||it.cat;
+    if(!it.src||it.src==='lib'){it.src='lib';it.rid=(r.f.src||'').replace(/^USDA-FDC:/,'')||it.rid}
+    it._old=0;it._lib='usda344';
+    return true;
+  }
+  it._old=1;it._lib='usda344';
+  return false;
+}
+/* 迁移整个菜单 + 所有菜单方案。返回统计 {fixed,kept,old,plans} */
+function migrateMenuToNewLib(){
+  var st={fixed:0,kept:0,old:0,plans:0};
+  menuList().forEach(function(it){
+    var r=_menuFixItem(it);
+    if(r)st.fixed++;else if(it._old)st.old++;else st.kept++;
+  });
+  (state.menuPlans||[]).forEach(function(p){
+    var ch=false;
+    (p.items||[]).forEach(function(it){if(_menuFixItem(it))ch=true});
+    if(ch)st.plans++;
+  });
+  state.menuLib='usda344';
+  return st;
+}
+/* 旧库项的处理：重新匹配（不清数据）/ 清除（要二次确认） */
+function menuRelinkOld(){
+  var list=menuList(),hit=0,no=0;
+  list.forEach(function(it){
+    /* 复用 _menuFixItem 的判定逻辑（含「克数项撞菜谱名要判旧」这个坑），
+       只把 _lib 清空强制重跑。别在这里自己写一遍匹配 —— 上一版就是因为
+       这里写成 `f===undefined` 而 _menuFindInNewLib 认不出时返回 null，
+       导致所有旧库项都被误判成"已匹配"，角标全消失。 */
+    it._lib='';it._old=0;
+    var fixed=_menuFixItem(it);
+    if(fixed)hit++;else if(it._old)no++;
+  });
+  saveState();renderMenuPage();renderMenuEntryCard();
+  showToast(hit?('已重新匹配 '+hit+' 项'+(no?('，'+no+' 项新库仍没有'):'')):'新库里还是认不出这些食材');
+}
+function menuDropOld(){
+  var list=menuList(),old=list.filter(function(x){return x._old===1});
+  if(!old.length){showToast('没有旧库残留项');return}
+  if(!confirm('清除 '+old.length+' 项旧库食材？\n\n'+old.map(function(x){return x.name}).join('、')+'\n\n（只是从菜单移除，不会删你的食物记录）'))return;
+  state.menu=list.filter(function(x){return x._old!==1});
+  /* 菜单方案里的旧项也一并清掉，避免方案里留着脏数据 */
+  (state.menuPlans||[]).forEach(function(p){if(p.items)p.items=p.items.filter(function(x){return x._old!==1})});
+  saveState();renderMenuPage();renderMenuEntryCard();
+  showToast('已清除 '+old.length+' 项旧库食材');
+}
+/* 旧库项的 UI 角标文案 */
+function _menuOldTag(it){return it._old?' <span class="menu-old-tag">旧库</span>':''}
 function menuTotals(){
   var t={cal:0,p:0,c:0,f:0,fi:0,va:0,vc:0};
   menuList().forEach(function(it){var n=menuItemNutri(it);t.cal+=n.cal;t.p+=n.p;t.c+=n.c;t.f+=n.f;t.fi+=n.fi;t.va+=n.va;t.vc+=n.vc});
@@ -4413,9 +4565,21 @@ function menuTotals(){
 }
 function menuAddItem(f,amount,meal){
   var isServing=!!f._recipe;
+  /* v3.13.41：记录来源。菜单项以前只存 name，导致「同名但来源不同」的歧义 ——
+     旧库「红烧肉」是菜、而新版恰好有同名菜谱，光看名字分不清。
+     现在把 src 一起存下来：'lib'=USDA库 / 'custom'=自定义食物 / 'rcp'=菜谱。
+     rid 存该来源的 id（菜谱 id 或 USDA 的 USDA-FDC 编号），改名后也能找回。 */
+  var src='lib',rid=null;
+  if(isServing){src='rcp';rid=f._rcpId||null}
+  else if(f.cat==='自定义'){src='custom';rid=null}
+  else if(f.src){rid=(''+f.src).replace(/^USDA-FDC:/,'')}
+  /* 调用方可能已经知道来源（如从今日饮食记录加入）——优先采用 */
+  if(f.src==='custom')src='custom';
+  else if(f.src==='lib'&&rid)src='lib';
+  else if(f.src==='rcp'){src='rcp';rid=f._rcpId||rid}
   var it={id:'m'+Date.now()+Math.floor(Math.random()*900),name:f.name,icon:f.icon||'🍽️',cat:f.cat||'',
     amount:((amount!=null&&!isNaN(+amount)&&+amount>=0)?+amount:(isServing?1:100)),unit:isServing?'份':'g',sc:isServing?1:100,
-    meal:meal||_menuGuessMeal(),per:_menuPer(f),staple:false,img:f.imgkey||null};
+    meal:meal||_menuGuessMeal(),per:_menuPer(f),staple:false,img:f.imgkey||null,src:src,rid:rid,_lib:'usda344'};
   menuList().push(it);saveState();
   return it;
 }
@@ -4595,7 +4759,7 @@ function openMenuNutriDetail(){
     showModal('nutritionModal');
     return;
   }
-  renderNbdTab('protein');
+  renderNbdTab('more');
   showModal('nutritionModal');
 }
 function renderMenuPage(){
@@ -4609,6 +4773,18 @@ function renderMenuPage(){
   if(!list.length){
     html+='<div class="card" style="margin:10px 16px;text-align:center;padding:26px 16px"><div style="font-size:13.5px;color:var(--text2);line-height:1.8">菜单还是空的<br>点「添加食物」把常吃的排进来<br>再把每天固定那几样点 ☆ 设为常备</div></div>';
   }
+  /* v3.13.40：旧库残留项提示条 —— 认不出的食材营养还是旧值，让老杜自己决定删留 */
+  var oldN=list.filter(function(x){return x._old===1}).length;
+  if(oldN){
+    html+='<div class="card" style="margin:10px 16px;padding:12px 14px;border-left:3px solid var(--orange)">'
+      +'<div style="font-size:13px;font-weight:700;margin-bottom:4px">'+oldN+' 项还是旧库的食材</div>'
+      +'<div style="font-size:11.5px;color:var(--text2);line-height:1.6">换 USDA 食材库后，这些食材已在新库里找不到了（多半是旧库的菜肴/零食/饮料），营养显示的还是旧数值。'
+      +'如果还常吃，重新搜一次加进来就能用上 USDA 数据。</div>'
+      +'<div style="display:flex;gap:8px;margin-top:10px">'
+      +'<button onclick="menuRelinkOld()" style="flex:1;padding:8px;border:none;border-radius:9px;background:var(--blue);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer">重新按新库匹配</button>'
+      +'<button onclick="menuDropOld()" style="padding:8px 14px;border:none;border-radius:9px;background:rgba(118,118,128,.12);color:var(--text2);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer">清除</button>'
+      +'</div></div>';
+  }
   _MENU_MEALS.forEach(function(m){
     var items=list.filter(function(x){return x.meal===m.key});
     if(!items.length)return;
@@ -4619,8 +4795,8 @@ function renderMenuPage(){
       var n=menuItemNutri(it);
       html+='<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;'+(i<items.length-1?'border-bottom:0.5px solid var(--card-border)':'')+'">'
         +'<span style="font-size:19px;flex-shrink:0">'+it.icon+'</span>'
-        +'<span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+it.name+'</span>'
-        +'<span style="display:block;font-size:11px;color:var(--text3);margin-top:1px"><span id="mcal_'+it.id+'">'+n.cal+'</span> kcal'+(it.staple?' · <span style="color:var(--blue)">常备</span>':'')+'</span></span>'
+        +'<span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+it.name+_menuOldTag(it)+'</span>'
+        +'<span style="display:block;font-size:11px;color:var(--text3);margin-top:1px"><span id="mcal_'+it.id+'">'+n.cal+'</span> kcal'+(it._old?' · <span style="color:var(--orange)">旧库食材，营养为旧值</span>':'')+(it.staple?' · <span style="color:var(--blue)">常备</span>':'')+'</span></span>'
         +'<input value="'+it.amount+'" inputmode="decimal" oninput="menuSetAmount(\''+it.id+'\',this.value)" style="width:50px;padding:6px 4px;border:1.5px solid var(--input-bd);border-radius:8px;background:var(--card-bg);color:var(--text);font-size:13px;text-align:center;outline:none;font-family:inherit">'
         +'<span style="font-size:11px;color:var(--text3);flex-shrink:0">'+it.unit+'</span>'
         +'<button onclick="menuToggleStaple(\''+it.id+'\')" title="常备" style="border:none;background:none;font-size:15px;cursor:pointer;padding:2px;line-height:1;color:'+(it.staple?'var(--blue)':'var(--text3)')+'">'+(it.staple?'★':'☆')+'</button>'
@@ -4698,7 +4874,7 @@ function addLogToMenu(id,silent){
   var f=getTodayFoods().filter(function(x){return x.id===id})[0];if(!f)return false;
   var isServing=(f._unit==='份'),sc=isServing?1:100;
   var amt=(+f.amount||(isServing?1:100)),k=amt/sc;if(!(k>0))k=1;
-  menuAddItem({name:f.name,icon:f.icon,cat:f.cat,imgkey:f.img,cal:(f.cal||0)/k,p:(f.p||0)/k,c:(f.c||0)/k,f:(f.f||0)/k,fi:(f.fi||0)/k,va:(f.va||0)/k,vc:(f.vc||0)/k,_recipe:isServing},amt,f.meal);
+  menuAddItem({name:f.name,icon:f.icon,cat:f.cat,imgkey:f.img,cal:(f.cal||0)/k,p:(f.p||0)/k,c:(f.c||0)/k,f:(f.f||0)/k,fi:(f.fi||0)/k,va:(f.va||0)/k,vc:(f.vc||0)/k,_recipe:isServing,_rcpId:f._recipeId||null,src:f.cat==='自定义'?'custom':(f._libSrc||'lib')},amt,f.meal);
   renderMenuEntryCard();
   if(!silent)showToast('已加入菜单：'+f.name+'（'+amt+(isServing?'份':'g')+'）');
   return true;
@@ -4723,7 +4899,8 @@ function addDayToMenu(){
 }
 function addRecipeToMenu(){
   var rec=findRecipe(_rcpCurId);if(!rec){showToast('没找到菜谱');return}
-  menuAddItem({name:rec.name,icon:'🍳',cat:rec.cat,cal:rec.cal,p:rec.p,c:rec.c,f:rec.f,fi:rec.fi,va:rec.va,vc:rec.vc,_recipe:true},1,_menuGuessMeal());
+  /* v3.13.41：带上 _rcpId，菜单项才能记住自己来自哪一道菜 */
+  menuAddItem({name:rec.name,icon:'🍳',cat:rec.cat,cal:rec.cal,p:rec.p,c:rec.c,f:rec.f,fi:rec.fi,va:rec.va,vc:rec.vc,_recipe:true,_rcpId:rec.id},1,_menuGuessMeal());
   renderMenuEntryCard();
   showToast('已加入菜单：'+rec.name+'（1 份）');
 }
@@ -4743,8 +4920,17 @@ function newRecipeForm(){
 function importBuiltinToMine(){
   var src=findRecipe(_rcpCurId);
   if(!src||!src.builtin)return null;
-  /* 已有同名"我的菜谱"就直接编辑那一份，避免每点一次复制一份 */
-  var exist=null;(state.recipes||[]).forEach(function(r){if(!r.builtin&&r.name===src.name)exist=r});
+  /* v3.13.41：**先按血统(from)找，再按名字找**。
+     原来只看名字，若老杜自己先做了一道叫「红烧肉」的菜、之后内置菜谱又出了同名，
+     就会把老杜自己的菜误当成「这份内置菜谱的副本」而被顶掉。
+     from 记的是被复制的内置菜谱 id，改名也不影响对应关系。 */
+  var exist=null;
+  (state.recipes||[]).forEach(function(r){if(!r.builtin&&r.from===src.id)exist=r});
+  /* v3.13.41：**故意不加"按名字找"的兜底**。
+     加了就会把老杜自己做的同名菜误当成副本（实测：自己做了一道"红烧肉"，
+     再复制内置红烧肉时系统直接返回了老杜那道菜，而不是生成副本）。
+     万一真出现重复副本（同名两条），老杜看得见、能自己删一个；
+     而误顶掉自己的菜是看不见的数据丢失。重复 < 覆盖，所以宁重复不覆盖。 */
   if(exist){
     /* 兼容旧脏数据：早前复制出的副本可能缺营养字段，顺手补齐 */
     if(!(exist.cal>0)){
@@ -4762,7 +4948,7 @@ function importBuiltinToMine(){
   /* 同步算出营养字段，否则详情/列表会显示 undefined */
   var t=_rcpTotals(ingrs);
   var rec={id:id,name:src.name,icon:src.icon||'🍳',img:null,time:src.time||0,season:src.season||'',ingrs:ingrs,steps:(src.steps&&src.steps.length)?src.steps.slice():[],
-    cal:Math.round(t.cal),p:+t.p.toFixed(1),c:+t.c.toFixed(1),f:+t.f.toFixed(1),fi:+t.fi.toFixed(1),va:Math.round(t.va),vc:+t.vc.toFixed(1),cat:_rcpCatOf(t.p,t.c,t.fi),createdAt:Date.now()};
+    cal:Math.round(t.cal),p:+t.p.toFixed(1),c:+t.c.toFixed(1),f:+t.f.toFixed(1),fi:+t.fi.toFixed(1),va:Math.round(t.va),vc:+t.vc.toFixed(1),cat:_rcpCatOf(t.p,t.c,t.fi),createdAt:Date.now(),from:src.id};
   var list=state.recipes||[];list.push(rec);state.recipes=list;
   /* 立即同步自定义菜肴（主页同名顶替生效），保存时会被 saveRecipe 同 idr 覆盖 */
   var cf=state.customFoods||[];cf=cf.filter(function(x){return !(x.idr&&x.idr===id)});
@@ -4779,7 +4965,7 @@ function editRecipeDetail(){
   var rec=findRecipe(_rcpCurId);
   if(!rec)return;
   if(rec.builtin){rec=importBuiltinToMine();if(!rec)return}
-  _rcpEdit={id:rec.id,imgOld:rec.img||null,name:rec.name,time:rec.time||0,season:rec.season||'',ingrs:(rec.ingrs||[]).map(function(x){return{name:x.name,icon:x.icon,cal:x.cal||0,p:x.p||0,c:x.c||0,f:x.f||0,fi:x.fi||0,va:x.va||0,vc:x.vc||0,gram:x.gram||100}}),steps:(rec.steps&&rec.steps.length)?rec.steps.slice():['']};
+  _rcpEdit={id:rec.id,from:rec.from||null,imgOld:rec.img||null,name:rec.name,time:rec.time||0,season:rec.season||'',ingrs:(rec.ingrs||[]).map(function(x){return{name:x.name,icon:x.icon,cal:x.cal||0,p:x.p||0,c:x.c||0,f:x.f||0,fi:x.fi||0,va:x.va||0,vc:x.vc||0,gram:x.gram||100}}),steps:(rec.steps&&rec.steps.length)?rec.steps.slice():['']};
   _rcpImgData=null;_rcpCoverDisp=null;
   document.getElementById('recipeModalTitle').textContent='编辑菜谱';
   document.getElementById('rcpName').value=rec.name;
@@ -4953,6 +5139,10 @@ async function saveRecipe(){
   var tv=parseInt(document.getElementById('rcpTime').value,10);
   var imgKey=_rcpImgData?(_rcpEdit.imgOld||('recipe_'+id)):(_rcpEdit.imgOld||null);
   var rec={id:id,name:name,img:imgKey,time:tv>0?tv:0,season:document.getElementById('rcpSeason').value.trim(),ingrs:_rcpEdit.ingrs.slice(),steps:steps.length?steps:[],cal:t.cal,p:t.p,c:t.c,f:t.f,fi:t.fi,va:Math.round(t.va),vc:+t.vc.toFixed(1),cat:_rcpCatOf(t.p,t.c,t.fi),createdAt:Date.now()};
+  /* v3.13.41：保存时保留血统标记 from（内置菜谱副本的来源 id），
+     否则老杜改一次菜名，这条"来自哪道内置菜"的信息就丢了，
+     下次再复制同名内置菜谱时又会认错人。 */
+  if(_rcpEdit.from)rec.from=_rcpEdit.from;
   var list=state.recipes||[];
   var idx=-1;list.forEach(function(r,i){if(r.id===id)idx=i});
   if(idx>=0)list[idx]=rec;else list.push(rec);
@@ -5153,7 +5343,7 @@ function openNutritionBreakdown(){
   if(foods.length===0){
     document.getElementById('nbdContent').innerHTML='<div class="nbd-empty"><span class="nbd-emoji">🍽️</span>今天还没有记录食物<br>添加食物后再来看营养素来源吧</div>';
   }
-  renderNbdTab('protein');
+  renderNbdTab('more');
   showModal('nutritionModal');
 }
 function renderNbdTab(nutriKey){
@@ -6328,6 +6518,13 @@ function obSkipAll(){
 }
 async function init(){
   loadState();
+  /* v3.13.40 食材库换 USDA 后，菜单存量项还带着旧库名称与旧营养快照。
+     这里在首次渲染前做一次对齐（幂等：靠 item._lib 与 state.menuLib 双重判定）。
+     只修数值与名称，**绝不删数据** —— 认不出来的打 _old 标记，UI 上可见。 */
+  try{ if(typeof migrateMenuToNewLib==='function'&&state.menuLib!=='usda344'){
+        var _ms=migrateMenuToNewLib();saveState();
+        if(_ms.fixed||_ms.old)console.log('[menu] 已对齐新食材库：修复 '+_ms.fixed+' 项，旧库残留 '+_ms.old+' 项，方案更新 '+_ms.plans+' 个');
+      }}catch(e){console.error('[menu] 对齐失败',e)}
   detectPlatform(); /* 给 <html> 打平台 class，驱动差异化玻璃参数 */
   state.selectedDate=getDateKey(new Date()); /* 每次打开默认今天 */
   checkAppLockOnLaunch();
