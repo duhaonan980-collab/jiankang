@@ -1080,7 +1080,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.42</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.43</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -4415,6 +4415,24 @@ function menuItemNutri(it){
   EXT_NUTRI_KEYS.forEach(function(n){o[n]=Math.round(((+p[n]||0)*k)*100)/100});
   return o;
 }
+/* v3.13.43：汇总「已排营养」时**跳过旧库残留项**。
+   它们的 per 是旧库「菜肴」口径（红烧肉旧值 600/100g，250g 就折出 1500kcal），
+   会把整张菜单的热量/脂肪拉爆（实测 2538/1682 kcal、脂肪 142.6/56g 全线飘红），
+   而这些值本来就已失效、没法用来对比每日目标。
+   列表里那一行仍显示它自己的 kcal（用户看得见"这项占多少"），只是不进汇总。 */
+function menuTotals(){
+  var t={cal:0,p:0,c:0,f:0,fi:0,va:0,vc:0};
+  EXT_NUTRI_KEYS.forEach(function(k){t[k]=0});
+  menuList().forEach(function(it){
+    if(it._old===1)return;
+    var n=menuItemNutri(it);
+    t.cal+=n.cal;t.p+=n.p;t.c+=n.c;t.f+=n.f;t.fi+=n.fi;t.va+=n.va;t.vc+=n.vc;
+    EXT_NUTRI_KEYS.forEach(function(k){t[k]+=n[k]||0});
+  });
+  t.p=_r1(t.p);t.c=_r1(t.c);t.f=_r1(t.f);t.fi=_r1(t.fi);t.vc=_r1(t.vc);
+  EXT_NUTRI_KEYS.forEach(function(k){t[k]=Math.round(t[k]*100)/100});
+  return t;
+}
 /* ---------- v3.13.40 菜单存量项对齐新食材库 ----------
    问题：菜单项把营养值 per「烤」进了 localStorage。换 USDA 库后，存量项
    仍是旧库名称 + 旧库营养（例如旧库「鸡胸肉」条目、已删除的「红烧肉」菜肴）。
@@ -4557,12 +4575,8 @@ function menuDropOld(){
 }
 /* 旧库项的 UI 角标文案 */
 function _menuOldTag(it){return it._old?' <span class="menu-old-tag">旧库</span>':''}
-function menuTotals(){
-  var t={cal:0,p:0,c:0,f:0,fi:0,va:0,vc:0};
-  menuList().forEach(function(it){var n=menuItemNutri(it);t.cal+=n.cal;t.p+=n.p;t.c+=n.c;t.f+=n.f;t.fi+=n.fi;t.va+=n.va;t.vc+=n.vc});
-  t.p=_r1(t.p);t.c=_r1(t.c);t.f=_r1(t.f);t.fi=_r1(t.fi);t.vc=_r1(t.vc);
-  return t;
-}
+/* v3.13.43：menuTotals 已上移到 menuItemNutri 旁边（会跳过 _old 旧库项），此处不再重复定义。
+   历史上这里有过第二份 menuTotals，因为函数声明提升会覆盖前一份，导致"跳过旧库项"的修复失效。 */
 function menuAddItem(f,amount,meal){
   var isServing=!!f._recipe;
   /* v3.13.41：记录来源。菜单项以前只存 name，导致「同名但来源不同」的歧义 ——
@@ -4744,10 +4758,15 @@ function menuNutriBox(){
 /* 菜单版营养素来源：数据源是菜单里排的食物（按折算后克数），复用主页弹窗的 tab 逻辑 */
 var _nbdSrc='today';
 function menuNbdFoods(){
-  return menuList().map(function(it){
+  /* v3.13.43：① 跳过旧库残留项（与 menuTotals 保持同一口径，
+     否则「已排营养素来源」页会把失效值也算进去，和上面的汇总对不上）。
+     ② 带上 x_ 扩展项 —— 不带的话这页的 17 项会全变成 0。 */
+  return menuList().filter(function(it){return it._old!==1}).map(function(it){
     var n=menuItemNutri(it),g=Math.max(0,+it.amount||0);
-    return {name:it.name,icon:it.icon||'🍽️',amount:g,meal:it.meal,
+    var o={name:it.name,icon:it.icon||'🍽️',amount:g,meal:it.meal,
       cal:n.cal,p:n.p,c:n.c,f:n.f,fi:n.fi,va:n.va,vc:n.vc};
+    EXT_NUTRI_KEYS.forEach(function(k){o['x_'+k]=n[k]});
+    return o;
   }).filter(function(f){return f.amount>0});
 }
 function openMenuNutriDetail(){
@@ -5296,13 +5315,69 @@ const NUTRI_META=[
 function sumAllNutri(foods){
   var out={};NUTRI_META.forEach(function(m){out[m.key]=0});
   foods.forEach(function(f){
+    /* v3.13.43：这条记录缺扩展项 → 按名字回查库里的当次值折算（不改用户存储，只补读） */
+    var bf=null;
     NUTRI_META.forEach(function(m){
       var v=f[m.key];
       if(typeof v!=='number'){v=f['x_'+m.key]}          /* 菜谱用 x_ 前缀 */
       if(typeof v==='number'&&isFinite(v))out[m.key]+=v;
+      else{
+        /* 扩展项缺失时才回查（cal 等 7 项本来就有，不查） */
+        if(m.key!=='cal'&&m.key!=='p'&&m.key!=='c'&&m.key!=='f'&&m.key!=='fi'&&m.key!=='va'&&m.key!=='vc'){
+          if(bf===null)bf=_backfillExtForEntry(f);
+          if(bf&&typeof bf[m.key]==='number')out[m.key]+=bf[m.key];
+        }
+      }
     });
   });
   return out;
+}
+/* v3.13.43：给「只存了前 7 项」的老记录**按名字回查**扩展营养素。
+   老记录（v3.13.34 之前记录的）只写了 cal/p/c/f/fi/va/vc，
+   于是「更多营养素」页里 17 项全是 0，整页看着像坏了 —— 老杜报的"17 项不兼容"就是这个。
+   这里不改用户的存储，只在**读取时**按名字去库里取当次那份的每100g值，再按克数折算：
+     1) 先按记录里的 USDA 溯源（老记录没有 src，只能按名字）
+     2) 名字命中新库 → 用新库的扩展项 × (amount/sc)
+     3) 名字是菜谱 → 用菜谱的 x_ 扩展项 × (amount/sc)
+   命中不到的保持 0（本来就是"这项没有数据"），但不再让整页看起来全空。 */
+function _libFindByName(name){
+  var i,F=(typeof FOOD_DB!=='undefined'?FOOD_DB:[])||[];
+  for(i=0;i<F.length;i++){if(F[i].name===name)return{k:'food',f:F[i]}}
+  var cf=(state.customFoods||[]).filter(function(x){return x.name===name})[0];
+  if(cf)return{k:'food',f:cf};
+  var br=((typeof BUILTIN_RECIPES!=='undefined'?BUILTIN_RECIPES:[])||[]).filter(function(x){return x.name===name})[0];
+  if(!br)br=(state.recipes||[]).filter(function(x){return x.name===name})[0];
+  if(br)return{k:'recipe',f:br};
+  /* 旧名兜底：「西红柿」→「西红柿（生）」、「米饭」→「大米（生）」 */
+  var A=(typeof window!=='undefined'&&window.INGR_ALIAS)?window.INGR_ALIAS:null;
+  if(A&&A[name]){for(i=0;i<F.length;i++){if(F[i].name===A[name])return{k:'food',f:F[i]}}}
+  var base=String(name).replace(/\((熟|生)\)$/,'').replace(/（(熟|生)）$/,'');
+  if(base&&base!==name){for(i=0;i<F.length;i++){if(F[i].name===base+'（生）')return{k:'food',f:F[i]}}}
+  return null;
+}
+/* 取单条记录的扩展营养素（找不到来源时返回 null，让上层保持 0） */
+function _backfillExtForEntry(f){
+  if(!f)return null;
+  var k=(+f.amount||0)/(+f.sc||100);
+  if(!(k>0))k=(+f.amount||0)>0?1:0;
+  if(k===0)return null;
+  var r=_libFindByName(f.name);
+  if(!r)return null;
+  var o={};
+  if(r.k==='recipe'){
+    /* 菜谱的 x_ 扩展项是「每份」口径（sc=1），按 amount 折算 */
+    EXT_NUTRI_KEYS.forEach(function(n){
+      var v=r.f['x_'+n];if(typeof v==='number')o[n]=Math.round(v*(+f.amount||1)*100)/100;
+    });
+    if(!EXT_NUTRI_KEYS.some(function(n){return typeof o[n]==='number'}))return null;
+    return o;
+  }
+  var any=false;
+  EXT_NUTRI_KEYS.forEach(function(n){
+    var v=r.f[n];
+    if(typeof v==='number'){o[n]=Math.round(v*k*100)/100;if(v>0)any=true}
+  });
+  return any?o:null;
 }
 /* 这一天有没有扩展项数据（老记录为 false，UI 要提示）
    注意：自定义食物（v3.13.35 起支持填扩展项）用的是**普通键** f[key]，
@@ -5316,6 +5391,9 @@ function hasExtNutri(foods){
       var a=f['x_'+EXT[j]],b=f[EXT[j]];
       if((typeof a==='number'&&a>0)||(typeof b==='number'&&b>0))return true;
     }
+    /* v3.13.43：这条没存扩展项，但若能按名字在库里回查到，
+       汇总时 sumAllNutri 会自动补上 → 不该再提示"数据缺失"。 */
+    try{ if(_backfillExtForEntry(f))return true }catch(e){}
   }
   return false;
 }
