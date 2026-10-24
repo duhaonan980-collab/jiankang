@@ -643,8 +643,16 @@ body.fullscreen .page.active{padding-bottom:calc(var(--safe-bottom) + 18px)}
 </head>
 <body>
 <script>
+/* v3.13.44：Service Worker 注册 + 版本自检
+   老杜的痛点：手机上装成 PWA 后，我改了代码/数据，App 打开还是旧内容，
+   必须「退后台杀掉进程再进」才生效。
+   ① sw.js 的缓存策略已改成 Network First（联网优先拿新代码，断网回退缓存）
+   ② 这里注册时立刻 update()，让新 sw.js 尽快接管
+   ③ autoCheckUpdate() 比对版本号，发现新版自动清缓存重载 */
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   navigator.serviceWorker.register('./sw.js').then(reg=>{
+    /* 每次打开都主动检查一次更新（原来只在 updatefound 时被动等） */
+    if(reg.update){reg.update().catch(()=>{})}
     reg.addEventListener('updatefound',()=>{
       const newWorker=reg.installing;
       newWorker.addEventListener('statechange',()=>{
@@ -654,7 +662,9 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       });
     });
     if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}
-  });
+  }).catch(e=>{console.warn('[App] SW注册失败',e)});
+  /* 版本自检（在 init 之后调，见 autoCheckUpdate 定义处） */
+  if(typeof autoCheckUpdate==='function')setTimeout(autoCheckUpdate,2500);
 }
 
 </script>
@@ -1071,6 +1081,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       </div>
       <div class="set-gtitle">存储</div>
       <div class="set-card">
+        <div class="set-row" style="cursor:pointer" onclick="checkUpdate()"><span style="font-size:18px;width:30px;text-align:center">🔄</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">检查更新</div><div style="font-size:11px;color:var(--text3);margin-top:1px">拉取最新代码与数据 · 改版后点这里立即生效</div></span><span class="se-che">›</span></div>
         <div class="set-row" style="cursor:pointer" onclick="clearPhotoCache()"><span style="font-size:18px;width:30px;text-align:center">🖼️</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">清除照片缓存</div><div style="font-size:11px;color:var(--text3);margin-top:1px">仅清图片临时副本 · 不删任何照片记录</div></span><span class="se-che">›</span></div>
       </div>
       <div class="set-gtitle" style="color:#E8A9A5">危险操作</div>
@@ -1080,7 +1091,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.43</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.44</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -2018,7 +2029,7 @@ function openSearchModal(target){
 function closeSearchModal(){hideModal('searchModal')}
 /* v3.13.33 食物库换成 USDA 生鲜库后，分类随库走：蔬菜/水果/肉类/水产/主食/蛋奶（+自定义），
    原来的 饮料/零食/菜肴/原料 已随旧库一起移除 */
-function renderCatFilter(){const cats=['all','蔬菜','水果','肉类','水产','主食','蛋奶','坚果','种子','油脂','糖类','酒类','自定义'];document.getElementById('catFilter').innerHTML=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('')}
+function renderCatFilter(){const cats=['all','蔬菜','水果','肉类','水产','主食','蛋奶','坚果','种子','油脂','糖类','酒类','调料','自定义'];document.getElementById('catFilter').innerHTML=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('')}
 function setCat(c){state.currentCat=c;renderCatFilter();searchFood()}
 function getAllFoods(){
   /* 自定义菜肴(菜谱同步)同名时"顶替"食品库内置菜肴：主页搜索只保留修改后的版本 */
@@ -3319,6 +3330,65 @@ function importRecipeFile(d){
 }
 async function clearAllData(){if(!confirm('确定清除所有数据？此操作不可撤销！'))return;if(!confirm('再次确认：所有食物记录、照片和个人信息将被删除！'))return;localStorage.removeItem('calorie_app');await clearAllPhotoData();/* 重置为与页面初始化完全一致的空态（字段缺一个都可能在后续渲染里踩空） */state={profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',targetBF:0,activity:'low',goal:'lose'},foodLogs:{},weightRecords:{},selectedDate:getDateKey(new Date()),pendingFood:null,pendingMeal:null,pendingTarget:'log',currentCat:'all',theme:'auto',weightChartYear:new Date().getFullYear(),weightChartMonth:new Date().getMonth(),weightChartAll:false,chartMode:'weight',appLock:{enabled:false,method:'pattern',pattern:[],backupPassword:'',backupHint:''},onboarded:false,recipes:[],customFoods:[],menu:[],menuPlans:[],pages:{recipe:true,history:true,rcpMenu:true,rcpSearch:true,rcpList:true,histStats:true,histLog:true},exerciseLogs:{},exerciseTags:null};document.documentElement.removeAttribute('data-theme');var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;document.querySelector('meta[name="theme-color"]').content=isDark?'#000000':'#F2F2F7';renderAll();showToast('所有数据已清除')}
 async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？食物记录不会被删除。'))return;await clearAllPhotoData();Object.values(state.foodLogs).forEach(foods=>foods.forEach(f=>f.hasPhoto=false));saveState();renderAll();if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({type:'CLEAR_PHOTO_CACHE'})}showToast('照片缓存已清除')}
+
+/* ---------- v3.13.44 检查更新 ----------
+   老杜的痛点：手机上装成 PWA 后，我改了代码/数据，App 打开还是旧内容，
+   必须「退后台杀掉进程再进」才生效。
+   根因：SW 对 .html/.js 用了 staleWhileRevalidate（缓存优先）。
+   已改成 Network First（联网优先、断网回退缓存），这里再补两个保险：
+   ① 手动「检查更新」按钮：清掉所有 SW 缓存 + 重新注册 + 重载页面
+   ② 启动时自动比对版本号：发现新版就提示，点一下就更新 */
+var APP_BUILD='v3.13.44';
+/* 清掉所有缓存并强制重新拉取 */
+async function forceUpdate(silent){
+  var btn=document.getElementById('cuBtn');
+  if(btn&&!silent){btn.textContent='更新中…';btn.disabled=true}
+  try{
+    if('caches' in window){
+      var ks=await caches.keys();
+      await Promise.all(ks.map(function(k){
+        if(k.indexOf('calorie-app-shell-')===0||k.indexOf('calorie-photos-')===0)return caches.delete(k);
+        return Promise.resolve(false);
+      }));
+    }
+    if(navigator.serviceWorker){
+      var regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(function(r){return r.unregister()}));
+    }
+    /* 让浏览器丢弃 HTTP 缓存的旧副本（iOS Safari 上尤其需要） */
+    try{if(window.caches&&caches.open){}}catch(e){}
+    location.reload(true);
+  }catch(e){
+    if(btn){btn.textContent='检查更新';btn.disabled=false}
+    showToast('更新失败：'+(e&&e.message?e.message:'未知错误'));
+  }
+}
+/* 手动点「检查更新」 */
+async function checkUpdate(){
+  showToast('正在检查更新…');
+  await forceUpdate(false);
+}
+/* 启动时自动比对：sw.js 里的 CACHE_VERSION 与本地记录的不一致 → 提示有新版 */
+async function autoCheckUpdate(){
+  if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
+  try{
+    var resp=await fetch('./sw.js?ts='+Date.now(),{cache:'no-store'});
+    if(!resp.ok)return;
+    var txt=await resp.text();
+    var m=txt.match(/CACHE_VERSION\s*=\s*'([^']+)'/);
+    if(!m)return;
+    var remote=m[1];
+    var local=localStorage.getItem('app_cache_ver')||'';
+    if(remote&&remote!==local){
+      localStorage.setItem('app_cache_ver',remote);
+      /* 只有当我们自己的页面已经加载过一次（local 有值）才提示，避免首装打扰 */
+      if(local){
+        showToast('发现新版本，正在更新…');
+        setTimeout(function(){forceUpdate(true)},900);
+      }
+    }
+  }catch(e){/* 离线等，忽略 */}
+}
 
 function renderWeightChart(){
   var svg=document.getElementById('weightChartSvg');
@@ -6603,6 +6673,19 @@ async function init(){
         var _ms=migrateMenuToNewLib();saveState();
         if(_ms.fixed||_ms.old)console.log('[menu] 已对齐新食材库：修复 '+_ms.fixed+' 项，旧库残留 '+_ms.old+' 项，方案更新 '+_ms.plans+' 个');
       }}catch(e){console.error('[menu] 对齐失败',e)}
+  /* v3.13.44：内置菜谱从 150 道换成 33 道，id 从 b1~b150 改成 n1~n33。
+     老杜「我的菜谱」里从旧内置菜谱复制的副本，from 指向的是旧 id（b*），
+     与新内置菜谱的 id 完全不重叠 —— 血统不会错位，副本也不会被误认。
+     这里只做一件事：把旧的 from 值标成 _oldFrom，保留来源信息以备后查。 */
+  try{
+    if(!state.rcpLib44){
+      (state.recipes||[]).forEach(function(r){
+        if(r.from&&/^b\d+$/.test(r.from)&&!r._oldFrom){r._oldFrom=r.from}
+      });
+      state.rcpLib44='n33';
+      saveState();
+    }
+  }catch(e){console.error('[rcp] 血统标记失败',e)}
   detectPlatform(); /* 给 <html> 打平台 class，驱动差异化玻璃参数 */
   state.selectedDate=getDateKey(new Date()); /* 每次打开默认今天 */
   checkAppLockOnLaunch();
@@ -6632,7 +6715,7 @@ async function init(){
 
 
   var mq=window.matchMedia('(prefers-color-scheme:dark)');function onSchemeChange(e){if(state.theme==='auto'){document.querySelector('meta[name="theme-color"]').content=e.matches?'#000000':'#F2F2F7'}};mq.addEventListener?mq.addEventListener('change',onSchemeChange):mq.addListener(onSchemeChange);onSchemeChange(mq);
-    if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除');if(e.data&&e.data.type==='SW_UPDATED'){console.log('[App] SW已更新');var sk='sw_reloaded_'+(e.data.version||'x');if(!sessionStorage.getItem(sk)){sessionStorage.setItem(sk,'1');location.reload()}}})}).catch(function(){console.warn('[App] SW注册失败')})}
+    if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').then(function(reg){console.log('[App] SW已注册');/* v3.13.44：每次打开主动检查更新 */if(reg.update){reg.update().catch(function(){})}reg.addEventListener('updatefound',function(){var nw=reg.installing;if(nw){nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){showToast('有新版本可用，刷新页面更新')}})}});navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='PHOTO_CACHE_CLEARED')console.log('[App] SW照片缓存已清除');if(e.data&&e.data.type==='SW_UPDATED'){console.log('[App] SW已更新');var sk='sw_reloaded_'+(e.data.version||'x');if(!sessionStorage.getItem(sk)){sessionStorage.setItem(sk,'1');location.reload()}}})}).catch(function(){console.warn('[App] SW注册失败')})}
   renderAll();
   generateIcon();
   var _obReplay=location.hash.indexOf('onboard')>=0;
