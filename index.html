@@ -172,10 +172,16 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .ex-plan-box .hl{color:var(--blue);font-weight:700}
 .ex-empty{font-size:13px;color:var(--text-secondary);padding:8px 0}
 .card-clickable{cursor:pointer;position:relative;transition:transform .15s ease}.card-clickable:active{transform:scale(0.98)}.card-clickable .card-title{display:flex;align-items:center;justify-content:space-between}.card-clickable .card-title::after{content:'›';font-size:18px;color:var(--text3);font-weight:400;transition:color .2s,transform .2s}.card-clickable:active .card-title::after{color:var(--blue);transform:translateX(2px)}
-.nutri-bar{margin-bottom:10px}.nutri-bar:last-child{margin-bottom:0}
-.nutri-bar-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
-.nutri-bar-name{color:var(--text2)}.nutri-bar-val{font-weight:600}.nutri-bar-val.mn-over{color:var(--red);font-weight:700}
-.nutri-bar-track{height:6px;background:rgba(118,118,128,0.12);border-radius:3px;overflow:hidden}
+/* v3.13.47：营养素项改成「名字一行 / 数值一行 / 细进度条」的紧凑排版。
+   原来名字和数值挤在同一行（"蛋白质 106.1 / 140g"），列宽只有一半，
+   数字又长又粗，看着像一串乱码 —— 截图里尤其明显。
+   现在数值单独一行、加粗放大，名字淡色小字，达标与否用进度条颜色区分。 */
+.nutri-bar{margin-bottom:0}
+.nutri-bar-head{display:flex;flex-direction:column;gap:1px;margin-bottom:4px}
+.nutri-bar-name{color:var(--text3);font-size:11px;line-height:1.3}
+.nutri-bar-val{font-weight:700;font-size:13px;line-height:1.25;font-variant-numeric:tabular-nums}
+.nutri-bar-val.mn-over{color:var(--red);font-weight:700}
+.nutri-bar-track{height:5px;background:rgba(118,118,128,0.12);border-radius:3px;overflow:hidden}
 .nutri-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
 .rcat{font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;border:none;background:rgba(118,118,128,0.10);color:var(--text2);font-family:inherit;cursor:pointer;flex-shrink:0}
 .rcat.active{background:var(--blue);color:#fff}
@@ -452,10 +458,43 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .search-input-wrap{position:relative;margin-bottom:12px}
 .search-input{width:100%;background:rgba(118,118,128,0.08);border:none;border-radius:12px;padding:12px 14px 12px 40px;font-size:16px;font-family:inherit;outline:none;color:var(--text)}
 .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text2)}
-.cat-filter{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+/* v3.13.47：分类栏从「横向滑动」改成「自动换行的网格」。
+   原来 14 个分类挤在 388px 宽里（实际内容宽 847px），
+   靠 overflow-x:auto 横滑 —— 结果「蛋奶」之后全被截断，
+   老杜根本看不到我新加的「调料」分类（截图实测：scrollW 847 / clientW 388）。
+   改成 flex-wrap 后 14 个分类一屏全露，不用猜能不能滑。 */
+/* v3.13.50：分类栏改回横向滑动 + 右侧固定的「▼ 展开」按钮。
+   老杜需求：「把它横向滑动，然后再加固定右侧有个向下的三角展开分类」。
+   之前 v3.13.47 改成了 flex-wrap 全露，但 14 个分类会把弹窗撑高、结果列表被推下去。
+   现在：一条横向滑动的 chip 行，右侧钉一个 ▼ 按钮，点开是全部分类的下拉面板。 */
+.cat-filter-wrap{position:relative;margin-bottom:12px}
+.cat-filter{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding:0 38px 2px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cat-filter::-webkit-scrollbar{display:none}
+.cat-chip{white-space:nowrap;padding:6px 12px;border-radius:20px;border:none;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(118,118,128,0.1);color:var(--text);transition:all .2s;flex-shrink:0}
+/* 右侧固定的展开按钮：钉在滑动区右缘，带渐变遮罩盖住下方滑过的 chip */
+.cat-filter-toggle{position:absolute;right:0;top:0;height:30px;width:38px;border:none;padding:0;
+  background:linear-gradient(to right,rgba(0,0,0,0),var(--card-bg) 42%);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2}
+.cat-filter-toggle span{display:block;font-size:11px;color:var(--text2);transition:transform .22s ease;line-height:1}
+.cat-filter-toggle.open span{transform:rotate(180deg)}
+/* 展开面板：全部分类一次性列出 */
+.cat-panel{display:none;margin-top:8px;padding:8px;border-radius:14px;background:rgba(118,118,128,0.08)}
+.cat-panel.show{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cat-panel .cat-chip{width:100%;text-align:center;padding:7px 4px;font-size:12px}
+.cat-panel .cat-chip.active{background:var(--blue);color:#fff}
+/* v3.13.52：展开时**隐藏横向滑动条**。
+   老杜原话：「三角展开 分类 然后隐藏滑动 选择后显示 关闭展开」——
+   两套 chip 同时显示是重复（滑动条一份、面板一份），看着乱。
+   展开 = 只留全部分类面板；选完收起 → 滑动条回来（显示当前选中项）。 */
+.cat-filter-wrap.expanded .cat-filter{display:none}
+/* 展开时 ▼ 按钮不再压在滑动条上，而是浮在面板顶栏右侧（点它收起）。
+   顶栏用面板的 ::before 画「全部分类」四个字，按钮绝对定位在同一条上。 */
+.cat-filter-wrap.expanded .cat-filter-toggle{background:none;z-index:3}
+.cat-filter-wrap.expanded .cat-panel{margin-top:0;padding-top:30px;position:relative}
+.cat-filter-wrap.expanded .cat-panel::before{content:'全部分类';position:absolute;left:10px;top:8px;
+  font-size:11px;color:var(--text3);font-weight:600}
 /* v3.13.33 食物库数据来源标注（老杜要求：搜索框上方写一行小字） */
 .search-source-note{font-size:11px;color:var(--text3);line-height:1.4;margin:-4px 0 8px;padding-left:2px;letter-spacing:.1px}
-.cat-chip{white-space:nowrap;padding:6px 14px;border-radius:20px;border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(118,118,128,0.1);color:var(--text);transition:all .2s}
 .cat-chip.active{background:var(--blue);color:#fff}
 .search-results{max-height:50vh;overflow-y:auto}
 .search-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;cursor:pointer;transition:background .2s}
@@ -494,7 +533,10 @@ body.fullscreen .page.active{padding-bottom:calc(var(--safe-bottom) + 18px)}
 .cal-stat-val{font-size:16px;font-weight:800}.cal-stat-label{font-size:11px;color:var(--text2)}
 .cal-detail-title{font-size:15px;font-weight:600;margin-bottom:8px;padding:0 4px}
 .photo-modal-img{width:100%;border-radius:16px;margin-bottom:12px}
-.nutri-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* v3.13.47：保持 2 列（老杜明确要求不动列数），只把「名字/数值」从同一行拆成上下两行。
+   原来"蛋白质 106.1 / 140g"挤在一行，列宽一半，数字又长又粗，看着乱。
+   现在名字淡色小字一行、数值加粗一行、下面一条细进度条 —— 列数不变，可读性好一截。 */
+.nutri-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
 .nutri-col{display:flex;flex-direction:column;gap:10px}
 .nutri-rec{margin-top:10px;padding:10px 12px;background:rgba(0,122,255,0.06);border-radius:10px;font-size:13px;color:var(--text2);line-height:1.6}
 .nutri-rec strong{color:var(--blue);font-weight:700}
@@ -683,14 +725,14 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <div class="bmi-info"><div class="bmi-status" id="bmiStatus" style="color:var(--text3)">请前往设置填写身高体重</div><div class="bmi-desc" id="bmiDesc"></div><div class="bodyfat-row" id="bodyfatRow" style="display:none"><div class="bodyfat-item"><span class="bodyfat-label">体脂率</span><span class="bodyfat-val" id="bfVal">--</span><span class="bodyfat-level" id="bfLevel"></span></div></div></div>
       </div>
     </div>
-    <div class="card">
+    <div class="card" id="mainAddRecordCard" style="display:none">
       <div class="card-title">添加记录</div>
       <button class="action-btn primary" onclick="openSearchModal()"><span class="icon">🔍</span> 手动搜索添加</button>
       <button class="action-btn secondary" onclick="openCustomFoodEditor()"><span class="icon">📋</span> 自定义添加</button>
     </div>
     <div style="height:1px;margin:4px 28px;background:var(--card-border);opacity:0.5"></div>
     <div class="card card-clickable" onclick="openCalorieBreakdown()">
-      <div class="card-title">今日热量</div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>今日热量</span><span style="color:var(--blue);font-size:11.5px;font-weight:600">营养来源 ›</span></div>
       <div class="calorie-main">
         <div class="ring-wrap"><svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100" id="ringSvg"><circle class="ring-bg-circle" cx="50" cy="50" r="42"/><g id="ringLayers"></g></svg><div class="ring-center"><div class="ring-num" id="ringNum">0</div><div class="ring-unit">已摄入 kcal</div></div><div class="ring-lap-tag" id="ringLapTag" style="display:none"></div></div>
         <div class="calorie-info">
@@ -703,8 +745,8 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         </div>
       </div>
     </div>
-    <div class="card card-clickable" onclick="openNutritionBreakdown()">
-      <div class="card-title">营养素摄入</div>
+    <div class="card card-clickable" onclick="openNutritionBreakdown()" style="margin-top:10px">
+      <div style="font-size:11.5px;font-weight:700;color:var(--text2);margin:0 0 9px;display:flex;align-items:center;justify-content:space-between"><span>营养素摄入</span><span style="color:var(--blue);font-weight:600;font-size:11px">更多 ›</span></div>
       <div class="nutri-grid">
         <div class="nutri-col">
           <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">蛋白质</span><span class="nutri-bar-val" id="proteinVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="proteinBar" style="width:0%;background:var(--green)"></div></div></div>
@@ -718,11 +760,9 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         </div>
       </div>
       <div class="nutri-rec" id="nutriRec"></div>
-      <div style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:8px">推荐值是「至少吃到」的参考量；只有超过科学安全上限（如纤维 50g、维A 3000μg）才会标红。</div>
-      <div class="disclaimer" style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:10px;padding:8px 10px;background:rgba(118,118,128,0.06);border-radius:10px">本结果基于公开的营养学公式和一般健康成年人膳食建议计算，仅供日常饮食规划参考，不构成医疗诊断或个体化营养治疗建议。孕妇、哺乳期女性、未成年人、老年人及患有慢性疾病或特殊健康状况的人群，请咨询医生或注册营养师后使用。</div>
-    </div>
+      </div>
     <div class="card">
-      <div class="card-title">今日饮食</div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>今日饮食</span><span id="mainFoodAddBtns" style="display:flex;gap:6px"><button onclick="openSearchModal()" style="border:none;background:rgba(0,122,255,0.12);color:var(--blue);font-size:11.5px;font-weight:600;font-family:inherit;padding:5px 10px;border-radius:20px;cursor:pointer">+ 手动</button><button onclick="openCustomFoodEditor()" style="border:none;background:rgba(118,118,128,0.12);color:var(--text2);font-size:11.5px;font-weight:600;font-family:inherit;padding:5px 10px;border-radius:20px;cursor:pointer">+ 自定义</button></span></div>
       <div class="date-nav"><button class="date-nav-btn" onclick="changeDate(-1)">‹</button><div class="date-nav-title" id="mainDateNavTitle">今天</div><button class="date-nav-btn" onclick="changeDate(1)">›</button></div>
       <div id="mainFoodLogContainer"></div>
     </div>
@@ -742,6 +782,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         </div>
         <button id="rcpFilterBtn" onclick="openRecipeFilter()" style="flex-shrink:0;padding:10px 14px;border:1.5px solid var(--input-bd);border-radius:12px;background:var(--card-bg);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer">全部 ▾</button>
       </div>
+      <div id="rcpCatFilter" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 16px 10px"></div>
       <div class="card" id="rcpListCard" style="display:none;padding-bottom:5px">
         <div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span id="rcpListTitle">全部菜谱</span><span id="rcpListCount" style="font-size:12.5px;color:var(--text3);text-transform:none;letter-spacing:0"></span></div>
         <div id="recipeList"></div>
@@ -782,18 +823,12 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   <div id="history-page" class="page">
     <div class="page-header"><div class="page-title">历史记录</div></div>
     <div id="histStatsWrap">
-    <div class="card" style="padding:12px 16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <div class="card-title" style="margin-bottom:0">体重月历</div>
-        <div style="display:flex;align-items:center;gap:4px">
-          <button class="date-nav-btn" onclick="changeWeightPeriod(-1)" style="width:30px;height:30px;font-size:16px">‹</button>
-          <div class="date-nav-title" id="weightPeriodLabel" onclick="openWeightMonthModal()" style="cursor:pointer;font-size:15px;min-width:84px;text-align:center">2026年7月</div>
-          <button class="date-nav-btn" onclick="changeWeightPeriod(1)" style="width:30px;height:30px;font-size:16px">›</button>
-        </div>
-      </div>
-    </div>
     <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span>体重变化 · <span id="weightChartMonth">本月</span></span><div style="display:flex;align-items:center;gap:6px"><span id="weightChartAllBtn" class="cms-item" onclick="toggleWeightChartAll()" style="font-size:12px;font-weight:600;padding:0 8px;width:auto">从有记录以来</span><div class="chart-mode-switch" id="chartModeSwitch"><span class="cms-item" data-mode="weight" onclick="toggleChartMode('weight')">体重</span><span class="cms-item" data-mode="waist" onclick="toggleChartMode('waist')">腰围</span></div></div></div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>体重变化</span><div style="display:flex;align-items:center;gap:6px">
+        <button class="date-nav-btn" onclick="changeWeightPeriod(-1)" style="width:26px;height:26px;font-size:15px">‹</button>
+        <div class="date-nav-title" id="weightPeriodLabel" onclick="openWeightMonthModal()" style="cursor:pointer;font-size:12.5px;min-width:66px;text-align:center">2026年10月</div>
+        <button class="date-nav-btn" onclick="changeWeightPeriod(1)" style="width:26px;height:26px;font-size:15px">›</button>
+        <span id="weightChartAllBtn" class="cms-item" onclick="toggleWeightChartAll()" style="font-size:12px;font-weight:600;padding:0 8px;width:auto">从有记录以来</span><div class="chart-mode-switch" id="chartModeSwitch"><span class="cms-item" data-mode="weight" onclick="toggleChartMode('weight')">体重</span><span class="cms-item" data-mode="waist" onclick="toggleChartMode('waist')">腰围</span></div></div></div>
       <div class="weight-chart-wrap" onclick="openWeightFull()" style="cursor:pointer" title="点击查看全部记录"><svg class="weight-chart-svg" id="weightChartSvg" viewBox="0 0 320 180" preserveAspectRatio="none"></svg></div>
       <div id="weightChartEmpty" style="display:none;text-align:center;padding:20px;color:var(--text3);font-size:14px">暂无体重记录<br>请在设置页点击「更新」记录体重</div>
       <div id="weightChartStats" style="display:none;margin-top:6px;padding-top:8px;border-top:0.5px solid var(--card-border)"></div>
@@ -803,7 +838,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     <div class="sec-div"><div class="sec-div-line"></div><span class="sec-div-text">饮食记录</span><div class="sec-div-line"></div></div>
     <div class="card">
       <div class="card-title">饮食日历 · 点日期看当天记录</div>
-      <div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div>
+      <div class="cal-nav"><button class="date-nav-btn" onclick="changeCalMonth(-1)">‹</button><div class="cal-title" id="calTitle" style="font-size:15px;font-weight:600"></div><button class="date-nav-btn" onclick="changeCalMonth(1)">›</button></div>
       <div class="calendar-grid" id="calGrid"></div>
       <div id="calDetail"></div>
       <div class="cal-stats" id="calStats" style="margin-bottom:0"></div>
@@ -1002,6 +1037,15 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
           <div class="seg-item" data-goal="gain" onclick="setGoal('gain')">增肌</div>
         </div>
         <div class="goal-tip" id="goalTip" style="padding:0 14px 12px;font-size:11px"></div>
+        <!-- v3.13.46：减脂缺口档位（只在目标=减脂时显示） -->
+        <div id="deficitTierBox" style="display:none;padding:0 14px 12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:11.5px;font-weight:700;color:var(--text2)">每日热量缺口</div>
+            <button class="sc-link" onclick="showGoalInfo()">怎么选</button>
+          </div>
+          <div class="seg-control" style="margin:0 0 8px;width:auto" id="deficitTierControl"></div>
+          <div id="deficitTierInfo" style="font-size:11px;color:var(--text3);line-height:1.55"></div>
+        </div>
       </div>
       <div class="set-tip" style="background:rgba(0,122,255,0.06)">
         <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">按当前设置 · 每日推荐</div>
@@ -1091,7 +1135,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.44</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.53</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1103,6 +1147,9 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="set-gtitle" style="margin-top:6px">页面</div>
       <div class="set-card" id="swPageTabs"></div>
       <div class="sw-note">关掉的页面会从底部导航栏隐藏（首页与设置始终保留）</div>
+      <div class="set-gtitle">主页内容</div>
+      <div class="set-card" id="swMainCards"></div>
+      <div class="sw-note">「添加记录大按钮」开启后，首页会多一张独立的添加卡片（手动搜索添加 / 自定义添加两个大按钮）；关闭时这两个入口缩在「今日饮食」标题栏里</div>
       <div class="set-gtitle">菜谱页内容</div>
       <div class="set-card" id="swRcpCards"></div>
       <div class="sw-note">「全部菜谱」关掉后页面更清爽；只要「菜谱搜索」还开着，一搜索照样出结果</div>
@@ -1241,7 +1288,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   <div class="modal-overlay" id="amountModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="amountModalTitle">确认食物信息</div><div class="food-preview"><span class="food-preview-icon" id="amountIcon">🍽️</span><div class="food-preview-name" id="amountName">食物名称</div></div><div class="amount-input-wrap"><input class="amount-input" type="number" id="amountInput" value="100" step="0.5" inputmode="decimal" oninput="updateAmountResult()"><span class="amount-unit" id="amountUnit">克</span></div><div class="amount-quick" id="amountQuick"><button class="amount-quick-btn" onclick="setAmount(50,this)">50g</button><button class="amount-quick-btn active" onclick="setAmount(100,this)">100g</button><button class="amount-quick-btn" onclick="setAmount(150,this)">150g</button><button class="amount-quick-btn" onclick="setAmount(200,this)">200g</button><button class="amount-quick-btn" onclick="setAmount(300,this)">300g</button></div><div class="amount-tip" id="amountTip">💡 估不准重量？</div><div class="amount-result">热量约 <strong id="amountCalories">0</strong> kcal</div><div class="meal-select"><div class="seg-control" id="mealControl"><div class="seg-item" data-meal="breakfast" onclick="setMeal('breakfast')">早餐</div><div class="seg-item" data-meal="lunch" onclick="setMeal('lunch')">午餐</div><div class="seg-item" data-meal="dinner" onclick="setMeal('dinner')">晚餐</div><div class="seg-item" data-meal="snack" onclick="setMeal('snack')">加餐</div></div></div></div><div class="modal-actions"><button class="modal-btn primary" id="amountConfirmBtn" onclick="confirmAddFood()">添加到今日记录</button><button class="modal-btn danger" onclick="closeAmountModal()" style="background:rgba(118,118,128,0.1);color:var(--text2)">取消</button></div></div></div></div></div>
 
-  <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="searchModalTitle">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="search-source-note">数据来自美国农业部（USDA FoodData Central）· 每 100 克可食部</div><div class="cat-filter" id="catFilter"></div><div class="search-results" id="searchResults"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:0">关闭</button></div></div></div></div></div>
+  <div class="modal-overlay" id="searchModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll"><div class="modal-title" id="searchModalTitle">搜索食物</div><div class="search-input-wrap"><span class="search-icon">🔍</span><input class="search-input" type="text" id="searchInput" placeholder="搜索食物名称..." oninput="searchFood()"></div><div class="search-source-note">数据来自美国农业部（USDA FoodData Central）· 每 100 克可食部</div><div class="cat-filter-wrap" id="catFilterWrap"><div class="cat-filter" id="catFilter"></div><button class="cat-filter-toggle" id="catFilterToggle" onclick="toggleCatPanel()" aria-label="展开全部分类"><span>▼</span></button><div class="cat-panel" id="catPanel"></div></div><div class="search-results" id="searchResults"></div></div><div class="modal-actions"><button class="modal-btn danger" onclick="closeSearchModal()" style="background:rgba(118,118,128,0.1);color:var(--text2);margin-top:0">关闭</button></div></div></div></div></div>
   <div class="modal-overlay" id="recAllModal"><div class="modal-sheet"><div class="modal-handle"></div><div class="modal-scroll">
     <div class="modal-title">全部推荐</div>
     <div class="search-input-wrap" style="margin:2px 0 8px"><span class="search-icon">🔍</span><input class="search-input" id="recAllSearch" placeholder="搜索你的菜…" oninput="renderRecAllList()"></div>
@@ -1590,12 +1637,47 @@ function actFactor(p){
   return ACT_FACTORS[p.activity]||1.2;
 }
 function calcTDEE(p){const b=calcBMR(p);if(!b)return 0;return b*actFactor(p)}
+/* ---------- v3.13.46 减脂缺口档位 ----------
+   以前减脂是写死的 tdee*0.85（15% 缺口），老杜要求能选 100~500 kcal 的具体缺口。
+   科学依据（全部复用项目已有常量，不另造轮子）：
+     · KCAL_PER_KG = 7700 —— 1kg 脂肪约等于 7700 kcal
+     · 缺口 ÷ 7700 = 每天减掉的 kg → ×7 = 每周减重 kg
+     · 医学共识：健康减重速度 ≤ 0.5 kg/周
+       → 0.5 × 7700 ÷ 7 ≈ 550 kcal/天，所以 500 是这套档位里的健康上限
+   档位值存在 state.profile.deficitTier（kcal/天），没设过的老用户保持原行为（tdee*0.85）。 */
+var DEFICIT_TIERS=[
+  {k:100,label:'极保守',note:'适合代谢已经偏低的阶段'},
+  {k:200,label:'温和',note:'容易坚持，掉得慢但不反弹'},
+  {k:300,label:'推荐',note:'速度与可持续性的平衡点'},
+  {k:400,label:'较快',note:'要保证蛋白摄入，别掉肌肉'},
+  {k:500,label:'健康上限',note:'每周 0.45kg，再多容易伤代谢'}
+];
+/* 某档位下的预计减重速度（kg/周） */
+function deficitWeeklyRate(kcal){
+  if(!(kcal>0))return 0;
+  var perDay=Math.round(kcal/7700*1000)/1000;   /* 每天 kg */
+  return Math.round(perDay*7*100)/100;           /* 每周 kg */
+}
+/* 当前生效的减脂缺口档位。老数据（没设过）返回 null → 走原来的 tdee*0.85 */
+function currentDeficitTier(){
+  var v=parseInt((state.profile||{}).deficitTier,10);
+  if(!v)return null;
+  for(var i=0;i<DEFICIT_TIERS.length;i++){if(DEFICIT_TIERS[i].k===v)return DEFICIT_TIERS[i]}
+  return null;
+}
 function calcTargetCalories(){
  const tdee=calcTDEE(state.profile);if(!tdee)return 0;
  const bmr=calcBMR(state.profile);
   let e;
  if(state.profile.goal==='buddha'){e=tdee*0.95;if(e<bmr)e=bmr} // 佛系：轻微控制，5% 缺口
- else if(state.profile.goal==='lose'){e=tdee*0.85;if(e<bmr)e=bmr}
+ else if(state.profile.goal==='lose'){
+   var tier=currentDeficitTier();
+   /* 老用户没设过档位 → 维持原行为（15% 缺口），不突然变严也不变松 */
+   e=tier?(tdee-tier.k):(tdee*0.85);
+   /* v3.13.46：老杜明确选了「不限制，照选」——
+      即使算出的摄入低于 BMR 也照算，不自动降档、不偷偷改结果。
+      只在 UI 上给一句提醒（见 renderDeficitTierUI）。 */
+ }
  else if(state.profile.goal==='gain'){e=tdee*1.15}
  else{e=tdee}
  return Math.round(e);
@@ -2029,8 +2111,39 @@ function openSearchModal(target){
 function closeSearchModal(){hideModal('searchModal')}
 /* v3.13.33 食物库换成 USDA 生鲜库后，分类随库走：蔬菜/水果/肉类/水产/主食/蛋奶（+自定义），
    原来的 饮料/零食/菜肴/原料 已随旧库一起移除 */
-function renderCatFilter(){const cats=['all','蔬菜','水果','肉类','水产','主食','蛋奶','坚果','种子','油脂','糖类','酒类','调料','自定义'];document.getElementById('catFilter').innerHTML=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('')}
-function setCat(c){state.currentCat=c;renderCatFilter();searchFood()}
+function renderCatFilter(){const cats=['all','蔬菜','水果','肉类','水产','主食','蛋奶','坚果','种子','油脂','糖类','酒类','调料','自定义'];
+  var html=cats.map(c=>'<button class="cat-chip '+(state.currentCat===c?'active':'')+'" onclick="setCat(\''+c+'\')">'+(c==='all'?'全部':c)+'</button>').join('');
+  document.getElementById('catFilter').innerHTML=html;
+  var p=document.getElementById('catPanel');if(p)p.innerHTML=html;
+  /* v3.13.50：选中后把滑动条滚到该分类，避免选中的 chip 藏在屏幕外看不见 */
+  var act=document.querySelector('#catFilter .cat-chip.active');
+  var box=document.getElementById('catFilter');
+  if(act&&box&&box.scrollWidth>box.clientWidth){
+    var off=act.offsetLeft-(box.clientWidth-act.offsetWidth)/2;
+    box.scrollTo({left:Math.max(0,off),behavior:'smooth'});
+  }
+}
+/* v3.13.50：点右侧 ▼ 展开/收起全部分类面板 */
+function toggleCatPanel(force){
+  var p=document.getElementById('catPanel');if(!p)return;
+  var btn=document.getElementById('catFilterToggle');
+  var wrap=document.getElementById('catFilterWrap');
+  var open=(force===undefined)?!p.classList.contains('show'):!!force;
+  p.classList.toggle('show',open);
+  if(btn)btn.classList.toggle('open',open);
+  /* v3.13.52：展开时隐藏横向滑动条（两套 chip 同时显示是重复） */
+  if(wrap)wrap.classList.toggle('expanded',open);
+}
+function setCat(c){
+  state.currentCat=c;
+  /* v3.13.52：先收起面板（滑动条恢复显示），再 renderCatFilter ——
+     顺序反了的话，滚动定位会在滑动条还隐藏着的时候执行（宽度为 0，滚动无效），
+     收起后选中项就停在屏幕外看不见了。 */
+  var p=document.getElementById('catPanel');
+  if(p&&p.classList.contains('show'))toggleCatPanel(false);
+  renderCatFilter();
+  searchFood();
+}
 function getAllFoods(){
   /* 自定义菜肴(菜谱同步)同名时"顶替"食品库内置菜肴：主页搜索只保留修改后的版本 */
   var custom=state.customFoods||[];
@@ -2198,7 +2311,7 @@ async function viewPhoto(id){
 }
 function closePhotoModal(){hideModal('photoModal')}
 
-function changeCalMonth(d){calMonth+=d;if(calMonth<0){calMonth=11;calYear--}if(calMonth>11){calMonth=0;calYear++}renderCalendar()}
+function changeCalMonth(d){calMonth+=d;if(calMonth<0){calMonth=11;calYear--}if(calMonth>11){calMonth=0;calYear++}renderCalendar();renderWeeklyChart&&renderWeeklyChart()}
 function renderCalendar(){
   var gridEl=document.getElementById('calGrid');if(!gridEl)return;
   var ttl=document.getElementById('calTitle');if(ttl)ttl.textContent=calYear+'年'+(calMonth+1)+'月';
@@ -2227,16 +2340,32 @@ function renderCalStats(){
   let mostEaten='--';let max=0;for(const[n,c]of Object.entries(foodCounts)){if(c>max){max=c;mostEaten=n}}
   const avg=days>0?Math.round(totalCal/days):0;
   var statsEl=document.getElementById('calStats');if(!statsEl)return;
-  statsEl.innerHTML='<div class="cal-stat"><div class="cal-stat-val">'+days+'</div><div class="cal-stat-label">记录天数</div></div><div class="cal-stat"><div class="cal-stat-val">'+avg+'</div><div class="cal-stat-label">日均热量</div></div><div class="cal-stat"><div class="cal-stat-val" style="font-size:14px">'+mostEaten+'</div><div class="cal-stat-label">最常吃</div></div>'
+  statsEl.innerHTML='<div class="cal-stat"><div class="cal-stat-val">'+avg+'</div><div class="cal-stat-label">日均热量</div></div><div class="cal-stat"><div class="cal-stat-val" style="font-size:14px">'+mostEaten+'</div><div class="cal-stat-label">最常吃</div></div>'
 }
 function selectCalDate(dk){calSelectedDate=dk;renderCalendar()}
+/* v3.13.47：记录行的副标题（克数 · 时间或餐次）
+   ⚠️ 老记录**没有 time 字段**（v3.13.x 早期存的），直接拼 f.time 会显示 "undefined"。
+   现在统一走这个函数：有 time 显示时间，没 time 就显示餐次（早/午/晚/加餐），
+   连餐次都没有就只显示克数 —— 任何情况下都不该冒出 undefined。 */
+function _mealLabel(meal){
+  var m=_MENU_MEALS.filter(function(x){return x.key===meal})[0];
+  return m?m.name:'';
+}
+function foodSubText(f){
+  /* 单位：份量口径的记录存的是 _unit==='份'，但老数据/导入数据可能用 unit，
+     两个都认，避免把「1份」显示成「1g」。 */
+  var isServing=(f._unit==='份')||(f.unit==='份');
+  var g=isServing?(f.amount+'份'):(f.amount+'g');
+  var sub=f.time||_mealLabel(f.meal);
+  return sub?(g+' · '+sub):g;
+}
 function renderCalDetail(){
   const c=document.getElementById('calDetail');if(!c)return;
   if(!calSelectedDate){c.innerHTML='';return}
   const foods=state.foodLogs[calSelectedDate]||[];
   if(!foods.length){c.innerHTML='<div style="padding:14px 0;text-align:center;font-size:13px;color:var(--text3)">'+formatDateLabel(calSelectedDate)+' 无记录</div>';return}
   let html='<div class="cal-detail-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>'+formatDateLabel(calSelectedDate)+' · 共'+foods.length+'项</span><span onclick="jumpToDate(\''+calSelectedDate+'\')" style="color:var(--blue);font-weight:600;font-size:13px;cursor:pointer;flex-shrink:0">在主页查看 ›</span></div>';
-  html+=foods.map(f=>'<div class="food-item" data-food-id="'+f.id+'"><div class="food-photo" style="background:rgba(118,118,128,0.08);display:flex;align-items:center;justify-content:center;font-size:22px'+(f.hasPhoto?';cursor:pointer" onclick="viewPhoto('+f.id+')"':'')+'"'+(f.hasPhoto?'':' ')+'>'+(f.hasPhoto?'':'<span>'+f.icon+'</span>')+'</div><div class="food-info"><div class="food-name">'+f.name+'</div><div class="food-detail">'+(f._unit==='份'?f.amount+'份':f.amount+'g')+' · '+f.time+'</div></div><span class="food-cal">'+f.cal+' kcal</span></div>').join('');
+  html+=foods.map(f=>'<div class="food-item" data-food-id="'+f.id+'"><div class="food-photo" style="background:rgba(118,118,128,0.08);display:flex;align-items:center;justify-content:center;font-size:22px'+(f.hasPhoto?';cursor:pointer" onclick="viewPhoto('+f.id+')"':'')+'"'+(f.hasPhoto?'':' ')+'>'+(f.hasPhoto?'':'<span>'+f.icon+'</span>')+'</div><div class="food-info"><div class="food-name">'+f.name+'</div><div class="food-detail">'+foodSubText(f)+'</div></div><span class="food-cal">'+f.cal+' kcal</span></div>').join('');
   const total=foods.reduce((s,f)=>s+f.cal,0);
   html+='<div style="text-align:center;padding:8px;font-size:14px;color:var(--text2)">总计: <strong style="color:var(--text)">'+total+' kcal</strong></div>';
   c.innerHTML=html;
@@ -2446,7 +2575,10 @@ function renderNutrition(){
       rec='✅ 今日各项营养素达标！<br><span style="font-size:12px;color:var(--text2)">当前热量比: '+ratio+'<br>推荐比: '+ideal+'</span>';
     }
   }
-  document.getElementById('nutriRec').innerHTML=rec;
+  /* v3.13.47：nutriRec 元素被移进「今日热量」卡后，页面管理可能把它所在的卡隐藏，
+     这里加 null 守卫 —— 元素不存在时不能崩（之前是直接 .innerHTML 会抛 TypeError）。 */
+  var recEl=document.getElementById('nutriRec');
+  if(recEl)recEl.innerHTML=rec;
 }
 function renderFoodLog(){
   var titleEl=document.getElementById('mainDateNavTitle');
@@ -2466,7 +2598,7 @@ function renderFoodLog(){
       /* v3.13.36：整行可点 → 打开份量弹窗改克数/餐次（老杜要求）。
          删除按钮在 .food-body 外面，点它不会冒泡触发编辑。
          顺带给无照片的条目补上 data-food-id（原来缺，导致照片回填定位不到）。 */
-      var _body='<div class="food-body" onclick="editFoodEntry('+f.id+')"><div class="food-info"><div class="food-name">'+f.name+'</div><div class="food-detail">'+(f._unit==='份'?f.amount+'份':f.amount+'g')+' · '+f.time+'</div></div><span class="food-edit-tip">✎</span><span class="food-cal">'+f.cal+' kcal</span></div>';
+      var _body='<div class="food-body" onclick="editFoodEntry('+f.id+')"><div class="food-info"><div class="food-name">'+f.name+'</div><div class="food-detail">'+foodSubText(f)+'</div></div><span class="food-edit-tip">✎</span><span class="food-cal">'+f.cal+' kcal</span></div>';
       if(pk){html+='<div class="food-item" data-food-id="'+f.id+'"><div class="food-photo" onclick="viewPhoto(\''+pk+'\')" data-ph="'+pk+'" style="background:rgba(118,118,128,0.08);display:flex;align-items:center;justify-content:center;font-size:20px">'+f.icon+'</div>'+_body+'<button class="food-del" onclick="deleteFood('+f.id+')">✕</button></div>'}
       else{html+='<div class="food-item" data-food-id="'+f.id+'"><span class="food-icon">'+f.icon+'</span>'+_body+'<button class="food-del" onclick="deleteFood('+f.id+')">✕</button></div>'}
     });
@@ -2537,6 +2669,10 @@ function renderSettings(src){
   renderAppLockState();
   renderPagesSub();
   refreshSettingsTop();
+  /* v3.13.46：减脂缺口档位 UI（放在 renderSettings 末尾 —— 必须在
+     applyUIConstraints 之后，因为后者会按 BMI 锁定/改写目标）。
+     ⚠️ 之前这行误插在 applyUIConstraints 内部，导致「切到维持后档位区还显示着」。 */
+  try{ if(typeof renderDeficitTierUI==='function')renderDeficitTierUI() }catch(e){}
 }
 function renderBFCompare(){
   var all=calcBodyFatAll(state.profile);
@@ -2727,6 +2863,7 @@ function openSettingsSub(key){
 var PAGE_ITEMS=[
   {k:'recipe',   g:'tab', tt:'菜谱页面', st:'底部导航的「菜谱」'},
   {k:'history',  g:'tab', tt:'历史页面', st:'底部导航的「历史」'},
+  {k:'mainAdd',  g:'main',tt:'添加记录大按钮', st:'首页独立的添加卡片（手动搜索添加 / 自定义添加）'},
   {k:'rcpMenu',  g:'rcp', tt:'一日菜单', st:'排一天吃什么 · 一键记录'},
   {k:'rcpSearch',g:'rcp', tt:'菜谱搜索', st:'搜索框与分类筛选'},
   {k:'rcpList',  g:'rcp', tt:'全部菜谱', st:'默认的整份菜谱列表'},
@@ -2735,28 +2872,38 @@ var PAGE_ITEMS=[
 ];
 var PAGE_GROUPS=[
   {g:'tab', box:'swPageTabs'},
+  {g:'main',box:'swMainCards'},
   {g:'rcp', box:'swRcpCards', parent:'recipe'},
   {g:'hist',box:'swHistCards',parent:'history'}
 ];
 function pageOn(k){var p=state.pages||{};return p[k]!==false}
+/* v3.13.51：「添加记录大按钮」默认**关**（老杜要求）。
+   pageOn() 的语义是「缺省=开」，这条要反过来，所以单独一个判断函数。 */
+function mainAddOn(){var p=state.pages||{};return p.mainAdd===true}
+/* 统一的「这一项是否显示」判断，供渲染/切换/统计三处共用 */
+function pageItemOn(it){
+  if(!it)return false;
+  var k=(typeof it==='string')?it:it.k;
+  return (k==='mainAdd')?mainAddOn():pageOn(k);
+}
 function renderPagesSub(){
   PAGE_GROUPS.forEach(function(grp){
     var box=document.getElementById(grp.box);if(!box)return;
     var dim=grp.parent&&!pageOn(grp.parent);
     var h='';
     PAGE_ITEMS.filter(function(it){return it.g===grp.g}).forEach(function(it){
-      var on=pageOn(it.k);
+      var on=pageItemOn(it);
       h+='<div class="sw-row'+(dim?' dim':'')+'"><div class="sw-txt"><div class="sw-tt">'+it.tt+'</div><div class="sw-st">'+it.st+'</div></div>'
         +'<button class="swt'+(on?' on':'')+'" onclick="togglePageItem(\''+it.k+'\')" aria-label="'+it.tt+'" aria-pressed="'+(on?'true':'false')+'"></button></div>';
     });
     box.innerHTML=h;
   });
   var v=document.getElementById('sPagesVal');
-  if(v){var off=PAGE_ITEMS.filter(function(it){return !pageOn(it.k)}).length;v.textContent=off?('已隐藏 '+off+' 项'):'全部显示'}
+  if(v){var off=PAGE_ITEMS.filter(function(it){return !pageItemOn(it)}).length;v.textContent=off?('已隐藏 '+off+' 项'):'全部显示'}
 }
 function togglePageItem(k){
   state.pages=state.pages||{};
-  var now=!pageOn(k);
+  var now=!pageItemOn({k:k});
   state.pages[k]=now;
   saveState();
   applyPagePrefs();
@@ -2766,17 +2913,27 @@ function togglePageItem(k){
 }
 function resetPagePrefs(){
   var p={};PAGE_ITEMS.forEach(function(it){p[it.k]=true});
+  /* v3.13.51：mainAdd 默认是关的，「恢复默认」不应把它打开 */
+  p.mainAdd=false;
   state.pages=p;
   saveState();
   applyPagePrefs();
   renderPagesSub();
-  showToast('已全部恢复显示');
+  showToast('已恢复默认显示');
 }
 function applyPagePrefs(){
   ['recipe','history'].forEach(function(n){
     var t=document.querySelector('.tab-item[data-page="'+n+'"]');
     if(t)t.style.display=pageOn(n)?'':'none';
   });
+  /* v3.13.51：主页「添加记录」两种形态互斥 ——
+     开着大按钮卡片 → 独立卡片显示、今日饮食标题栏的小药丸隐藏；
+     关掉 → 反之。 */
+  var addOn=mainAddOn();
+  var addCard=document.getElementById('mainAddRecordCard');
+  if(addCard)addCard.style.display=addOn?'':'none';
+  var addBtns=document.getElementById('mainFoodAddBtns');
+  if(addBtns)addBtns.style.display=addOn?'none':'flex';
   /* 菜谱页内模块 */
   var m=document.getElementById('rcpMenuCard');if(m)m.style.display=pageOn('rcpMenu')?'':'none';
   var sb=document.getElementById('rcpSearchBar');if(sb)sb.style.display=pageOn('rcpSearch')?'':'none';
@@ -3000,6 +3157,59 @@ function updateActNotes(){
   _renderActNote(document.getElementById('obActNote'),k);
 }
 function setGoal(g){state.profile.goal=g;saveState();renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart()}
+/* ---------- v3.13.46 减脂缺口档位：UI 渲染与选择 ---------- */
+/* 渲染档位按钮组 + 说明 + （低于 BMR 时的橙色提醒） */
+function renderDeficitTierUI(){
+  var box=document.getElementById('deficitTierBox');
+  if(!box)return;
+  var isLose=(state.profile.goal==='lose');
+  box.style.display=isLose?'block':'none';
+  if(!isLose)return;
+  var ctrl=document.getElementById('deficitTierControl');
+  if(!ctrl)return;
+  var cur=currentDeficitTier();
+  var tdee=calcTDEE(state.profile);
+  var bmr=calcBMR(state.profile);
+  var html=DEFICIT_TIERS.map(function(t){
+    var rate=deficitWeeklyRate(t.k);
+    var act=cur&&cur.k===t.k;
+    /* 数字和速度之间留一点间隔，别挤成 "5000.46" */
+    return '<div class="seg-item'+(act?' active':'')+'" data-deficit="'+t.k+'" onclick="setDeficitTier('+t.k+')"'
+      +' style="display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.15;padding:7px 9px">'
+      +'<span style="font-size:13.5px;font-weight:700">'+t.k+'</span>'
+      +'<span style="font-size:9.5px;opacity:.75;font-weight:400">'+rate.toFixed(2)+' kg/周</span></div>';
+  }).join('');
+  if(ctrl.innerHTML!==html)ctrl.innerHTML=html;
+  /* 说明 + 提醒 */
+  var info=document.getElementById('deficitTierInfo');
+  if(!info)return;
+  if(!cur){
+    /* 老用户还没选过档位 → 展示当前实际生效的 15% 缺口，引导去选 */
+    var legacy=tdee?Math.round(tdee*0.15):0;
+    info.innerHTML='当前未指定档位，按 15% 缺口计算（约 '+legacy+' kcal/天）。'
+      +'<br>选一档可精确控制减重速度。';
+    return;
+  }
+  var rate=deficitWeeklyRate(cur.k);
+  var intake=tdee?Math.round(tdee-cur.k):0;
+  var lines=['<b style="color:var(--text2)">'+cur.k+' kcal/天</b> · 约 '+rate.toFixed(2)+' kg/周 · '+cur.label+' —— '+cur.note];
+  if(bmr>0&&intake<bmr){
+    /* 老杜选了「不限制，照选」，所以这里只提醒、不阻止、不改结果 */
+    lines.push('<span style="color:var(--orange)">⚠️ 此档位推荐摄入 '+intake+' kcal，低于基础代谢 '+Math.round(bmr)
+      +' kcal。长期低于 BMR 可能降低代谢、掉肌肉，建议只短期使用。</span>');
+  }
+  info.innerHTML=lines.join('<br>');
+}
+function setDeficitTier(k){
+  var v=parseInt(k,10);
+  var ok=false;
+  for(var i=0;i<DEFICIT_TIERS.length;i++){if(DEFICIT_TIERS[i].k===v)ok=true}
+  if(!ok)return;
+  state.profile.deficitTier=v;
+  saveState();
+  renderSettings();renderCalorieSummary();renderNutrition();renderWeeklyChart();
+  showToast('减脂缺口已设为 '+v+' kcal/天');
+}
 function setTheme(t){state.theme=t;saveState();if(t==='auto'){document.documentElement.removeAttribute('data-theme')}else{document.documentElement.setAttribute('data-theme',t)};document.querySelector('meta[name="theme-color"]').content=t==='dark'?'#000000':'#F2F2F7';renderSettings()}
 function showActivityInfo(){
   document.getElementById('infoModalTitle').textContent='你每天大概走多少步';
@@ -3020,11 +3230,31 @@ function showGoalInfo(){
   document.getElementById('infoModalTitle').textContent='目标说明';
   var items=[
     {t:'佛系',d:'每天比消耗少吃一点点（约 5%～8%），稳步慢减，基本不挨饿'},
-    {t:'减脂',d:'每天比消耗少吃约 15%，大约 250～350 kcal，差不多一碗米饭'},
+    {t:'减脂',d:'可以自己选每天的热量缺口：100～500 kcal 五档。每档都标了预计减重速度，选适合自己的节奏'},
     {t:'维持',d:'吃进去 = 消耗掉，体重基本不动'},
     {t:'增肌',d:'每天比消耗多吃约 15%，配合力量训练长肌肉'}
   ];
   var html=items.map(function(i){return '<div class="info-modal-item"><div class="info-modal-item-title">'+i.t+'</div><div class="info-modal-item-desc">'+i.d+'</div></div>'}).join('');
+  /* v3.13.46：把五档缺口和科学依据摊开讲清楚 */
+  html+='<div class="info-modal-item" style="border-bottom:none;padding-top:10px"><div class="info-modal-item-title">减脂的五档缺口</div>';
+  html+='<div class="info-modal-item-desc" style="font-size:12px;line-height:1.7">'
+    +DEFICIT_TIERS.map(function(t){
+        var r=deficitWeeklyRate(t.k);
+        return '<div style="display:flex;justify-content:space-between;padding:3px 0">'
+          +'<span><b>'+t.k+'</b> kcal/天 · '+t.label+'</span>'
+          +'<span style="color:var(--text3)">'+r.toFixed(2)+' kg/周</span></div>';
+      }).join('')
+    +'</div></div>';
+  html+='<div class="info-modal-item" style="border-bottom:none;padding-top:6px"><div class="info-modal-item-desc" style="font-size:11.5px;color:var(--text3);line-height:1.65">'
+    +'<b style="color:var(--text2)">怎么算的：</b>1 kg 脂肪约等于 7700 kcal，缺口 ÷ 7700 = 每天掉的体重，×7 就是每周。<br>'
+    +'<b style="color:var(--text2)">为什么最高 500：</b>医学上认为每周减 0.5 kg 以内最安全'
+    +'（0.5 × 7700 ÷ 7 ≈ 550 kcal/天），超过容易掉肌肉、降低代谢、也更容易反弹。<br>'
+    +'<b style="color:var(--text2)">怎么选：</b>能长期坚持的才是好档位。'
+    +'300 kcal/天（约 0.27 kg/周）是速度与可持续性的平衡点；'
+    +'500 档速度最快，但建议只短期用，并且保证蛋白质吃够。<br>'
+    +'<b style="color:var(--text2)">注意：</b>如果某一档算出的摄入低于你的基础代谢（BMR），'
+    +'说明太狠了 —— 长期这样会降低代谢、掉肌肉，尽量别超过几周。'
+    +'</div></div>';
   html+='<div class="info-modal-item" style="border-bottom:none;padding-top:10px"><div class="info-modal-item-desc" style="font-size:12px;color:var(--text3)">具体克数按你的身高体重自动算，不用自己算。</div></div>';
   document.getElementById('infoModalBody').innerHTML=html;
   showModal('infoModal');
@@ -3338,7 +3568,7 @@ async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？�
    已改成 Network First（联网优先、断网回退缓存），这里再补两个保险：
    ① 手动「检查更新」按钮：清掉所有 SW 缓存 + 重新注册 + 重载页面
    ② 启动时自动比对版本号：发现新版就提示，点一下就更新 */
-var APP_BUILD='v3.13.44';
+var APP_BUILD='v3.13.53';
 /* 清掉所有缓存并强制重新拉取 */
 async function forceUpdate(silent){
   var btn=document.getElementById('cuBtn');
@@ -3410,10 +3640,6 @@ function renderWeightChart(){
       var parts=r.date.split('-');
       return parseInt(parts[0])===y&&parseInt(parts[1])===m+1;
     });
-  }
-  var monthLabelEl=document.getElementById('weightChartMonth');
-  if(monthLabelEl){
-    monthLabelEl.textContent=state.weightChartAll?'全部记录':y+'年'+(m+1)+'月';
   }
   var emptyEl=document.getElementById('weightChartEmpty');
   if(!records.length){
@@ -4224,6 +4450,19 @@ function _rcpChip(cat){
 function rcpBuiltins(){return window.BUILTIN_RECIPES||[]}
 function allRecipes(){return rcpBuiltins().concat(state.recipes||[])}
 function findRecipe(id){var r=null;allRecipes().forEach(function(x){if(x.id===id)r=x});return r}
+function renderRcpStyleFilter(){
+  var el=document.getElementById('rcpCatFilter');if(!el)return;
+  var all=(state.recipes||[]).concat(rcpBuiltins());
+  var cnt={};_rcpStyleDefs.forEach(function(d){cnt[d[1]]=all.filter(function(r){return d[1]==='全部'||_rcpStyleOf(r)===d[1]}).length});
+  var html=_rcpStyleDefs.map(function(d){
+    var on=(_rcpStyle||'全部')===d[1];
+    return '<div onclick="pickRcpStyle(\''+d[1]+'\')" style="white-space:nowrap;padding:6px 12px;border-radius:20px;'
+      +(on?'background:var(--blue);color:#fff;':'background:rgba(118,118,128,0.1);color:var(--text);')
+      +'font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer">'+d[1]+' '+cnt[d[1]]+'</div>';
+  }).join('');
+  if(el.innerHTML!==html)el.innerHTML=html;
+}
+function pickRcpStyle(s){_rcpStyle=s;renderRcpStyleFilter();renderRecipeList();}
 function renderRecipeList(){
   var el=document.getElementById('recipeList');if(!el)return;
   var card=document.getElementById('rcpListCard'),emp=document.getElementById('rcpEmptyState');
@@ -4231,6 +4470,8 @@ function renderRecipeList(){
   var all=mine.concat(rcpBuiltins());
   var q=(document.getElementById('rcpSearch')&&document.getElementById('rcpSearch').value||'').trim();
   var list=all.slice();
+  renderRcpStyleFilter();
+  if(_rcpStyle&&_rcpStyle!=='全部')list=list.filter(function(r){return _rcpStyleOf(r)===_rcpStyle});
   if(_rcpCat==='我的')list=list.filter(function(r){return !r.builtin});
   else if(_rcpCat!=='all')list=list.filter(function(r){return r.cat===_rcpCat});
   if(q)list=list.filter(function(r){return (r.name||'').indexOf(q)>=0||((r.ingrs||[]).some(function(x){return (x.name||'').indexOf(q)>=0}))});
@@ -4267,11 +4508,11 @@ function renderRecipeList(){
   list.forEach(function(r,i){
     var chip='';
     if(r.cat){var cc=_rcpChip(r.cat);chip='<span class="rcat-chip" style="background:'+cc[0]+';color:'+cc[1]+';flex-shrink:0">'+r.cat+'</span>'}
-    html+='<div onclick="openRecipeDetail(\''+r.id+'\')" style="display:flex;align-items:center;gap:12px;padding:12px 0;cursor:pointer'+(i?';border-top:0.5px solid var(--card-border)':'')+'">'
-      +'<div style="width:52px;height:52px;border-radius:14px;background:rgba(118,118,128,0.08);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0" data-rimg="'+r.id+'">'+(r.icon||'🍳')+'</div>'
+    html+='<div onclick="openRecipeDetail(\''+r.id+'\')" style="display:flex;align-items:center;gap:10px;padding:9px 0;cursor:pointer'+(i?';border-top:0.5px solid var(--card-border)':'')+'">'
+      +'<div style="width:40px;height:40px;border-radius:12px;background:rgba(118,118,128,0.08);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0" data-rimg="'+r.id+'">'+(r.icon||'🍳')+'</div>'
       +'<div style="flex:1;min-width:0">'
-      +'<div style="font-size:15.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+r.name+'</div>'
-      +'<div style="font-size:12.5px;color:var(--text2);margin-top:3px">'+r.cal+' kcal · 蛋白 '+r.p+'g · '+(r.time||0)+' 分钟</div>'
+      +'<div style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+r.name+'</div>'
+      +'<div style="font-size:11.5px;color:var(--text3);margin-top:2px">'+r.cal+' kcal · 蛋白 '+r.p+'g · '+(r.time||0)+' 分钟</div>'
       +'</div>'
       +chip
       +'</div>';
@@ -4442,6 +4683,18 @@ function exitRecipeDetail(){
   /* 不调 renderRecipeList()：列表 DOM 仍在原位，只是不显示；重渲会让 150 张卡 innerHTML 重建 + 一连串 IndexedDB getPhoto 排队，造成返回后"卡一会儿"。分类/搜索/新建/删除路径已在对应处显式 invalidate。 */
 }
 var _rcpCatDefs=[['all','全部'],['我的','我的'],['高蛋白','高蛋白'],['高纤维','高纤维'],['高碳水','高碳水']];
+/* mock：新增「按菜系」筛选组 */
+var _rcpStyleDefs=[['全部','全部'],['荤菜','荤菜'],['素菜','素菜'],['汤羹','汤羹'],['主食','主食'],['蛋奶','蛋奶'],['水产','水产']];
+var _rcpStyle='全部';
+function _rcpStyleOf(r){
+  var n=r.name||'';
+  if(/汤|羹|粥|煲/.test(n))return '汤羹';
+  if(/饭|面|粥|饼|馒头|窝头|红薯/.test(n))return /粥/.test(n)?'汤羹':'主食';
+  if(/蒸|白灼|清蒸|生/.test(n)&&/鱼|虾|蟹|蛤|鱿|鳕|三文鱼|鲈鱼/.test(n))return '水产';
+  if(/蛋|奶|豆腐/.test(n)&&/蒸|煮|牛奶|蒸蛋/.test(n))return '蛋奶';
+  if(/炒|烧|炖|焖|红烧|宫保|麻婆|鱼香|回锅|可乐鸡|地三鲜|茄子|肉丝/.test(n))return '荤菜';
+  return '素菜';
+}
 function _rcpCatLabel(cat){var s='全部';_rcpCatDefs.forEach(function(d){if(d[0]===cat)s=d[1]});return s}
 function openRecipeFilter(){renderRecipeFilter();showModal('rcpFilterModal')}
 function renderRecipeFilter(){
@@ -5815,12 +6068,22 @@ function exAdd(tagId,amount){
   exLogs().push({id:'ex'+Date.now()+Math.floor(Math.random()*900),tagId:t.id,name:t.name,icon:t.icon||'🏃',
     mode:t.mode,amount:amt,kcal:kc,at:new Date().toTimeString().slice(0,5)});
   saveState();
+  /* v3.13.45：记完运动要**立刻**刷新主页今日热量卡片。
+     之前只调了 refreshCalorieModal()（刷弹窗）+ renderExerciseSummary()（刷已消耗拆解），
+     漏了 renderCalorieSummary() —— 主页的环形缺口 / 中心数字 / 缺口结论文案
+     都要靠它渲染，不刷就一直停在记运动之前的样子（老杜报的 bug）。
+     放在 exAdd 里而不是按钮回调里：exAdd 是唯一的运动写入入口，
+     以后谁调它都自动生效，不会再漏。 */
+  if(typeof renderCalorieSummary==='function')renderCalorieSummary();
   return true;
 }
 function exDel(id){
   var dk=state.selectedDate;
   state.exerciseLogs[dk]=exLogs(dk).filter(function(e){return e.id!==id});
-  saveState();renderExerciseSummary();refreshCalorieModal();showToast('已删除这条运动');
+  saveState();renderExerciseSummary();refreshCalorieModal();
+  /* v3.13.45：删运动同理，主页卡片要跟着回退 */
+  if(typeof renderCalorieSummary==='function')renderCalorieSummary();
+  showToast('已删除这条运动');
 }
 /* 健康体重区间：BMI 22 反推（若用户设了目标体重则优先） */
 function healthyWeight(){

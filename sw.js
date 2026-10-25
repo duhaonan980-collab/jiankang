@@ -1,10 +1,10 @@
 /* ============================================
    热量营养检测 - Service Worker
-   版本: v3.11.11
+   版本: v3.13.44
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v132';
+const CACHE_VERSION = 'v141';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 
@@ -78,7 +78,11 @@ self.addEventListener('fetch', (event) => {
   // 跳过非 GET 请求
   if (event.request.method !== 'GET') return;
 
-  // 处理应用核心文件请求（Cache First，后台更新）
+  // 处理应用核心文件请求（Network First：联网优先拿新代码，断网回退缓存）
+  //
+  // v3.13.44：原来是 staleWhileRevalidate（缓存优先），导致手机上装成 PWA 后
+  // 改了代码/数据必须「退后台杀掉进程再进」才生效 —— 因为每次打开都先给旧缓存。
+  // 改成 Network First：联网时直接拿服务器上的最新文件，断网才用缓存（离线可用）。
   if (
     pathname.endsWith('.html') ||
     pathname.endsWith('.js') ||
@@ -86,7 +90,7 @@ self.addEventListener('fetch', (event) => {
     pathname === '/' ||
     pathname.endsWith('/')
   ) {
-    event.respondWith(staleWhileRevalidate(event.request));
+    event.respondWith(networkFirst(event.request));
     return;
   }
 
@@ -126,14 +130,32 @@ async function cacheFirst(request) {
 /**
  * Network First：优先网络，失败时使用缓存
  * 适用于：可能更新的内容
+ *
+ * v3.13.44：加了超时兜底 —— 网络慢的时候不等它，直接给缓存，
+ * 保证 App 打开不会干等（网络优先 + 超时回退 = 又新又不卡）。
  */
 async function networkFirst(request) {
+  // 超时兜底：3 秒内网络没响应就用缓存，不让用户干等
+  const timeout = new Promise((resolve) => {
+    setTimeout(() => resolve('__TIMEOUT__'), 3000);
+  });
   try {
-    const response = await fetch(request);
-    // 网络成功时，后台更新缓存
-    const cache = await caches.open(APP_SHELL);
-    cache.put(request, response.clone());
-    return response;
+    const netPromise = fetch(request).then((response) => {
+      if (response && response.ok) {
+        const cacheCopy = response.clone();
+        caches.open(APP_SHELL).then((cache) => {
+          cache.put(request, cacheCopy);
+        });
+      }
+      return response;
+    });
+    const result = await Promise.race([netPromise, timeout]);
+    if (result !== '__TIMEOUT__') return result;
+    // 超时了：后台继续跑网络请求（更新缓存），当前先用缓存响应
+    netPromise.catch(() => {});
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    return await netPromise;
   } catch (err) {
     // 离线时，从缓存获取
     const cached = await caches.match(request);
