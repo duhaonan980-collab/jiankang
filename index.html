@@ -497,6 +497,13 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .search-source-note{font-size:11px;color:var(--text3);line-height:1.4;margin:-4px 0 8px;padding-left:2px;letter-spacing:.1px}
 .cat-chip.active{background:var(--blue);color:#fff}
 .search-results{max-height:50vh;overflow-y:auto}
+/* v3.13.55：菜谱页顶部两个容器的布局搬进 CSS 类。
+   ⚠️ display 一定要放 CSS 里，不能只写在 inline style ——
+   JS 里 el.style.display='' 恢复显示时，会把 inline 的 display 一起清空，
+   容器退化成 block：菜系 chips 竖排 7 行、搜索框与筛选按钮上下分离。
+   放 CSS 类后，'' 恢复时由类兜底，这类坑不会再犯。 */
+.rcp-search-bar{display:flex;gap:8px;align-items:center;margin:0 16px 12px}
+.rcp-cat-filter{display:flex;flex-wrap:wrap;gap:6px;margin:0 16px 10px}
 .search-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;cursor:pointer;transition:background .2s}
 .search-item:active{background:rgba(118,118,128,0.1)}
 .search-item-icon{width:36px;height:36px;border-radius:10px;font-size:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(118,118,128,0.08);background-size:cover;background-position:center}
@@ -732,7 +739,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     </div>
     <div style="height:1px;margin:4px 28px;background:var(--card-border);opacity:0.5"></div>
     <div class="card card-clickable" onclick="openCalorieBreakdown()">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>今日热量</span><span style="color:var(--blue);font-size:11.5px;font-weight:600">营养来源 ›</span></div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>今日热量</span></div>
       <div class="calorie-main">
         <div class="ring-wrap"><svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100" id="ringSvg"><circle class="ring-bg-circle" cx="50" cy="50" r="42"/><g id="ringLayers"></g></svg><div class="ring-center"><div class="ring-num" id="ringNum">0</div><div class="ring-unit">已摄入 kcal</div></div><div class="ring-lap-tag" id="ringLapTag" style="display:none"></div></div>
         <div class="calorie-info">
@@ -746,7 +753,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       </div>
     </div>
     <div class="card card-clickable" onclick="openNutritionBreakdown()" style="margin-top:10px">
-      <div style="font-size:11.5px;font-weight:700;color:var(--text2);margin:0 0 9px;display:flex;align-items:center;justify-content:space-between"><span>营养素摄入</span><span style="color:var(--blue);font-weight:600;font-size:11px">更多 ›</span></div>
+      <div class="card-title" style="font-size:11.5px;font-weight:700;color:var(--text2);margin:0 0 9px;display:flex;align-items:center;justify-content:space-between"><span>营养素摄入</span></div>
       <div class="nutri-grid">
         <div class="nutri-col">
           <div class="nutri-bar"><div class="nutri-bar-head"><span class="nutri-bar-name">蛋白质</span><span class="nutri-bar-val" id="proteinVal">0 / 0g</span></div><div class="nutri-bar-track"><div class="nutri-bar-fill" id="proteinBar" style="width:0%;background:var(--green)"></div></div></div>
@@ -775,14 +782,14 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <button onclick="openRecipeEditor()" title="新建菜谱" style="border:none;background:var(--blue);color:#fff;width:38px;height:38px;border-radius:50%;font-size:22px;font-weight:600;line-height:1;font-family:inherit;cursor:pointer">+</button>
       </div>
       <div id="rcpMenuCard" class="card" style="cursor:pointer" onclick="openMenuPage()"></div>
-      <div id="rcpSearchBar" style="display:flex;gap:8px;align-items:center;margin:0 16px 12px">
+      <div id="rcpSearchBar" class="rcp-search-bar">
         <div class="search-input-wrap" style="flex:1;margin-bottom:0">
           <span class="search-icon" style="left:12px;font-size:14px">🔍</span>
           <input class="search-input" id="rcpSearch" placeholder="搜索菜谱、食材..." oninput="renderRecipeList()" style="padding:10px 10px 10px 33px;font-size:15px">
         </div>
         <button id="rcpFilterBtn" onclick="openRecipeFilter()" style="flex-shrink:0;padding:10px 14px;border:1.5px solid var(--input-bd);border-radius:12px;background:var(--card-bg);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer">全部 ▾</button>
       </div>
-      <div id="rcpCatFilter" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 16px 10px"></div>
+      <div id="rcpCatFilter" class="rcp-cat-filter"></div>
       <div class="card" id="rcpListCard" style="display:none;padding-bottom:5px">
         <div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span id="rcpListTitle">全部菜谱</span><span id="rcpListCount" style="font-size:12.5px;color:var(--text3);text-transform:none;letter-spacing:0"></span></div>
         <div id="recipeList"></div>
@@ -1135,7 +1142,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.53</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.56</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1153,6 +1160,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="set-gtitle">菜谱页内容</div>
       <div class="set-card" id="swRcpCards"></div>
       <div class="sw-note">「全部菜谱」关掉后页面更清爽；只要「菜谱搜索」还开着，一搜索照样出结果</div>
+      <div class="sw-note" style="margin-top:-4px">「全部菜谱」关掉时，上面的<b style="color:var(--text2)">菜系分类</b>会一并隐藏（列表没了，分类也没意义）</div>
       <div class="set-gtitle">历史页内容</div>
       <div class="set-card" id="swHistCards"></div>
       <div class="sw-note">只影响显示，记录与数据都还在，随时可以再打开</div>
@@ -2942,6 +2950,11 @@ function applyPagePrefs(){
     var si=document.getElementById('rcpSearch');if(si&&si.value)si.value='';
     if(typeof _rcpCat!=='undefined'&&_rcpCat!=='all')_rcpCat='all';
   }
+  if(!pageOn('rcpList')){
+    /* v3.13.54：菜系分类跟着「全部菜谱」关掉 → 残留的菜系条件也要清，
+       否则用户看不到分类 chips，列表却被一个看不见的条件筛过。 */
+    if(typeof _rcpStyle!=='undefined'&&_rcpStyle!=='全部')_rcpStyle='全部';
+  }
   /* 历史页内模块 */
   var s=document.getElementById('histStatsWrap');if(s)s.style.display=pageOn('histStats')?'':'none';
   var l=document.getElementById('histLogWrap');if(l)l.style.display=pageOn('histLog')?'':'none';
@@ -3568,7 +3581,7 @@ async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？�
    已改成 Network First（联网优先、断网回退缓存），这里再补两个保险：
    ① 手动「检查更新」按钮：清掉所有 SW 缓存 + 重新注册 + 重载页面
    ② 启动时自动比对版本号：发现新版就提示，点一下就更新 */
-var APP_BUILD='v3.13.53';
+var APP_BUILD='v3.13.56';
 /* 清掉所有缓存并强制重新拉取 */
 async function forceUpdate(silent){
   var btn=document.getElementById('cuBtn');
@@ -4452,6 +4465,11 @@ function allRecipes(){return rcpBuiltins().concat(state.recipes||[])}
 function findRecipe(id){var r=null;allRecipes().forEach(function(x){if(x.id===id)r=x});return r}
 function renderRcpStyleFilter(){
   var el=document.getElementById('rcpCatFilter');if(!el)return;
+  /* v3.13.54：菜系分类跟着「全部菜谱」开关一起关。
+     老杜原话：「页面关闭 全部菜谱显示时 分类也一并 关闭」——
+     列表都不显示了，分类筛选就失去意义，不能孤零零挂在那。
+     顺带修掉一个漏网之鱼：这行菜系 chips 之前**没有任何开关管着**。 */
+  el.style.display=pageOn('rcpList')?'':'none';
   var all=(state.recipes||[]).concat(rcpBuiltins());
   var cnt={};_rcpStyleDefs.forEach(function(d){cnt[d[1]]=all.filter(function(r){return d[1]==='全部'||_rcpStyleOf(r)===d[1]}).length});
   var html=_rcpStyleDefs.map(function(d){
@@ -5108,8 +5126,7 @@ function renderMenuPage(){
   var body=document.getElementById('menuBody');if(!body)return;
   var list=menuList();
   var html='<div class="card card-clickable" style="margin:10px 16px" onclick="openMenuNutriDetail()">'
-    +'<div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span>已排营养</span>'
-    +'<span style="font-size:12px;color:var(--blue);text-transform:none;letter-spacing:0;font-weight:600">营养来源 ›</span></div>'
+    +'<div class="card-title" style="display:flex;align-items:center;justify-content:space-between"><span>已排营养</span></div>'
     +'<div id="menuNutriBox">'+menuNutriBox()+'</div>'
     +'<div style="font-size:11px;color:var(--text3);line-height:1.5">这是「打算吃」的清单，不会计入今日摄入。确认吃完了再点下方按钮记录。</div></div>';
   if(!list.length){
