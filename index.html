@@ -1142,7 +1142,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.56</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.57</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -3581,7 +3581,7 @@ async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？�
    已改成 Network First（联网优先、断网回退缓存），这里再补两个保险：
    ① 手动「检查更新」按钮：清掉所有 SW 缓存 + 重新注册 + 重载页面
    ② 启动时自动比对版本号：发现新版就提示，点一下就更新 */
-var APP_BUILD='v3.13.56';
+var APP_BUILD='v3.13.57';
 /* 清掉所有缓存并强制重新拉取 */
 async function forceUpdate(silent){
   var btn=document.getElementById('cuBtn');
@@ -3611,9 +3611,32 @@ async function checkUpdate(){
   showToast('正在检查更新…');
   await forceUpdate(false);
 }
+/* v3.13.57：联网探测（带超时）。
+   老杜原话：「打开 检测是否联网 联网就检测版本是不是最新 没联网或者超时连接就用离线版 不更新」。
+   返回 true = 确认联网；false = 离线或超时（此时 App 就用离线版，不做任何更新动作）。
+   手法：navigator.onLine 先做快速判断（明显离线就立刻返回），
+   再发一个带 AbortController 的轻量 HEAD 请求做真实探测 ——
+   只要能拿到响应（哪怕 405）就说明网络通，只有抛异常才算不通。 */
+async function checkOnline(timeoutMs){
+  timeoutMs=timeoutMs||2000;
+  if(navigator.onLine===false)return false;
+  try{
+    if(typeof AbortController==='undefined')return true;
+    var ctl=new AbortController();
+    var timer=setTimeout(function(){try{ctl.abort()}catch(e){}},timeoutMs);
+    try{
+      await fetch('./sw.js?ping='+Date.now(),{method:'HEAD',cache:'no-store',signal:ctl.signal});
+      return true;
+    }finally{clearTimeout(timer)}
+  }catch(e){return false}
+}
 /* 启动时自动比对：sw.js 里的 CACHE_VERSION 与本地记录的不一致 → 提示有新版 */
 async function autoCheckUpdate(){
   if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
+  /* v3.13.57：先探联网（2 秒超时）。离线/超时就直接用离线版，
+     不发版本请求、不触发更新、不打扰用户。 */
+  var online=await checkOnline(2000);
+  if(!online)return;
   try{
     var resp=await fetch('./sw.js?ts='+Date.now(),{cache:'no-store'});
     if(!resp.ok)return;

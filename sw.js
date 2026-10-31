@@ -4,11 +4,14 @@
    功能: 离线缓存、App Shell、照片缓存
    ============================================ */
 
-const CACHE_VERSION = 'v144';
+const CACHE_VERSION = 'v145';
 const APP_SHELL = 'calorie-app-shell-' + CACHE_VERSION;
 const PHOTO_CACHE = 'calorie-photos-' + CACHE_VERSION;
 
 // App Shell 资源列表（核心文件，首次安装时预缓存）
+// v3.13.57：补上 ing-alias.js / weight-tips.js ——
+// 之前漏了这两个，离线时它们加载失败（菜谱算不出营养、getFoodWeightTip 报错）。
+// SW 改成缓存优先后，缓存里必须凑齐首屏全部文件，否则离线打开直接坏。
 const APP_SHELL_FILES = [
   './',
   './index.html',
@@ -16,7 +19,9 @@ const APP_SHELL_FILES = [
   './favicon.png',
   './apple-touch-icon.png',
   './foods.js',
-  './recipes.js'
+  './recipes.js',
+  './ing-alias.js',
+  './weight-tips.js'
 ];
 
 // ==================== INSTALL ====================
@@ -78,11 +83,12 @@ self.addEventListener('fetch', (event) => {
   // 跳过非 GET 请求
   if (event.request.method !== 'GET') return;
 
-  // 处理应用核心文件请求（Network First：联网优先拿新代码，断网回退缓存）
+  // 处理应用核心文件请求（Cache First：命中缓存立刻返回，零网络等待）
   //
-  // v3.13.44：原来是 staleWhileRevalidate（缓存优先），导致手机上装成 PWA 后
-  // 改了代码/数据必须「退后台杀掉进程再进」才生效 —— 因为每次打开都先给旧缓存。
-  // 改成 Network First：联网时直接拿服务器上的最新文件，断网才用缓存（离线可用）。
+  // v3.13.57：原来是 Network First（联网优先拿新代码），代价是**每次打开都要等网络**
+  // ——首屏 599KB 全部走网络往返，手机上就是"打开慢一点"。
+  // 改成缓存优先：打开直接读本地缓存（秒开），
+  // 版本更新交给页面侧的「联网探测 + 版本检查」在后台做（见 index.html 的 autoCheckUpdate）。
   if (
     pathname.endsWith('.html') ||
     pathname.endsWith('.js') ||
@@ -90,7 +96,7 @@ self.addEventListener('fetch', (event) => {
     pathname === '/' ||
     pathname.endsWith('/')
   ) {
-    event.respondWith(networkFirst(event.request));
+    event.respondWith(cacheFirstAppShell(event.request));
     return;
   }
 
@@ -124,6 +130,36 @@ async function cacheFirst(request) {
   } catch (err) {
     // 离线时，返回缓存中的任何图片作为降级
     return caches.match(request);
+  }
+}
+
+/**
+ * Cache First（App Shell）：命中缓存立刻返回，不等网络
+ * 适用于：index.html / foods.js / recipes.js 等首屏核心文件
+ *
+ * v3.13.57：新增。原来这些文件走 Network First，每次打开都要等网络往返 → 打开慢。
+ * 现在打开直接读缓存（秒开）；没有缓存（首次安装）才走网络并写入缓存。
+ * 版本更新由页面侧后台检查后调 forceUpdate 完成。
+ */
+async function cacheFirstAppShell(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      const cacheCopy = response.clone();
+      caches.open(APP_SHELL).then((cache) => {
+        cache.put(request, cacheCopy);
+      });
+    }
+    return response;
+  } catch (err) {
+    // 离线且没缓存 → 页面请求回退到已缓存的 index.html
+    if (request.headers.get('Accept') && request.headers.get('Accept').includes('text/html')) {
+      const shell = await caches.match('./index.html');
+      if (shell) return shell;
+    }
+    throw err;
   }
 }
 
