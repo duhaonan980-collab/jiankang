@@ -688,6 +688,21 @@ body.fullscreen .page.active{padding-bottom:calc(var(--safe-bottom) + 18px)}
   .weight-full-close{order:1; flex:0 0 auto}
   .range-chip-group{order:2; flex:1 0 100%; min-width:0; width:auto; max-width:100%}
 }
+
+/* ===== v3.13.60 一屏 4 块：折叠式摘要行 ===== */
+.set-fold{margin:8px 16px;background:var(--card-bg);border:0.5px solid var(--card-border);border-radius:18px;overflow:hidden}
+.set-fold>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;min-height:56px}
+.set-fold>summary::-webkit-details-marker{display:none}
+.set-fold-sum-tt{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap}
+.set-fold-sum-val{font-size:19px;font-weight:800;color:var(--blue);letter-spacing:-.3px;white-space:nowrap}
+.set-fold-sum-tag{font-size:11px;color:var(--text3);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-fold-arrow{margin-left:auto;color:var(--text3);font-size:18px;transition:transform .2s;flex:0 0 auto}
+.set-fold[open] .set-fold-arrow{transform:rotate(90deg)}
+.set-fold-body{padding:12px 14px 16px;border-top:0.5px solid var(--card-border)}
+.set-data-row{display:flex;align-items:center;gap:10px;padding:12px 16px;min-height:52px}
+.set-data-row .lb{flex:1;font-size:14px;color:var(--text)}
+.set-data-row .un{font-size:12px;color:var(--text3)}
+.set-data-row input.bf-i{width:76px;margin:0;display:inline-block;text-align:center;flex:0 0 auto;background:var(--card-bg);border:1px solid var(--card-border);border-radius:11px;padding:6px 4px;font-size:15px;font-weight:600;color:var(--text);outline:none;font-family:inherit;-webkit-appearance:none}
 </style>
 </head>
 <body>
@@ -699,7 +714,7 @@ body.fullscreen .page.active{padding-bottom:calc(var(--safe-bottom) + 18px)}
    ② 这里注册时立刻 update()，让新 sw.js 尽快接管
    ③ autoCheckUpdate() 比对版本号，发现新版自动清缓存重载 */
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  navigator.serviceWorker.register('./sw.js').then(reg=>{
+  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>{
     /* 每次打开都主动检查一次更新（原来只在 updatefound 时被动等） */
     if(reg.update){reg.update().catch(()=>{})}
     reg.addEventListener('updatefound',()=>{
@@ -717,6 +732,12 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 }
 
 </script>
+<!-- v3.13.59 新版本常驻横幅：不依赖一闪而过的 toast，点「稍后」下次还会提醒 -->
+<div id="updateBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;align-items:center;gap:10px;padding:10px 14px;background:var(--blue);color:#fff;font-size:13px;box-shadow:0 2px 12px rgba(0,0,0,.2)">
+  <span style="flex:1;line-height:1.4" id="updateBannerTxt">发现新版本</span>
+  <button onclick="applyUpdateBanner()" style="border:none;background:#fff;color:var(--blue);font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:8px;white-space:nowrap">立即更新</button>
+  <button onclick="hideUpdateBanner()" style="border:none;background:transparent;color:#fff;opacity:.8;font-size:12.5px;padding:6px 2px;white-space:nowrap">稍后</button>
+</div>
 <div id="app">
   <main class="page-area">
   <!-- ===== MAIN PAGE 主页 ===== -->
@@ -961,77 +982,93 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <button class="set-back" onclick="navUiBack()">‹</button>
         <div class="set-title">身体测量与体脂</div>
       </div>
-      <div class="set-gtitle" style="margin-top:6px">选填 · 填得越全，体脂越准</div>
-      <!-- v3.13.58 实测体脂率：BMR 体脂白名单来源之一 -->
+      <div class="set-gtitle" style="margin-top:6px">身体数据 · 选填</div>
       <div class="set-card">
-        <div class="sc-head"><span class="sc-tt">实测体脂率</span><span class="set-pill g" id="bfMeasPill" style="display:none">已填写</span></div>
-        <div class="bf3">
-          <div class="bf"><span class="bf-l">体脂率</span><input class="bf-i" type="number" id="setBFMeasured" placeholder="22.0" inputmode="decimal" oninput="setBFMeasured(this.value)"><span class="bf-u">%</span></div>
-          <div class="bf" style="flex:2"><span class="bf-l">测量来源</span>
-            <div class="seg-control" id="bfSrcControl" style="margin:6px 0 0;padding:2px">
-              <div class="seg-item active" data-bfsrc="scale" onclick="setBFSource('scale')" style="font-size:11px;padding:5px 2px">体脂秤</div>
-              <div class="seg-item" data-bfsrc="dexa" onclick="setBFSource('dexa')" style="font-size:11px;padding:5px 2px">DEXA</div>
-              <div class="seg-item" data-bfsrc="caliper" onclick="setBFSource('caliper')" style="font-size:11px;padding:5px 2px">皮褶钳</div>
-            </div>
-          </div>
+        <div class="set-data-row">
+          <span class="lb">实测体脂率</span>
+          <input class="bf-i" type="number" id="setBFMeasured" placeholder="22.0" inputmode="decimal" oninput="setBFMeasured(this.value)">
+          <span class="un">%</span>
+          <span class="set-pill g" id="bfMeasPill" style="display:none">已填写</span>
         </div>
-      </div>
-      <div class="set-tip">💡 晨起空腹、同一时段测；留空则用腰颈围估算。只有「实测体脂」和「U.S. Navy 围度」算得出的体脂，才会用于 Katch 基础代谢。</div>
-      <div class="set-card">
-        <div class="sc-head"><span class="sc-tt">体脂算法</span><span class="set-pill">自动选择最优</span></div>
-        <div class="seg-control" style="margin:0 14px 12px;width:auto" id="bfMethodControl">
-          <div class="seg-item active" data-method="auto" onclick="setBFMethod('auto')">自动</div>
-          <div class="seg-item" data-method="navy" onclick="setBFMethod('navy')">U.S. Navy</div>
-          <div class="seg-item" data-method="hybrid" onclick="setBFMethod('hybrid')">混合法</div>
-          <div class="seg-item" data-method="bmi" onclick="setBFMethod('bmi')">BMI 法</div>
-        </div>
-        <div class="bf3">
+        <div class="bf3" style="padding:0 14px 12px">
           <div class="bf"><span class="bf-l">腰围</span><input class="bf-i" type="number" id="setWaist" placeholder="72" inputmode="decimal"><span class="bf-u">cm</span></div>
           <div class="bf"><span class="bf-l">颈围</span><input class="bf-i" type="number" id="setNeck" placeholder="36" inputmode="decimal"><span class="bf-u">cm</span></div>
           <div class="bf" id="hipField"><span class="bf-l">臀围</span><input class="bf-i" type="number" id="setHip" placeholder="90" inputmode="decimal"><span class="bf-u">cm</span></div>
         </div>
-      </div>
-      <div class="set-tip">💡 填腰围+颈围启用 U.S. Navy 公式（精度最高）；女性填臀围。留空则用 BMI 估算。</div>
-      <!-- v3.13.58 基础代谢公式：两公式并列 + 口径说明 -->
-      <div class="set-card">
-        <div class="sc-head"><span class="sc-tt">基础代谢公式</span><span class="set-pill" id="bmrActivePill">自动</span></div>
-        <div class="seg-control" style="margin:0 14px 12px;width:auto" id="bmrMethodControl">
-          <div class="seg-item active" data-bmrm="auto" onclick="setBMRMethod('auto')">自动</div>
-          <div class="seg-item" data-bmrm="mifflin" onclick="setBMRMethod('mifflin')">Mifflin</div>
-          <div class="seg-item" data-bmrm="katch" onclick="setBMRMethod('katch')">Katch</div>
-        </div>
-        <div class="algo-compare" style="margin:0 14px 12px;gap:8px">
-          <div class="algo-compare-item" id="bmrMifItem" style="padding:10px 4px;background:rgba(118,118,128,0.06)"><div class="val" id="bmrMifVal" style="font-size:17px">--</div><div class="label">Mifflin-St Jeor</div></div>
-          <div class="algo-compare-item" id="bmrKatItem" style="padding:10px 4px;background:rgba(118,118,128,0.06)"><div class="val" id="bmrKatVal" style="font-size:17px">--</div><div class="label">Katch-McArdle</div></div>
-        </div>
-        <div class="set-tip" id="bmrMethodTip" style="margin:0 14px 14px;background:rgba(118,118,128,0.06)">--</div>
-      </div>
-      <!-- v3.13.58 体重变化校准 -->
-      <div class="set-card">
-        <div class="sc-head"><span class="sc-tt">按体重变化校准</span><span class="set-pill o" id="calibStatePill">未开启</span></div>
-        <div style="padding:0 14px 12px;font-size:12px;color:var(--text2);line-height:1.7" id="calibInfo">--</div>
-        <div style="display:flex;gap:8px;margin:0 14px 14px">
-          <div class="seg-item" id="calibApplyBtn" onclick="applyTdeeCalib()" style="flex:1;background:rgba(0,122,255,0.12);color:var(--blue)">应用校准</div>
-          <div class="seg-item" onclick="resetTdeeCalib()" style="flex:1;background:rgba(118,118,128,0.12)">重置</div>
-        </div>
-        <div class="set-tip" style="margin:0 14px 14px;background:rgba(118,118,128,0.06)">取最近 28 天：平均每日摄入 − 体重回归斜率×7700 = 真实每日消耗。需 ≥14 天饮食记录 + ≥5 次体重记录；数据不够或偏差过大一律不出数。只影响推荐摄入，不改历史记录。</div>
-      </div>
-      <div class="set-card">
-        <div class="sc-head"><span class="sc-tt">目标体脂率</span><span class="set-pill">用于减脂预测</span></div>
-        <div class="bf3">
-          <div class="bf"><span class="bf-l">目标体脂</span><input class="bf-i" type="number" id="setTargetBF" placeholder="18" inputmode="decimal" oninput="setTargetBF(this.value)"><span class="bf-u">%</span></div>
-          <div class="bf" style="grid-column:span 2"><span class="bf-l" style="flex:1;color:var(--text3);font-size:12px" id="bfTargetHint">留空 = 按 BMI 22 健康体重推算</span></div>
+        <div class="set-data-row" style="border-top:0.5px solid var(--card-border)">
+          <span class="lb">目标体脂率<br><span style="font-size:11px;color:var(--text3)" id="bfTargetHint">留空 = 按 BMI 22 健康体重推算</span></span>
+          <input class="bf-i" type="number" id="setTargetBF" placeholder="18" inputmode="decimal" oninput="setTargetBF(this.value)">
+          <span class="un">%</span>
         </div>
       </div>
-      <div class="set-tip" id="bfSuggestTip">参考：男性健康 14～18% · 女性健康 21～25%</div>
-      <div class="set-card">
-        <div class="sc-head"><span class="sc-tt">体脂结果对比</span><span style="font-size:11px;color:var(--text3)" id="bfCompareHead">各算法同显 · 高亮为当前采用</span></div>
-        <div class="algo-compare" id="algoCompareInner">
-          <div class="algo-compare-item"><div class="val" id="bfNavyVal">--</div><div class="label">Navy 法</div><div class="stars">★★★★</div></div>
-          <div class="algo-compare-item"><div class="val" id="bfHybridVal">--</div><div class="label">混合法</div><div class="stars">★★★</div></div>
-          <div class="algo-compare-item"><div class="val" id="bfBMIVal">--</div><div class="label">BMI 法</div><div class="stars">★★</div></div>
+      <div class="set-tip">💡 晨起空腹、同一时段测体脂；腰围 + 颈围（女性加臀围）用于 U.S. Navy 估算。<b>只有实测体脂和 Navy 围度算得出的体脂，才用于 Katch 基础代谢。</b></div>
+
+      <details class="set-fold" id="foldBMR">
+        <summary>
+          <span class="set-fold-sum-tt">基础代谢</span>
+          <span class="set-fold-sum-val" id="bmrSumVal">--</span>
+          <span class="set-fold-sum-tag" id="bmrSumTag">--</span>
+          <span class="set-fold-arrow">›</span>
+        </summary>
+        <div class="set-fold-body">
+          <div class="bf-hint" style="margin:0 0 8px">体脂来源 · 仅影响基础代谢口径</div>
+          <div class="seg-control" id="bfSrcControl" style="margin:0 0 14px;width:auto">
+            <div class="seg-item active" data-bfsrc="scale" onclick="setBFSource('scale')">体脂秤</div>
+            <div class="seg-item" data-bfsrc="dexa" onclick="setBFSource('dexa')">DEXA</div>
+            <div class="seg-item" data-bfsrc="caliper" onclick="setBFSource('caliper')">皮褶钳</div>
+          </div>
+          <div class="bf-hint" style="margin:0 0 8px">计算公式</div>
+          <div class="seg-control" style="margin:0 0 12px;width:auto" id="bmrMethodControl">
+            <div class="seg-item active" data-bmrm="auto" onclick="setBMRMethod('auto')">自动</div>
+            <div class="seg-item" data-bmrm="mifflin" onclick="setBMRMethod('mifflin')">Mifflin</div>
+            <div class="seg-item" data-bmrm="katch" onclick="setBMRMethod('katch')">Katch</div>
+          </div>
+          <div class="algo-compare" style="gap:8px;margin-bottom:12px">
+            <div class="algo-compare-item" id="bmrMifItem" style="padding:10px 4px;background:rgba(118,118,128,0.06)"><div class="val" id="bmrMifVal" style="font-size:17px">--</div><div class="label">Mifflin-St Jeor</div></div>
+            <div class="algo-compare-item" id="bmrKatItem" style="padding:10px 4px;background:rgba(118,118,128,0.06)"><div class="val" id="bmrKatVal" style="font-size:17px">--</div><div class="label">Katch-McArdle</div></div>
+          </div>
+          <div class="set-tip" id="bmrMethodTip" style="margin:0;background:rgba(118,118,128,0.06)">--</div>
         </div>
-      </div>
+      </details>
+
+      <details class="set-fold" id="foldCalib">
+        <summary>
+          <span class="set-fold-sum-tt">体重变化校准</span>
+          <span class="set-fold-sum-tag" id="calibSumTag" style="flex:0 0 auto">未开启</span>
+          <span class="set-fold-sum-tag" id="calibSumNote" style="text-align:right">--</span>
+          <span class="set-fold-arrow">›</span>
+        </summary>
+        <div class="set-fold-body">
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.7;margin-bottom:12px" id="calibInfo">--</div>
+          <div style="display:flex;gap:8px">
+            <div class="seg-item" id="calibApplyBtn" onclick="applyTdeeCalib()" style="flex:1;background:rgba(0,122,255,0.12);color:var(--blue)">应用校准</div>
+            <div class="seg-item" onclick="resetTdeeCalib()" style="flex:1;background:rgba(118,118,128,0.12)">重置</div>
+          </div>
+          <div class="set-tip" style="margin:12px 0 0;background:rgba(118,118,128,0.06)">取最近 28 天：平均每日摄入 − 体重回归斜率×7700 = 真实每日消耗。需 ≥14 天饮食记录 + ≥5 次体重记录；数据不够或偏差过大一律不出数。只影响推荐摄入，不改历史记录。</div>
+        </div>
+      </details>
+
+      <details class="set-fold" id="foldCompare">
+        <summary>
+          <span class="set-fold-sum-tt">体脂结果对比</span>
+          <span class="set-fold-sum-tag" id="bfCompareHead">各算法同显 · 高亮为当前采用</span>
+          <span class="set-fold-arrow">›</span>
+        </summary>
+        <div class="set-fold-body">
+          <div class="seg-control" style="margin:0 0 12px;width:auto" id="bfMethodControl">
+            <div class="seg-item active" data-method="auto" onclick="setBFMethod('auto')">自动</div>
+            <div class="seg-item" data-method="navy" onclick="setBFMethod('navy')">U.S. Navy</div>
+            <div class="seg-item" data-method="hybrid" onclick="setBFMethod('hybrid')">混合法</div>
+            <div class="seg-item" data-method="bmi" onclick="setBFMethod('bmi')">BMI 法</div>
+          </div>
+          <div class="algo-compare" id="algoCompareInner">
+            <div class="algo-compare-item" style="background:rgba(118,118,128,0.06)"><div class="val" id="bfNavyVal">--</div><div class="label">Navy 法</div><div class="stars">★★★★</div></div>
+            <div class="algo-compare-item" style="background:rgba(118,118,128,0.06)"><div class="val" id="bfHybridVal">--</div><div class="label">混合法</div><div class="stars">★★★</div></div>
+            <div class="algo-compare-item" style="background:rgba(118,118,128,0.06)"><div class="val" id="bfBMIVal">--</div><div class="label">BMI 法</div><div class="stars">★★</div></div>
+          </div>
+          <div class="set-tip" id="bfSuggestTip" style="margin:12px 0 0;background:rgba(118,118,128,0.06)">参考：男性健康 14～18% · 女性健康 21～25%</div>
+        </div>
+      </details>
     </div>
 
     <!-- ============ 二级：目标与活动 ============ -->
@@ -1173,6 +1210,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="set-card">
         <div class="set-row" style="cursor:pointer" onclick="checkUpdate()"><span style="font-size:18px;width:30px;text-align:center">🔄</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">检查更新</div><div style="font-size:11px;color:var(--text3);margin-top:1px">拉取最新代码与数据 · 改版后点这里立即生效</div></span><span class="se-che">›</span></div>
         <div class="set-row" style="cursor:pointer" onclick="clearPhotoCache()"><span style="font-size:18px;width:30px;text-align:center">🖼️</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">清除照片缓存</div><div style="font-size:11px;color:var(--text3);margin-top:1px">仅清图片临时副本 · 不删任何照片记录</div></span><span class="se-che">›</span></div>
+        <div class="set-row" id="restoreRow" style="cursor:pointer;display:none" onclick="restorePreupdateData()"><span style="font-size:18px;width:30px;text-align:center">↩️</span><span style="flex:1"><div style="font-size:14.5px;font-weight:600">恢复更新前数据</div><div style="font-size:11px;color:var(--text3);margin-top:1px" id="restoreRowHint">把数据回滚到上次更新前的快照</div></span><span class="se-che">›</span></div>
       </div>
       <div class="set-gtitle" style="color:#E8A9A5">危险操作</div>
       <div class="danger-card" onclick="clearAllData()">
@@ -1181,7 +1219,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.58</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法 · 双公式基础代谢 · 体重变化校准<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.60</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法 · 双公式基础代谢 · 体重变化校准<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -2819,6 +2857,12 @@ function renderSettings(src){
      applyUIConstraints 之后，因为后者会按 BMI 锁定/改写目标）。
      ⚠️ 之前这行误插在 applyUIConstraints 内部，导致「切到维持后档位区还显示着」。 */
   try{ if(typeof renderDeficitTierUI==='function')renderDeficitTierUI() }catch(e){}
+  /* v3.13.59：有「更新前快照」才显示回滚入口，并带上快照时间 */
+  try{
+    refreshRestoreRow();
+    var _at=localStorage.getItem('calorie_app_preupdate_at'),_h=document.getElementById('restoreRowHint');
+    if(_at&&_h)_h.textContent='快照时间：'+_at+' · 点此覆盖当前数据';
+  }catch(e){}
 }
 function renderBFCompare(){
   var all=calcBodyFatAll(state.profile);
@@ -2887,6 +2931,11 @@ function renderBMRCard(){
       :'⚠️ 没有合格体脂（需实测体脂，或腰围+颈围、女性加臀围），已回退 Mifflin。BMI 法 / 混合法估的体脂误差过大，不允许用于 Katch。';
     tip.innerHTML=s1+'<br>'+s2+'<br><span style="color:var(--text3)">公式估算，个体误差可达 ±10~20%；真值需医院间接测热法。</span>';
   }
+  /* v3.13.60 折叠摘要行：收起时也能看到当前结论 */
+  var _sv=document.getElementById('bmrSumVal');
+  if(_sv)_sv.textContent=Math.round(calcBMR(p))+' kcal';
+  var _st=document.getElementById('bmrSumTag');
+  if(_st)_st.textContent=bmrMethodLabel(p)+(src?' · '+src.srcLabel+' '+src.bf.toFixed(1)+'%':' · 需填实测体脂或围度');
 }
 /* ===== v3.13.58 体重变化校准卡片 ===== */
 function renderCalibCard(){
@@ -2907,6 +2956,20 @@ function renderCalibCard(){
   }
   var btn=document.getElementById('calibApplyBtn');
   if(btn){var ok=!!(r&&r.ok);btn.classList.toggle('disabled',!ok);btn.style.opacity=ok?'1':'0.4'}
+  var _ct=document.getElementById('calibSumTag');
+  if(_ct)_ct.textContent=on?('已开启 ×'+p.tdeeCalibK):'未开启';
+  var _cn=document.getElementById('calibSumNote');
+  if(_cn)_cn.textContent=(r&&r.ok)?('可校准 · 样本 '+r.days+' 天'):(r&&r.invalid?'记录偏差过大':'攒够 14 天饮食记录后可用');
+}
+/* v3.13.60：折叠开合记在 state.pages，重载后保持（state.pages 已在 saveState 序列化里） */
+function initSetFolds(){
+  ['foldBMR','foldCalib','foldCompare'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    try{el.open=!!(state.pages&&state.pages[id])}catch(e){}
+    el.addEventListener('toggle',function(){
+      try{state.pages=state.pages||{};state.pages[id]=el.open;saveState()}catch(e){}
+    });
+  });
 }
 function _bmrRefresh(){saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition();refreshSettingsTop()}
 function setBFMeasured(v){
@@ -3804,11 +3867,24 @@ async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？�
    已改成 Network First（联网优先、断网回退缓存），这里再补两个保险：
    ① 手动「检查更新」按钮：清掉所有 SW 缓存 + 重新注册 + 重载页面
    ② 启动时自动比对版本号：发现新版就提示，点一下就更新 */
-var APP_BUILD='v3.13.58';
+var APP_BUILD='v3.13.60';
 /* 清掉所有缓存并强制重新拉取 */
+/* v3.13.59 更新前数据快照：只做一次原样拷贝，绝不删改任何用户数据。
+   更新流程只清 Cache Storage + 反注册 SW，跟 localStorage / IndexedDB 完全隔离。
+   抽成独立函数是为了能单独验证，不触发 reload。 */
+function snapshotBeforeUpdate(){
+  try{
+    var raw=localStorage.getItem('calorie_app');
+    if(!raw)return false;
+    localStorage.setItem('calorie_app_preupdate',raw);
+    localStorage.setItem('calorie_app_preupdate_at',new Date().toLocaleString('zh-CN'));
+    return true;
+  }catch(e){return false}
+}
 async function forceUpdate(silent){
   var btn=document.getElementById('cuBtn');
   if(btn&&!silent){btn.textContent='更新中…';btn.disabled=true}
+  snapshotBeforeUpdate();
   try{
     if('caches' in window){
       var ks=await caches.keys();
@@ -3834,12 +3910,9 @@ async function checkUpdate(){
   showToast('正在检查更新…');
   await forceUpdate(false);
 }
-/* v3.13.57：联网探测（带超时）。
-   老杜原话：「打开 检测是否联网 联网就检测版本是不是最新 没联网或者超时连接就用离线版 不更新」。
-   返回 true = 确认联网；false = 离线或超时（此时 App 就用离线版，不做任何更新动作）。
-   手法：navigator.onLine 先做快速判断（明显离线就立刻返回），
-   再发一个带 AbortController 的轻量 HEAD 请求做真实探测 ——
-   只要能拿到响应（哪怕 405）就说明网络通，只有抛异常才算不通。 */
+/* v3.13.57 遗留的联网探测。v3.13.59 起**不再作为版本检查的闸门**：
+   2 秒超时会把「GitHub Pages 慢」误判成「离线」，让旧版永远不检查更新。
+   函数保留给需要判断网络的场合，版本检查走下面的独立后台任务。 */
 async function checkOnline(timeoutMs){
   timeoutMs=timeoutMs||2000;
   if(navigator.onLine===false)return false;
@@ -3853,30 +3926,60 @@ async function checkOnline(timeoutMs){
     }finally{clearTimeout(timer)}
   }catch(e){return false}
 }
-/* 启动时自动比对：sw.js 里的 CACHE_VERSION 与本地记录的不一致 → 提示有新版 */
+/* ===== v3.13.59 版本检查 =====
+   秒开照旧（App Shell 缓存优先），版本检查独立在后台跑：
+   · 8 秒超时、失败静默，不阻塞首屏、不弹错误
+   · 不再先用 2 秒探网当闸门（慢网 ≠ 离线）
+   · 没记过 app_cache_ver 但已有本地数据 → 照样提示，不用开两次
+   · 常驻横幅；点「稍后」不写版本号，下次打开继续提醒 */
+function showUpdateBanner(ver){
+  window.__pendingVer=ver;
+  var b=document.getElementById('updateBanner'),t=document.getElementById('updateBannerTxt');
+  if(t)t.textContent='发现新版本 '+ver+'，点「立即更新」生效';
+  if(b)b.style.display='flex';
+}
+function hideUpdateBanner(){var b=document.getElementById('updateBanner');if(b)b.style.display='none'}
+function applyUpdateBanner(){
+  try{if(window.__pendingVer)localStorage.setItem('app_cache_ver',window.__pendingVer)}catch(e){}
+  forceUpdate(true);
+}
 async function autoCheckUpdate(){
   if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http'))return;
-  /* v3.13.57：先探联网（2 秒超时）。离线/超时就直接用离线版，
-     不发版本请求、不触发更新、不打扰用户。 */
-  var online=await checkOnline(2000);
-  if(!online)return;
+  var ctl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var timer=ctl?setTimeout(function(){try{ctl.abort()}catch(e){}},8000):null;
   try{
-    var resp=await fetch('./sw.js?ts='+Date.now(),{cache:'no-store'});
+    var opt={cache:'no-store'};
+    if(ctl)opt.signal=ctl.signal;
+    var resp=await fetch('./sw.js?ts='+Date.now(),opt);
     if(!resp.ok)return;
     var txt=await resp.text();
     var m=txt.match(/CACHE_VERSION\s*=\s*'([^']+)'/);
-    if(!m)return;
-    var remote=m[1];
-    var local=localStorage.getItem('app_cache_ver')||'';
-    if(remote&&remote!==local){
-      localStorage.setItem('app_cache_ver',remote);
-      /* 只有当我们自己的页面已经加载过一次（local 有值）才提示，避免首装打扰 */
-      if(local){
-        showToast('发现新版本，正在更新…');
-        setTimeout(function(){forceUpdate(true)},900);
-      }
-    }
-  }catch(e){/* 离线等，忽略 */}
+    if(!m||!m[1])return;
+    var remote=m[1],local=localStorage.getItem('app_cache_ver')||'';
+    if(remote===local)return;
+    /* 首装（既无版本记录也无用户数据）只记下版本，不打扰 */
+    var hasData=false;try{hasData=!!localStorage.getItem('calorie_app')}catch(e){}
+    if(!local&&!hasData){try{localStorage.setItem('app_cache_ver',remote)}catch(e){}return}
+    showUpdateBanner(remote);   /* 用户点「立即更新」时才写 app_cache_ver */
+  }catch(e){/* 离线 / 超时 / GitHub 慢：静默，继续用离线版 */}
+  finally{if(timer)clearTimeout(timer)}
+}
+/* ===== v3.13.59 更新前快照的回滚入口 ===== */
+function restorePreupdateData(){
+  var raw=null,at='';
+  try{raw=localStorage.getItem('calorie_app_preupdate');at=localStorage.getItem('calorie_app_preupdate_at')||''}catch(e){}
+  if(!raw){showToast('没有找到更新前的备份');return}
+  if(!confirm('用 '+(at||'更新前')+' 的数据覆盖当前数据？当前改动会丢失。'))return;
+  try{
+    localStorage.setItem('calorie_app',raw);
+    showToast('已恢复，正在重载…');
+    setTimeout(function(){location.reload()},600);
+  }catch(e){showToast('恢复失败：'+(e&&e.message?e.message:'未知错误'))}
+}
+function refreshRestoreRow(){
+  var row=document.getElementById('restoreRow');if(!row)return;
+  var raw=null;try{raw=localStorage.getItem('calorie_app_preupdate')}catch(e){}
+  row.style.display=raw?'':'none';
 }
 
 function renderWeightChart(){
@@ -7194,6 +7297,7 @@ function obSkipAll(){
 }
 async function init(){
   loadState();
+  try{initSetFolds()}catch(e){}
   /* v3.13.40 食材库换 USDA 后，菜单存量项还带着旧库名称与旧营养快照。
      这里在首次渲染前做一次对齐（幂等：靠 item._lib 与 state.menuLib 双重判定）。
      只修数值与名称，**绝不删数据** —— 认不出来的打 _old 标记，UI 上可见。 */
