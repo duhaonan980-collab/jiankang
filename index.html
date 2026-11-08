@@ -888,7 +888,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       </div>
       <div class="set-entry" onclick="openSettingsSub('body')">
         <div class="se-ico" style="background:rgba(52,199,89,0.08)">📏</div>
-        <div style="flex:0 1 auto"><div class="se-tt">身体测量与体脂</div><div class="se-st">腰颈臀 · 算法对比</div></div>
+        <div style="flex:0 1 auto"><div class="se-tt">身体测量与体脂</div><div class="se-st">腰颈臀 · 体脂 · 基础代谢</div></div>
         <div class="se-val"><span class="set-pill g" id="sBfVal" style="display:none">已填写</span><span class="set-pill o" id="sBfValNo" style="display:none">未填写</span></div>
         <span class="se-che">›</span>
       </div>
@@ -962,6 +962,21 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <div class="set-title">身体测量与体脂</div>
       </div>
       <div class="set-gtitle" style="margin-top:6px">选填 · 填得越全，体脂越准</div>
+      <!-- v3.13.58 实测体脂率：BMR 体脂白名单来源之一 -->
+      <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">实测体脂率</span><span class="set-pill g" id="bfMeasPill" style="display:none">已填写</span></div>
+        <div class="bf3">
+          <div class="bf"><span class="bf-l">体脂率</span><input class="bf-i" type="number" id="setBFMeasured" placeholder="22.0" inputmode="decimal" oninput="setBFMeasured(this.value)"><span class="bf-u">%</span></div>
+          <div class="bf" style="flex:2"><span class="bf-l">测量来源</span>
+            <div class="seg-control" id="bfSrcControl" style="margin:6px 0 0;padding:2px">
+              <div class="seg-item active" data-bfsrc="scale" onclick="setBFSource('scale')" style="font-size:11px;padding:5px 2px">体脂秤</div>
+              <div class="seg-item" data-bfsrc="dexa" onclick="setBFSource('dexa')" style="font-size:11px;padding:5px 2px">DEXA</div>
+              <div class="seg-item" data-bfsrc="caliper" onclick="setBFSource('caliper')" style="font-size:11px;padding:5px 2px">皮褶钳</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="set-tip">💡 晨起空腹、同一时段测；留空则用腰颈围估算。只有「实测体脂」和「U.S. Navy 围度」算得出的体脂，才会用于 Katch 基础代谢。</div>
       <div class="set-card">
         <div class="sc-head"><span class="sc-tt">体脂算法</span><span class="set-pill">自动选择最优</span></div>
         <div class="seg-control" style="margin:0 14px 12px;width:auto" id="bfMethodControl">
@@ -977,6 +992,30 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         </div>
       </div>
       <div class="set-tip">💡 填腰围+颈围启用 U.S. Navy 公式（精度最高）；女性填臀围。留空则用 BMI 估算。</div>
+      <!-- v3.13.58 基础代谢公式：两公式并列 + 口径说明 -->
+      <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">基础代谢公式</span><span class="set-pill" id="bmrActivePill">自动</span></div>
+        <div class="seg-control" style="margin:0 14px 12px;width:auto" id="bmrMethodControl">
+          <div class="seg-item active" data-bmrm="auto" onclick="setBMRMethod('auto')">自动</div>
+          <div class="seg-item" data-bmrm="mifflin" onclick="setBMRMethod('mifflin')">Mifflin</div>
+          <div class="seg-item" data-bmrm="katch" onclick="setBMRMethod('katch')">Katch</div>
+        </div>
+        <div class="algo-compare" style="margin:0 14px 12px;gap:8px">
+          <div class="algo-compare-item" id="bmrMifItem" style="padding:10px 4px;background:rgba(118,118,128,0.06)"><div class="val" id="bmrMifVal" style="font-size:17px">--</div><div class="label">Mifflin-St Jeor</div></div>
+          <div class="algo-compare-item" id="bmrKatItem" style="padding:10px 4px;background:rgba(118,118,128,0.06)"><div class="val" id="bmrKatVal" style="font-size:17px">--</div><div class="label">Katch-McArdle</div></div>
+        </div>
+        <div class="set-tip" id="bmrMethodTip" style="margin:0 14px 14px;background:rgba(118,118,128,0.06)">--</div>
+      </div>
+      <!-- v3.13.58 体重变化校准 -->
+      <div class="set-card">
+        <div class="sc-head"><span class="sc-tt">按体重变化校准</span><span class="set-pill o" id="calibStatePill">未开启</span></div>
+        <div style="padding:0 14px 12px;font-size:12px;color:var(--text2);line-height:1.7" id="calibInfo">--</div>
+        <div style="display:flex;gap:8px;margin:0 14px 14px">
+          <div class="seg-item" id="calibApplyBtn" onclick="applyTdeeCalib()" style="flex:1;background:rgba(0,122,255,0.12);color:var(--blue)">应用校准</div>
+          <div class="seg-item" onclick="resetTdeeCalib()" style="flex:1;background:rgba(118,118,128,0.12)">重置</div>
+        </div>
+        <div class="set-tip" style="margin:0 14px 14px;background:rgba(118,118,128,0.06)">取最近 28 天：平均每日摄入 − 体重回归斜率×7700 = 真实每日消耗。需 ≥14 天饮食记录 + ≥5 次体重记录；数据不够或偏差过大一律不出数。只影响推荐摄入，不改历史记录。</div>
+      </div>
       <div class="set-card">
         <div class="sc-head"><span class="sc-tt">目标体脂率</span><span class="set-pill">用于减脂预测</span></div>
         <div class="bf3">
@@ -986,7 +1025,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       </div>
       <div class="set-tip" id="bfSuggestTip">参考：男性健康 14～18% · 女性健康 21～25%</div>
       <div class="set-card">
-        <div class="sc-head"><span class="sc-tt">体脂结果对比</span><span style="font-size:11px;color:var(--text3)">各算法同显 · 高亮为当前采用</span></div>
+        <div class="sc-head"><span class="sc-tt">体脂结果对比</span><span style="font-size:11px;color:var(--text3)" id="bfCompareHead">各算法同显 · 高亮为当前采用</span></div>
         <div class="algo-compare" id="algoCompareInner">
           <div class="algo-compare-item"><div class="val" id="bfNavyVal">--</div><div class="label">Navy 法</div><div class="stars">★★★★</div></div>
           <div class="algo-compare-item"><div class="val" id="bfHybridVal">--</div><div class="label">混合法</div><div class="stars">★★★</div></div>
@@ -1142,7 +1181,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.57</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.58</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法 · 双公式基础代谢 · 体重变化校准<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1517,7 +1556,9 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 <script src="weight-tips.js"></script>
 <script>
 let state = {
-  profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',targetBF:0,activity:'low',goal:'lose'},
+  profile:{height:0,weight:0,age:25,gender:'male',waist:0,neck:0,hip:0,bfMethod:'auto',targetBF:0,activity:'low',goal:'lose',
+    /* v3.13.58 基础代谢口径与体重变化校准 */
+    bfMeasured:0,bfSource:'scale',bmrMethod:'auto',tdeeCalibOn:false,tdeeCalibK:0},
   foodLogs:{}, weightRecords:{},
   selectedDate:getDateKey(new Date()),
   pendingFood:null, pendingMeal:null, currentCat:'all',
@@ -1585,7 +1626,14 @@ function clearAllPhotoData(){
 
 function saveState(){try{localStorage.setItem('calorie_app',JSON.stringify({profile:state.profile,foodLogs:state.foodLogs,weightRecords:state.weightRecords,selectedDate:state.selectedDate,theme:state.theme,appLock:state.appLock,chartMode:state.chartMode,customFoods:state.customFoods,recipes:state.recipes,onboarded:!!state.onboarded,menu:state.menu||[],menuPlans:state.menuPlans||[],menuLib:state.menuLib||'',pages:state.pages||{},exerciseLogs:state.exerciseLogs||{},exerciseTags:state.exerciseTags||[]}))}catch(e){showToast('存储失败')}}
 function loadState(){try{const raw=localStorage.getItem('calorie_app');if(raw){const d=JSON.parse(raw);state.profile=d.profile||state.profile;state.foodLogs=d.foodLogs||{};state.weightRecords=d.weightRecords||{};state.selectedDate=d.selectedDate||getDateKey(new Date());state.theme=d.theme||'auto';state.appLock=d.appLock||{enabled:false,method:'pattern',pattern:[]};state.chartMode=d.chartMode||'weight';state.customFoods=d.customFoods||[];state.recipes=d.recipes||[];state.onboarded=!!d.onboarded;state.menu=d.menu||[];state.menuPlans=d.menuPlans||[];state.menuLib=d.menuLib||'';state.pages=d.pages||{};state.exerciseLogs=d.exerciseLogs||{};state.exerciseTags=Array.isArray(d.exerciseTags)?d.exerciseTags:null;/* 兼容旧版 weightRecords: 数字 → {w,waist} */
-Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';if(typeof state.profile.targetBF==='undefined')state.profile.targetBF=0}}catch(e){console.error(e)}}
+Object.keys(state.weightRecords).forEach(function(k){var v=state.weightRecords[k];if(typeof v==='number')state.weightRecords[k]={w:v,waist:0};if(v&&typeof v.w==='undefined')state.weightRecords[k]={w:v,waist:0}});/* 兼容旧版 profile 无 waist */if(!state.profile.waist)state.profile.waist=0;if(typeof state.profile.neck==='undefined')state.profile.neck=0;if(typeof state.profile.hip==='undefined')state.profile.hip=0;if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';if(typeof state.profile.targetBF==='undefined')state.profile.targetBF=0;
+/* v3.13.58 老数据迁移：全部给默认值，保证老用户行为完全不变（无实测体脂 → 白名单靠围度判定） */
+if(typeof state.profile.bfMeasured==='undefined')state.profile.bfMeasured=0;
+if(typeof state.profile.bfSource==='undefined')state.profile.bfSource='scale';
+if(typeof state.profile.bmrMethod==='undefined')state.profile.bmrMethod='auto';
+if(typeof state.profile.tdeeCalibOn==='undefined')state.profile.tdeeCalibOn=false;
+if(typeof state.profile.tdeeCalibK==='undefined')state.profile.tdeeCalibK=0;
+}}catch(e){console.error(e)}}
 
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function formatDateLabel(k){const t=getDateKey(new Date());if(k===t)return '今天';if(k===getDateKey(new Date(Date.now()-86400000)))return '昨天';const[y,m,dd]=k.split('-');return parseInt(m)+'月'+parseInt(dd)+'日'}
@@ -1630,7 +1678,40 @@ function getBMIInfo(b){
   const p=getBMIPolicy(b);if(!p)return{label:'--',status:'--',color:'var(--text3)',desc:'',severity:'none',lockedGoals:[],recGoal:'',bmiLevel:0};
   return{label:p.label,status:p.status,color:p.color,desc:p.msg,severity:p.severity,lockedGoals:p.lockedGoals,recGoal:p.recGoal,allowedGoals:p.allowedGoals,recActivity:p.recActivity,bmiLevel:p.bmiLevel};
 }
-function calcBMR(p){if(!p.height||!p.weight||!p.age)return 0;const b=10*p.weight+6.25*p.height-5*p.age;return p.gender==='male'?b+5:b-161}
+/* ===== v3.13.58 基础代谢口径 =====
+   Mifflin-St Jeor：10W+6.25H-5A+5/-161 —— 人群验证最充分，群体无偏倚
+   Katch-McArdle  ：370+21.6×FFM —— 按去脂体重算，体型偏离常态时不易系统性跑偏
+   体脂白名单（老杜定）：只允许「手填实测体脂」和「U.S. Navy 围度（腰+颈，女加臀）」
+   算得出的体脂用于 Katch；BMI 法 / 混合法估算的体脂一律不算，强制回退 Mifflin。
+   注意：两者都是公式估算，个体误差仍可达 ±10~20%，真值需医院间接测热。 */
+function calcBMRMifflin(p){if(!p.height||!p.weight||!p.age)return 0;const b=10*p.weight+6.25*p.height-5*p.age;return p.gender==='male'?b+5:b-161}
+function bfMeasuredValid(p){var v=parseFloat((p||{}).bfMeasured);return (isFinite(v)&&v>=3&&v<=45)?v:null}
+/* BMR 专用体脂来源：{bf,src,srcLabel} 或 null。与「体脂算法」选择独立，只看能不能测出来 */
+function bfForBMR(p){
+  p=p||state.profile||{};
+  var m=bfMeasuredValid(p);
+  if(m!==null)return {bf:m,src:'measured',
+    srcLabel:(p.bfSource==='dexa'?'DEXA':p.bfSource==='caliper'?'皮褶钳':'体脂秤')+'实测'};
+  var n=calcBodyFatNavy(p);
+  if(n!==null&&n>0)return {bf:n,src:'navy',srcLabel:'U.S. Navy 围度'};
+  return null;
+}
+function calcBMRKatch(p){
+  p=p||state.profile||{};
+  var b=bfForBMR(p),w=parseFloat(p.weight);
+  if(!b||!(w>0))return 0;
+  var v=370+21.6*(w*(1-b.bf/100));
+  return Math.min(4000,Math.max(800,v));
+}
+/* 唯一判定出口：无合格体脂时，连手动强制 Katch 也拒绝 */
+function activeBMRMethod(p){
+  p=p||state.profile||{};
+  if((p.bmrMethod||'auto')==='mifflin')return 'mifflin';
+  if(!bfForBMR(p))return 'mifflin';
+  return 'katch';
+}
+function bmrMethodLabel(p){return activeBMRMethod(p)==='katch'?'Katch-McArdle':'Mifflin-St Jeor'}
+function calcBMR(p){p=p||state.profile||{};return activeBMRMethod(p)==='katch'?calcBMRKatch(p):calcBMRMifflin(p)}
 var ACT_FACTORS={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
 function actFactor(p){
   p=p||state.profile||{};
@@ -1644,7 +1725,57 @@ function actFactor(p){
   }
   return ACT_FACTORS[p.activity]||1.2;
 }
-function calcTDEE(p){const b=calcBMR(p);if(!b)return 0;return b*actFactor(p)}
+/* 未校准的公式 TDEE。校准模块只能用这个，不能用 calcTDEE（会递归） */
+function calcTDEEBase(p){var b=calcBMR(p);if(!b)return 0;return b*actFactor(p)}
+/* ===== v3.13.58 体重变化校准（穷人版双标水）=====
+   能量平衡：ΔW(kg/天)×7700 = 平均摄入 − 真实TDEE
+   → 真实TDEE = 平均摄入 − 斜率×7700
+   体重用 28 天线性回归斜率（抗水分波动），不用首尾差。
+   门槛：≥14 天有饮食记录 + ≥5 次体重记录；不够就返回 null，绝不出数。 */
+function tdeeCalibRaw(){
+  var p=state.profile||{},logs=state.foodLogs||{},wr=state.weightRecords||{};
+  var today=new Date();today.setHours(0,0,0,0);
+  var DAYS=28,keys=[],i;
+  for(i=DAYS-1;i>=0;i--)keys.push(getDateKey(new Date(today.getTime()-i*86400000)));
+  var sum=0,intakeDays=0,pts=[];
+  keys.forEach(function(k,idx){
+    var arr=logs[k];
+    if(Array.isArray(arr)&&arr.length){
+      var c=arr.reduce(function(s,f){return s+(f.cal||0)},0);
+      if(c>0){sum+=c;intakeDays++}
+    }
+    var r=wr[k],w=r?(typeof r==='object'?parseFloat(r.w):parseFloat(r)):0;
+    if(w>0)pts.push({x:idx,y:w});
+  });
+  if(intakeDays<14||pts.length<5)return {need:true,days:intakeDays,wDays:pts.length};
+  var n=pts.length,sx=0,sy=0,sxx=0,sxy=0;
+  pts.forEach(function(q){sx+=q.x;sy+=q.y;sxx+=q.x*q.x;sxy+=q.x*q.y});
+  var den=n*sxx-sx*sx;
+  if(!(den>0))return {need:true,days:intakeDays,wDays:pts.length};
+  var slope=(n*sxy-sx*sy)/den;
+  if(!isFinite(slope))return {need:true,days:intakeDays,wDays:pts.length};
+  var avgIntake=sum/intakeDays;
+  var realTDEE=avgIntake-slope*7700;
+  var base=calcTDEEBase(p);
+  if(!(base>0)||!(realTDEE>0))return {need:true,days:intakeDays,wDays:pts.length};
+  var k=realTDEE/base;
+  if(k<0.7||k>1.3)return {invalid:true,days:intakeDays,wDays:pts.length,
+    k:Math.round(k*1000)/1000,realTDEE:Math.round(realTDEE),avgIntake:Math.round(avgIntake)};
+  return {ok:true,days:intakeDays,wDays:pts.length,slope:slope,
+    avgIntake:Math.round(avgIntake),realTDEE:Math.round(realTDEE),
+    formulaTDEE:Math.round(base),k:Math.round(k*1000)/1000};
+}
+function tdeeCalibFactor(){
+  var p=state.profile||{};
+  if(!p.tdeeCalibOn)return 1;
+  /* 用户已手填「每天消耗 kcal」反推活动系数时，不再叠校准（防双重计算） */
+  var c=p.activityCustom||{};
+  if(p.activity==='custom'&&parseFloat(c.kcal)>0)return 1;
+  var k=parseFloat(p.tdeeCalibK);
+  if(!isFinite(k)||k<0.7||k>1.3)return 1;
+  return k;
+}
+function calcTDEE(p){var b=calcTDEEBase(p);if(!b)return 0;return b*tdeeCalibFactor()}
 /* ---------- v3.13.46 减脂缺口档位 ----------
    以前减脂是写死的 tdee*0.85（15% 缺口），老杜要求能选 100~500 kcal 的具体缺口。
    科学依据（全部复用项目已有常量，不另造轮子）：
@@ -1830,6 +1961,8 @@ function bcHints(c){
   return out.slice(0,3);
 }
 function calcBodyFat(p){
+  /* v3.13.58：填了实测体脂就全站统一用它（主页体脂率/身体成分/BMR 同一个数） */
+  var _meas=bfMeasuredValid(p);if(_meas!==null)return _meas;
   const m=p.bfMethod||'auto';
   if(m==='navy'){const v=calcBodyFatNavy(p);if(v!==null)return v}
   if(m==='hybrid'){const v=calcBodyFatHybrid(p);if(v!==null)return v}
@@ -2644,8 +2777,13 @@ function renderSettings(src){
   var hipField=document.getElementById('hipField');
   if(hipField)hipField.style.display=state.profile.gender==='female'?'block':'none';
   document.querySelectorAll('#bfMethodControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.method===state.profile.bfMethod));
+  /* v3.13.58：新增输入框都要进 busy 守卫，否则连打字会被重渲染吞掉字符 */
+  var bmEl=document.getElementById('setBFMeasured');
+  if(bmEl&&!busy('setBFMeasured'))bmEl.value=state.profile.bfMeasured>0?state.profile.bfMeasured:'';
+  document.querySelectorAll('#bfSrcControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.bfsrc===(state.profile.bfSource||'scale')));
+  document.querySelectorAll('#bmrMethodControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.bmrm===(state.profile.bmrMethod||'auto')));
   /* v2 布局：身体测量与目标改为独立二级页常显，折叠逻辑移除 */
-  renderBFCompare();
+  renderBFCompare();renderBMRCard();renderCalibCard();
   document.querySelectorAll('#activityControl .seg-item').forEach(el=>el.classList.toggle('active',el.dataset.act===state.profile.activity));
   updateActNotes();
   renderExTags();renderActCustomEcho();
@@ -2703,6 +2841,13 @@ function renderBFCompare(){
     else if(activeMethod==='hybrid'&&items[1])items[1].classList.add('active');
     else if(activeMethod==='bmi'&&items[2])items[2].classList.add('active');
   }
+  /* v3.13.58：填了实测体脂后，三个算法值只作对比，不再冒充「当前采用」 */
+  var _meas=bfMeasuredValid(state.profile||{});
+  if(_meas!==null&&items.length>=3)[].forEach.call(items,function(el){el.classList.remove('active')});
+  var _ch=document.getElementById('bfCompareHead');
+  if(_ch)_ch.textContent=_meas!==null
+    ?('当前采用：实测 '+_meas.toFixed(1)+'%（'+((bfForBMR(state.profile)||{}).srcLabel||'')+'）')
+    :'各算法同显 · 高亮为当前采用';
   /* v3.13.24 目标体脂率输入与提示 */
   var tb=document.getElementById('setTargetBF');
   if(tb&&document.activeElement!==tb)tb.value=(state.profile.targetBF>0)?state.profile.targetBF:'';
@@ -2716,6 +2861,73 @@ function renderBFCompare(){
     var g=(state.profile||{}).gender==='female';
     st.textContent=g?'参考：女性健康 21～25% · 运动员 14～21%':'参考：男性健康 14～18% · 运动员 6～14%';
   }
+}
+/* ===== v3.13.58 基础代谢公式卡片 ===== */
+function renderBMRCard(){
+  var p=state.profile||{};
+  var mf=calcBMRMifflin(p),kt=calcBMRKatch(p),src=bfForBMR(p);
+  var mEl=document.getElementById('bmrMifVal'),kEl=document.getElementById('bmrKatVal');
+  if(mEl)mEl.textContent=mf>0?Math.round(mf)+'':'--';
+  if(kEl)kEl.textContent=kt>0?Math.round(kt)+'':'--';
+  var act=activeBMRMethod(p);
+  var kItem=document.getElementById('bmrKatItem'),mItem=document.getElementById('bmrMifItem');
+  if(kItem)kItem.classList.toggle('active',act==='katch');
+  if(mItem)mItem.classList.toggle('active',act==='mifflin');
+  var kBtn=document.querySelector('#bmrMethodControl [data-bmrm="katch"]');
+  if(kBtn){kBtn.classList.toggle('disabled',!src);kBtn.title=src?'':'需填实测体脂或腰颈围（女加臀）'}
+  var pill=document.getElementById('bmrActivePill');
+  if(pill)pill.textContent=act==='katch'?'采用 Katch':'采用 Mifflin';
+  var measPill=document.getElementById('bfMeasPill');
+  if(measPill)measPill.style.display=bfMeasuredValid(p)!==null?'inline-block':'none';
+  var tip=document.getElementById('bmrMethodTip');
+  if(tip){
+    var s1='当前口径：<b>'+bmrMethodLabel(p)+'</b>';
+    if(src)s1+=' · 体脂 '+src.bf.toFixed(1)+'%（'+src.srcLabel+'）';
+    var s2=src?'Katch 按去脂体重算，体型偏离常态时不易系统性跑偏。'
+      :'⚠️ 没有合格体脂（需实测体脂，或腰围+颈围、女性加臀围），已回退 Mifflin。BMI 法 / 混合法估的体脂误差过大，不允许用于 Katch。';
+    tip.innerHTML=s1+'<br>'+s2+'<br><span style="color:var(--text3)">公式估算，个体误差可达 ±10~20%；真值需医院间接测热法。</span>';
+  }
+}
+/* ===== v3.13.58 体重变化校准卡片 ===== */
+function renderCalibCard(){
+  var p=state.profile||{},r=tdeeCalibRaw();
+  var on=!!p.tdeeCalibOn&&parseFloat(p.tdeeCalibK)>0;
+  var pill=document.getElementById('calibStatePill');
+  if(pill){pill.textContent=on?('已开启 ×'+p.tdeeCalibK):'未开启';pill.className='set-pill '+(on?'g':'o')}
+  var info=document.getElementById('calibInfo');
+  if(info){
+    if(!r||r.need){
+      var d=r?r.days:0,w=r?r.wDays:0;
+      info.innerHTML='数据还不够：还需 <b>'+Math.max(0,14-d)+'</b> 天饮食记录、<b>'+Math.max(0,5-w)+'</b> 次体重记录（当前 '+d+' 天 / '+w+' 次）。<br>不猜、不出数。';
+    }else if(r.invalid){
+      info.innerHTML='本次反推每日消耗 <b>'+r.realTDEE+' kcal</b>，与公式相差过大（×'+r.k+'），多半是漏记或体重波动，已拒绝校准。';
+    }else{
+      info.innerHTML='公式 TDEE <b>'+r.formulaTDEE+'</b> kcal · 体重反推 <b>'+r.realTDEE+'</b> kcal<br>平均摄入 '+r.avgIntake+' kcal/天 · 体重 '+(r.slope*7>=0?'+':'')+(r.slope*7).toFixed(2)+' kg/周 · 系数 ×'+r.k+'<br>样本 '+r.days+' 天饮食 / '+r.wDays+' 次体重';
+    }
+  }
+  var btn=document.getElementById('calibApplyBtn');
+  if(btn){var ok=!!(r&&r.ok);btn.classList.toggle('disabled',!ok);btn.style.opacity=ok?'1':'0.4'}
+}
+function _bmrRefresh(){saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition();refreshSettingsTop()}
+function setBFMeasured(v){
+  var p=state.profile||{};var n=parseFloat(v);
+  p.bfMeasured=(isNaN(n)||n<=0)?0:Math.min(45,Math.max(3,n));
+  /* 不走 renderSettings：输入频繁，只刷受影响的卡片与主页，避免重设输入框 */
+  saveState();renderBMRCard();renderBMI();renderCalorieSummary();renderNutrition();refreshSettingsTop();
+}
+function setBFSource(s){state.profile.bfSource=s;_bmrRefresh()}
+function setBMRMethod(m){state.profile.bmrMethod=m;_bmrRefresh()}
+function applyTdeeCalib(){
+  var r=tdeeCalibRaw();
+  if(!r||!r.ok){showToast(r&&r.invalid?'记录偏差过大，暂不校准':'记录不足：需 ≥14 天饮食 + ≥5 次体重');return}
+  var p=state.profile,old=parseFloat(p.tdeeCalibK);
+  var k=(isFinite(old)&&old>=0.7&&old<=1.3)?(0.7*old+0.3*r.k):r.k;
+  p.tdeeCalibK=Math.round(k*1000)/1000;p.tdeeCalibOn=true;
+  _bmrRefresh();showToast('已按 28 天体重变化校准：×'+p.tdeeCalibK);
+}
+function resetTdeeCalib(){
+  state.profile.tdeeCalibOn=false;state.profile.tdeeCalibK=0;
+  _bmrRefresh();showToast('已重置为公式估算');
 }
 function applyUIConstraints(info){
   if(!info)return;
@@ -3023,7 +3235,12 @@ function refreshSettingsTop(){
   if(verEl)T('sDataVal',verEl.textContent.replace(/^热量营养检测\s*/,''));
   /* 资料页 BMR 信息 */
   var bmr=calcBMR(pr),tdee=calcTDEE(pr);
-  if(bmr>0)T('setBMRInfo','由这些数据估算：基础代谢 '+Math.round(bmr)+' kcal · 每日消耗 '+Math.round(tdee)+' kcal');
+  if(bmr>0){
+    var _s=bfForBMR(pr),_c=tdeeCalibFactor();
+    T('setBMRInfo','由这些数据估算：基础代谢 '+Math.round(bmr)+' kcal（'+bmrMethodLabel(pr)
+      +(_s?' · 体脂 '+_s.srcLabel:'')+'）· 每日消耗 '+Math.round(tdee)+' kcal'
+      +(_c!==1?' · 已按体重校准 ×'+Math.round(_c*1000)/1000:''));
+  }
   else T('setBMRInfo','填完身高体重年龄，这里会给出你的基础代谢与每日消耗');
 }
 function setBFMethod(m){state.profile.bfMethod=m;saveState();renderSettings();renderBMI();renderCalorieSummary();renderNutrition()}
@@ -3366,6 +3583,12 @@ function doImportRestore(){
   if(typeof state.profile.neck==='undefined')state.profile.neck=0;
   if(typeof state.profile.hip==='undefined')state.profile.hip=0;
   if(typeof state.profile.bfMethod==='undefined')state.profile.bfMethod='auto';
+  /* v3.13.58 老备份导入：补齐新字段，行为与旧版一致 */
+  if(typeof state.profile.bfMeasured==='undefined')state.profile.bfMeasured=0;
+  if(typeof state.profile.bfSource==='undefined')state.profile.bfSource='scale';
+  if(typeof state.profile.bmrMethod==='undefined')state.profile.bmrMethod='auto';
+  if(typeof state.profile.tdeeCalibOn==='undefined')state.profile.tdeeCalibOn=false;
+  if(typeof state.profile.tdeeCalibK==='undefined')state.profile.tdeeCalibK=0;
   /* 只在文件确实带了这个字段时才覆盖，避免内容文件误清记录 */
   if(d.foodLogs!==undefined)state.foodLogs=d.foodLogs;
   if(d.weightRecords!==undefined)state.weightRecords=d.weightRecords;
@@ -3581,7 +3804,7 @@ async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？�
    已改成 Network First（联网优先、断网回退缓存），这里再补两个保险：
    ① 手动「检查更新」按钮：清掉所有 SW 缓存 + 重新注册 + 重载页面
    ② 启动时自动比对版本号：发现新版就提示，点一下就更新 */
-var APP_BUILD='v3.13.57';
+var APP_BUILD='v3.13.58';
 /* 清掉所有缓存并强制重新拉取 */
 async function forceUpdate(silent){
   var btn=document.getElementById('cuBtn');
@@ -6296,8 +6519,10 @@ function openCalorieBreakdown(){
   const diff=target-consumed;
   var bmrSection='<div class="info-modal-item"><div class="info-modal-item-title">🔥 基础代谢 vs 总消耗</div><div class="cal-bmr-grid">'+
     '<div class="cal-bmr-item"><span class="cal-bmr-label">基础代谢 BMR</span><span class="cal-bmr-val">'+Math.round(bmr)+' kcal</span></div>'+
+    '<div class="cal-bmr-item"><span class="cal-bmr-label">计算口径</span><span class="cal-bmr-val" style="font-size:12px;color:var(--text2)">'+bmrMethodLabel(profile)+(bfForBMR(profile)?' · 体脂 '+bfForBMR(profile).srcLabel:'')+'</span></div>'+
     '<div class="cal-bmr-item"><span class="cal-bmr-label">活动系数</span><span class="cal-bmr-val">'+(actLabels[profile.activity]||'未知')+' ×'+realFactor.toFixed(3)+'</span></div>'+
     '<div class="cal-bmr-item" style="border-top:1px solid var(--card-border);padding-top:8px"><span class="cal-bmr-label" style="font-weight:700">总消耗 TDEE</span><span class="cal-bmr-val" style="font-weight:700">'+Math.round(tdee)+' kcal</span></div>'+
+    (tdeeCalibFactor()!==1?'<div class="cal-bmr-item"><span class="cal-bmr-label">体重变化校准</span><span class="cal-bmr-val" style="font-size:12px;color:var(--text2)">×'+Math.round(tdeeCalibFactor()*1000)/1000+'（按 28 天体重反推）</span></div>':'')+
     '<div class="cal-bmr-item"><span class="cal-bmr-label">目标调节</span><span class="cal-bmr-val" style="color:var(--text2)">'+(goalLabels[profile.goal]||'维持')+' → '+target+' kcal</span></div>'+
   '</div></div>';
   var statusHtml='';
