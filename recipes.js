@@ -145,15 +145,18 @@
     var t = {cal:0,p:0,c:0,f:0,fi:0,va:0,vc:0};
     EXT.forEach(function(n){t[n]=0});
     var miss = [];
+    var resolved = [];   /* 记下每样配料对应的库条目，详情页要借它的图标 */
     ingrs.forEach(function(g){
       var f = findFood(g.name) || findAlias(g.name);
-      if (!f) { miss.push(g.name); return; }
+      if (!f) { miss.push(g.name); resolved.push(null); return; }
+      resolved.push(f);
       var k = (g.gram || 0) / 100;
       t.cal += (f.cal||0)*k; t.p += (f.p||0)*k; t.c += (f.c||0)*k;
       t.f += (f.f||0)*k; t.fi += (f.fi||0)*k; t.va += (f.va||0)*k; t.vc += (f.vc||0)*k;
       EXT.forEach(function(n){t[n] += (f[n]||0)*k});
     });
     t.miss = miss;
+    t.resolved = resolved;
     return t;
   }
   var out = [];
@@ -172,9 +175,16 @@
     var per = {cal:Math.round(tot.cal*kp),p:+(tot.p*kp).toFixed(1),c:+(tot.c*kp).toFixed(1),
       f:+(tot.f*kp).toFixed(1),fi:+(tot.fi*kp).toFixed(1),va:Math.round(tot.va*kp),vc:+(tot.vc*kp).toFixed(1)};
     EXT.forEach(function(n){per[n]=+(tot[n]*kp).toFixed(2)});
+    /* v3.13.47：配料行要显示**各自的图标**。
+       之前 RAW 里只存了 name/gram，详情页只能退回默认 🍽️（一整列看着全一样）。
+       这里从库条目借图标（鸡蛋🥚、西红柿🍅…），借不到才用通用 🍽️。 */
+    var ingrs = r.ingrs.map(function(g,i){
+      var db = tot.resolved && tot.resolved[i];
+      return {name:g.name, icon:(db && db.icon) || '🍽️', gram:g.gram, _no:db?0:1};
+    });
     /* cal/p/c/... 是「每份」的口径 —— 菜谱列表、加入菜单、记入饮食都用这个 */
     var rec = {id:'n'+(out.length+1),builtin:true,name:r.name,icon:r.icon,img:null,time:r.time||0,season:r.season||'',
-      ingrs:r.ingrs,steps:r.steps||[],servingG:servingG,
+      ingrs:ingrs,steps:r.steps||[],servingG:servingG,
       cal:Math.round(tot.cal*k),p:+(tot.p*k).toFixed(1),c:+(tot.c*k).toFixed(1),
       f:+(tot.f*k).toFixed(1),fi:+(tot.fi*k).toFixed(1),va:Math.round(tot.va*k),vc:+(tot.vc*k).toFixed(1),
       cat:catOf(tot.p*k,tot.c*k,tot.fi*k),createdAt:0,_per:per};
