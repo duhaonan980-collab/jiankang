@@ -1219,7 +1219,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.60</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法 · 双公式基础代谢 · 体重变化校准<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.61</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法 · 双公式基础代谢 · 体重变化校准<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -3867,7 +3867,7 @@ async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？�
    已改成 Network First（联网优先、断网回退缓存），这里再补两个保险：
    ① 手动「检查更新」按钮：清掉所有 SW 缓存 + 重新注册 + 重载页面
    ② 启动时自动比对版本号：发现新版就提示，点一下就更新 */
-var APP_BUILD='v3.13.60';
+var APP_BUILD='v3.13.61';
 /* 清掉所有缓存并强制重新拉取 */
 /* v3.13.59 更新前数据快照：只做一次原样拷贝，绝不删改任何用户数据。
    更新流程只清 Cache Storage + 反注册 SW，跟 localStorage / IndexedDB 完全隔离。
@@ -6531,8 +6531,11 @@ function exPlanInfo(){
   }
   var remain=Math.round((curW-tw)*10)/10;
   var needKcal=Math.round(remain*KCAL_PER_KG);
-  /* 按当前缺口速度 */
-  var speed=g.gap>0?g.gap:0;
+  /* v3.13.61：减重速度必须用「计划缺口」(TDEE − 推荐摄入)，不是今天的实时缺口。
+     吃满推荐摄入时实时缺口=0，但计划缺口照常，体重会按计划下降。
+     计划缺口 = 减脂档位值(100~500) 或老用户 tdee×0.15；维持/增肌目标则为 0。 */
+  var planGap=Math.max(0,Math.round(calcTDEE(state.profile)-g.target));
+  var speed=planGap;
   var days=speed>0?Math.ceil(needKcal/speed):0;
   /* 健康速率：每周 0.5kg → 每天缺口 550 kcal */
   var healthyDaily=Math.round(0.5*KCAL_PER_KG/7);
@@ -6745,13 +6748,13 @@ function openCalorieBreakdown(){
           +'<div class="ex-rate-item"><div class="ex-rate-num" style="color:var(--blue)">'+(plan.weeklyLoss>=0.01?plan.weeklyLoss.toFixed(2):'0')+'</div><div class="ex-rate-lab">kg / 每周</div></div>'
           +'<div class="ex-rate-item"><div class="ex-rate-num" style="color:var(--blue)">'+(plan.monthlyLoss>=0.1?plan.monthlyLoss.toFixed(1):'0')+'</div><div class="ex-rate-lab">kg / 每月</div></div>'
         +'</div>'
-        +'<div class="ex-rate-src">按今日缺口 '+plan.speed+' kcal/天 折算 · 1 kg ≈ 7700 kcal</div>'
+        +'<div class="ex-rate-src">按计划缺口 '+plan.speed+' kcal/天 折算（与你今天吃多少无关）· 1 kg ≈ 7700 kcal</div>'
         /* 预计时间 */
         +(plan.days>0?('<div class="ex-eta-box">'
           +'<div class="ex-eta-main">按这个节奏，预计 <b>'+plan.days+' 天</b> 后达标</div>'
           +'<div class="ex-eta-sub">约 '+plan.totalWeeksAtCurrent+' 周 · 大概 '+plan.etaDate+'</div>'
-          +'</div>'):'<div class="ex-eta-box warn"><div class="ex-eta-main">今天没有缺口，体重不会往下走</div>'
-          +'<div class="ex-eta-sub">先把缺口做出来（少吃或动起来）再看预测</div></div>')
+          +'</div>'):'<div class="ex-eta-box warn"><div class="ex-eta-main">当前目标没有减重缺口</div>'
+          +'<div class="ex-eta-sub">维持 / 增肌目标不预测减重；要减脂请在目标里选「减脂」</div></div>')
         +'</div>';
     }
   }
