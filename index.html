@@ -1081,11 +1081,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       <div class="set-card">
         <div class="sc-head"><span class="sc-tt">日常活动量</span><button class="sc-link" onclick="showActivityInfo()">说明</button></div>
         <div class="seg-control" style="margin:0 14px 10px;width:auto" id="activityControl">
-          <div class="seg-item active" data-act="low" onclick="setActivity('low')">偏低</div>
-          <div class="seg-item" data-act="normal" onclick="setActivity('normal')">正常</div>
-          <div class="seg-item" data-act="medium" onclick="setActivity('medium')">稍高</div>
-          <div class="seg-item" data-act="high" onclick="setActivity('high')">高</div>
-          <div class="seg-item" data-act="extreme" onclick="setActivity('extreme')">极高</div>
+          <div class="seg-item active" data-act="default" onclick="setActivity('default')">默认</div>
           <div class="seg-item" data-act="custom" onclick="setActivity('custom')">自定义</div>
         </div>
         <div class="act-note" id="actNote" style="margin:0 14px 12px;background:rgba(0,122,255,0.08);border-radius:9px;padding:9px 11px"></div>
@@ -1219,7 +1215,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
         <span style="color:#D9807A;font-size:15px">›</span>
       </div>
       <div class="set-gtitle">关于</div>
-      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.61</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法 · 双公式基础代谢 · 体重变化校准<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
+      <div class="about-text" style="margin:6px 16px 20px"><div class="ver">热量营养检测 v3.13.62</div><div>营养追踪 · 体重管理 · 拍照上传 · 自定义添加 · 菜谱 · U.S. Navy 体脂算法 · 双公式基础代谢 · 体重变化校准<br><span style="font-size:11px;opacity:.75">食物数据来自美国农业部 USDA FoodData Central（每 100 克生鲜食材）</span></div></div>
     </div>
 
     <!-- ============ 二级：页面管理 ============ -->
@@ -1303,11 +1299,8 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
           <div class="set-card" style="margin:6px 0 12px">
             <div class="sc-head"><span class="sc-tt">日常活动量</span></div>
             <div class="seg-control" style="margin:0 14px 10px;width:auto" id="obAct">
-              <div class="seg-item active" data-act="low" onclick="obSetAct('low')">偏低</div>
-              <div class="seg-item" data-act="normal" onclick="obSetAct('normal')">正常</div>
-              <div class="seg-item" data-act="medium" onclick="obSetAct('medium')">稍高</div>
-              <div class="seg-item" data-act="high" onclick="obSetAct('high')">高</div>
-              <div class="seg-item" data-act="extreme" onclick="obSetAct('extreme')">极高</div>
+              <div class="seg-item active" data-act="default" onclick="obSetAct('default')">默认</div>
+              <div class="seg-item" data-act="custom" onclick="obSetAct('custom')">自定义</div>
             </div>
             <div class="act-note" id="obActNote" style="margin:0 14px 12px;background:rgba(0,122,255,0.08);border-radius:9px;padding:9px 11px"></div>
           </div>
@@ -1671,6 +1664,15 @@ if(typeof state.profile.bfSource==='undefined')state.profile.bfSource='scale';
 if(typeof state.profile.bmrMethod==='undefined')state.profile.bmrMethod='auto';
 if(typeof state.profile.tdeeCalibOn==='undefined')state.profile.tdeeCalibOn=false;
 if(typeof state.profile.tdeeCalibK==='undefined')state.profile.tdeeCalibK=0;
+/* v3.13.62 活动量简化迁移：旧五档 → default(1.2) / custom(保留原系数)，TDEE 数值不变 */
+(function(){var a=state.profile.activity;
+  if(a==='default'||a==='custom')return;
+  if(a==='low'){state.profile.activity='default';return;}
+  var legacy={normal:1.375,medium:1.55,high:1.725,extreme:1.9};
+  if(legacy[a]){state.profile.activity='custom';state.profile.activityCustom=state.profile.activityCustom||{};
+    if(!(parseFloat(state.profile.activityCustom.factor)>0))state.profile.activityCustom.factor=legacy[a];}
+  else{state.profile.activity='default';}
+})();
 }}catch(e){console.error(e)}}
 
 function getDateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -1750,7 +1752,7 @@ function activeBMRMethod(p){
 }
 function bmrMethodLabel(p){return activeBMRMethod(p)==='katch'?'Katch-McArdle':'Mifflin-St Jeor'}
 function calcBMR(p){p=p||state.profile||{};return activeBMRMethod(p)==='katch'?calcBMRKatch(p):calcBMRMifflin(p)}
-var ACT_FACTORS={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
+var ACT_FACTORS={default:1.2,low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
 function actFactor(p){
   p=p||state.profile||{};
   if(p.activity==='custom'){
@@ -1901,7 +1903,7 @@ function calcBodyFatHybrid(p){
   const bfBMI=1.2*bmi+0.23*p.age-10.8*sex-5.4;
   let bfWC=0;
   if(p.waist&&p.height){const waistRatio=(p.waist/p.height)*100;bfWC=0.6*(waistRatio-45)}
-  const actMod={low:2,normal:0,medium:-1,high:-2,extreme:-3};
+  const actMod={default:2,low:2,normal:0,medium:-1,high:-2,extreme:-3};
   const mod=actMod[p.activity]||0;
   let bf=bfBMI+bfWC+mod;
   bf=Math.max(3,Math.min(45,bf));
@@ -2633,16 +2635,17 @@ function renderCalorieSummary(){
   renderCalorieRing(total,burnedTotal,target);
   renderExerciseSummary();
   /* ===== v3.13.32 结论上位：原来缩在绿色小条里的缺口/盈余，提为卡片主结论 =====
-     口径不变：净摄入 = 摄入 − 运动，缺口 = 推荐摄入 − 净摄入（BMR 属消耗侧，不抵摄入） */
+     v3.13.62 口径：缺口基准改「维持 TDEE」= TDEE − 净摄入（BMR 属消耗侧，不抵摄入） */
   var vEl=document.getElementById('calorieVerdict');
   if(vEl){
     const netIn=total-exBurn;
-    const gap=target-netIn;
+    const tdee=calcTDEE(state.profile);
+    const gap=Math.round(tdee)-netIn;
     var vCls='none',vTxt='';
     if(total===0&&exBurn===0){vCls='none';vTxt='还未摄入食物';}
-    else if(target>0&&gap>0){vCls='deficit';vTxt='↓ 热量缺口 '+gap+' kcal';}
-    else if(target>0&&gap<=0&&gap>=-target*0.1){vCls='warn';vTxt='热量平衡';}
-    else if(target>0){vCls='surplus';vTxt='↑ 热量盈余 '+(-gap)+' kcal';}
+    else if(tdee>0&&gap>100){vCls='deficit';vTxt='↓ 热量缺口 '+Math.round(gap)+' kcal';}
+    else if(tdee>0&&gap>=-100){vCls='warn';vTxt='热量平衡（接近维持）';}
+    else if(tdee>0){vCls='surplus';vTxt='↑ 热量盈余 '+Math.round(-gap)+' kcal';}
     else{vCls='none';vTxt='已摄入 '+total+' kcal';}
     if(vEl.textContent!==vTxt)vEl.textContent=vTxt;
     var vWant='calorie-verdict '+vCls;
@@ -3008,9 +3011,10 @@ function applyUIConstraints(info){
     el.classList.toggle('active',el.dataset.goal===state.profile.goal);
   });
   if(info.recActivity){
+    /* v3.13.62 活动量简化：recActivity 旧档位(low~extreme)统一落到「默认」 */
     document.querySelectorAll('#activityControl .seg-item').forEach(function(el){
       el.classList.toggle('disabled',false);
-      el.classList.toggle('recommended',el.dataset.act===info.recActivity);
+      el.classList.toggle('recommended',el.dataset.act==='default');
     });
   }
   var goalTip=document.getElementById('goalTip');
@@ -3314,7 +3318,7 @@ function setActivity(a){
   if(a==='custom'){
     state.profile.activityCustom=state.profile.activityCustom||{};
     var c=state.profile.activityCustom;
-    if(!parseFloat(c.factor)&&!parseFloat(c.kcal))c.factor=1.375;
+    if(!parseFloat(c.factor)&&!parseFloat(c.kcal))c.factor=1.2;
     saveState();
   }
   renderSettings();renderCalorieSummary();renderNutrition();renderExerciseSummary();
@@ -3427,25 +3431,22 @@ function renderActCustomEcho(){
   var p=state.profile,f=parseFloat((p.activityCustom||{}).factor),k=parseFloat((p.activityCustom||{}).kcal);
   var b=calcBMR(p);
   var eff=actFactor(p);
-  var src=k>0?('由每日消耗 '+k+' kcal ÷ 基础代谢 '+Math.round(b)+' kcal 反推'):(f>0?'按你填的系数':'未填写，暂用 1.375');
+  var src=k>0?('由每日消耗 '+k+' kcal ÷ 基础代谢 '+Math.round(b)+' kcal 反推'):(f>0?'按你填的系数':'未填写，暂用 1.2');
   box.textContent='实际采用：×'+eff.toFixed(3)+' · 每日总消耗约 '+Math.round(b*eff)+' kcal（'+src+'）';
 }
 /* 活动量按每日步数表述（只改文案，系数/档位/state 值一律不动） */
 var ACT_INFO={
-  low:['偏低 ≈ 每天 5000 步以下','久坐办公、学生、基本不出门'],
-  normal:['正常 ≈ 每天 5000～7500 步','上下班通勤 + 买菜、日常走动'],
-  medium:['稍高 ≈ 每天 7500～10000 步','走得多，或每周运动 3～5 次'],
-  high:['高 ≈ 每天 10000～12500 步','规律训练，或体力型工作'],
-  extreme:['极高 ≈ 每天 12500 步以上','重体力劳动、职业运动员']
+  default:['默认 ≈ 久坐 / 日常','适合大多数上班族：久坐办公 + 日常走动，系数 ×1.2'],
+  custom:['自定义','填活动系数或每天消耗，算得最准']
 };
 function _renderActNote(el,k){
   if(!el)return;
-  var r=ACT_INFO[k]||ACT_INFO.normal;
+  var r=ACT_INFO[k]||ACT_INFO.default;
   el.innerHTML='<div style="font-size:12.5px;font-weight:600;color:var(--blue);margin-bottom:3px">'+r[0]+'</div>'
     +'<div style="font-size:11.5px;color:var(--text3);line-height:1.5">'+r[1]+'</div>';
 }
 function updateActNotes(){
-  var k=state.profile.activity||'low';
+  var k=state.profile.activity||'default';
   _renderActNote(document.getElementById('actNote'),k);
   _renderActNote(document.getElementById('obActNote'),k);
 }
@@ -3505,17 +3506,14 @@ function setDeficitTier(k){
 }
 function setTheme(t){state.theme=t;saveState();if(t==='auto'){document.documentElement.removeAttribute('data-theme')}else{document.documentElement.setAttribute('data-theme',t)};document.querySelector('meta[name="theme-color"]').content=t==='dark'?'#000000':'#F2F2F7';renderSettings()}
 function showActivityInfo(){
-  document.getElementById('infoModalTitle').textContent='你每天大概走多少步';
+  document.getElementById('infoModalTitle').textContent='日常活动量说明';
   var items=[
-    {t:'5000 步以下',d:'久坐办公、学生、基本不出门'},
-    {t:'5000～7500 步',d:'通勤买菜、日常走动，没有固定训练'},
-    {t:'7500～10000 步',d:'走得多，或每周运动 3～5 次'},
-    {t:'10000～12500 步',d:'规律训练，或体力型工作'},
-    {t:'12500 步以上',d:'重体力劳动、职业运动员'}
+    {t:'默认（×1.2）',d:'适合大多数上班族：久坐办公、日常走动、没有固定训练。拿不准就选它，不用纠结。'},
+    {t:'自定义',d:'知道自己的活动系数，或手环 / 体脂秤给了「每天消耗 kcal」，就选自定义填进去，算得最准。'}
   ];
-  var html='<div style="font-size:12.5px;color:var(--text3);line-height:1.5;padding:0 0 8px">看手机里的「健康」或「微信运动」，选最接近的一档就行。</div>';
+  var html='<div style="font-size:12.5px;color:var(--text3);line-height:1.5;padding:0 0 8px">不确定选哪个，先选「默认」就行，之后随时能改。</div>';
   html+=items.map(function(i){return '<div class="info-modal-item"><div class="info-modal-item-title">'+i.t+'</div><div class="info-modal-item-desc">'+i.d+'</div></div>'}).join('');
-  html+='<div class="info-modal-item" style="border-bottom:none;padding-top:10px"><div class="info-modal-item-desc" style="font-size:12px;color:var(--text3)">这里只算走路。若另有力量训练、游泳、骑行等不产生步数的运动，往上选一档。</div></div>';
+  html+='<div class="info-modal-item" style="border-bottom:none;padding-top:10px"><div class="info-modal-item-desc" style="font-size:12px;color:var(--text3)">活动量决定「每日总消耗 TDEE」，进而影响推荐摄入和热量缺口。×1.2 偏保守，减脂时更不容易高估、更稳。</div></div>';
   document.getElementById('infoModalBody').innerHTML=html;
   showModal('infoModal');
 }
@@ -3867,7 +3865,7 @@ async function clearPhotoCache(){if(!confirm('确定清除所有食物照片？�
    已改成 Network First（联网优先、断网回退缓存），这里再补两个保险：
    ① 手动「检查更新」按钮：清掉所有 SW 缓存 + 重新注册 + 重载页面
    ② 启动时自动比对版本号：发现新版就提示，点一下就更新 */
-var APP_BUILD='v3.13.61';
+var APP_BUILD='v3.13.62';
 /* 清掉所有缓存并强制重新拉取 */
 /* v3.13.59 更新前数据快照：只做一次原样拷贝，绝不删改任何用户数据。
    更新流程只清 Cache Storage + 反注册 SW，跟 localStorage / IndexedDB 完全隔离。
@@ -6506,7 +6504,9 @@ function exGapInfo(){
   var bmr=Math.round(calcBMR(state.profile)||0);
   var burnedAll=bmr+burned;
   var net=consumed-burned;            /* 净摄入：只扣运动，BMR 是「消耗侧」不抵摄入 */
-  var gap=target-net;                 /* 正=缺口，负=盈余 */
+  /* v3.13.62：缺口基准从「推荐摄入」改成「维持热量 TDEE」。
+     缺口 = TDEE − 净摄入：吃满减脂推荐时显示的是「比维持少了多少」，而不是 0。 */
+  var gap=Math.round(calcTDEE(state.profile)-net); /* 正=缺口(比维持少)，负=盈余(吃超维持) */
   var lostG=Math.round(Math.abs(gap)/KCAL_PER_KG*1000); /* 理论掉重(或增重)克 */
   return {consumed:consumed,burned:burned,bmr:bmr,burnedAll:burnedAll,
     net:net,netAll:consumed-burnedAll,target:target,gap:gap,
@@ -6531,11 +6531,9 @@ function exPlanInfo(){
   }
   var remain=Math.round((curW-tw)*10)/10;
   var needKcal=Math.round(remain*KCAL_PER_KG);
-  /* v3.13.61：减重速度必须用「计划缺口」(TDEE − 推荐摄入)，不是今天的实时缺口。
-     吃满推荐摄入时实时缺口=0，但计划缺口照常，体重会按计划下降。
-     计划缺口 = 减脂档位值(100~500) 或老用户 tdee×0.15；维持/增肌目标则为 0。 */
-  var planGap=Math.max(0,Math.round(calcTDEE(state.profile)-g.target));
-  var speed=planGap;
+  /* v3.13.62：减重速度用「今日实际缺口」= TDEE − 净摄入（动态，跟着今天吃多少走）。
+     吃满减脂推荐时缺口=档位值(如600)，体重按此下降；吃超维持线则缺口≤0、不预测。 */
+  var speed=Math.max(0,g.gap);
   var days=speed>0?Math.ceil(needKcal/speed):0;
   /* 健康速率：每周 0.5kg → 每天缺口 550 kcal */
   var healthyDaily=Math.round(0.5*KCAL_PER_KG/7);
@@ -6618,8 +6616,8 @@ function openCalorieBreakdown(){
   }
   const bmr=calcBMR(profile);
   const tdee=calcTDEE(profile);
-  const actLabels={low:'偏低',normal:'正常',medium:'稍高',high:'高',extreme:'极高',custom:'自定义'};
-  const actFactors={low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
+  const actLabels={default:'默认',custom:'自定义',low:'偏低',normal:'正常',medium:'稍高',high:'高',extreme:'极高'};
+  const actFactors={default:1.2,low:1.2,normal:1.375,medium:1.55,high:1.725,extreme:1.9};
   const realFactor=actFactor(profile);
   const goalLabels={buddha:'佛系',lose:'减脂',maintain:'维持',gain:'增肌'};
   const diff=target-consumed;
@@ -6669,8 +6667,8 @@ function openCalorieBreakdown(){
     +'<span style="font-size:30px;font-weight:800;color:'+gapColor+';letter-spacing:-0.5px">'+Math.abs(g.gap)+'</span>'
     +'<span style="font-size:13px;color:var(--text2)">kcal</span></div>'
     +'<div style="font-size:11.5px;color:var(--text3);line-height:1.6">'
-    +(g.over?('净摄入比目标多了 '+Math.abs(g.gap)+' kcal，今天算是盈余')
-            :('净摄入比目标少了 '+g.gap+' kcal，这就是今天的热量缺口'))
+    +(g.over?('净摄入比维持热量多了 '+Math.abs(g.gap)+' kcal，今天算是盈余')
+            :('比维持热量少了 '+g.gap+' kcal，这就是今天的热量缺口'))
     +'</div></div>';
   /* ③ 运动标签记录 */
   var tagBtns=exTags().map(function(t){
@@ -6748,13 +6746,16 @@ function openCalorieBreakdown(){
           +'<div class="ex-rate-item"><div class="ex-rate-num" style="color:var(--blue)">'+(plan.weeklyLoss>=0.01?plan.weeklyLoss.toFixed(2):'0')+'</div><div class="ex-rate-lab">kg / 每周</div></div>'
           +'<div class="ex-rate-item"><div class="ex-rate-num" style="color:var(--blue)">'+(plan.monthlyLoss>=0.1?plan.monthlyLoss.toFixed(1):'0')+'</div><div class="ex-rate-lab">kg / 每月</div></div>'
         +'</div>'
-        +'<div class="ex-rate-src">按计划缺口 '+plan.speed+' kcal/天 折算（与你今天吃多少无关）· 1 kg ≈ 7700 kcal</div>'
+        +'<div class="ex-rate-src">按今日缺口 '+plan.speed+' kcal/天 折算 · 1 kg ≈ 7700 kcal</div>'
         /* 预计时间 */
         +(plan.days>0?('<div class="ex-eta-box">'
           +'<div class="ex-eta-main">按这个节奏，预计 <b>'+plan.days+' 天</b> 后达标</div>'
           +'<div class="ex-eta-sub">约 '+plan.totalWeeksAtCurrent+' 周 · 大概 '+plan.etaDate+'</div>'
-          +'</div>'):'<div class="ex-eta-box warn"><div class="ex-eta-main">当前目标没有减重缺口</div>'
-          +'<div class="ex-eta-sub">维持 / 增肌目标不预测减重；要减脂请在目标里选「减脂」</div></div>')
+          +'</div>'):(state.profile.goal==='lose'||state.profile.goal==='buddha'
+            ?'<div class="ex-eta-box warn"><div class="ex-eta-main">今天没制造热量缺口</div>'
+              +'<div class="ex-eta-sub">净摄入达到或超过了维持线，今天体重不会下降</div></div>'
+            :'<div class="ex-eta-box warn"><div class="ex-eta-main">当前目标没有减重缺口</div>'
+              +'<div class="ex-eta-sub">维持 / 增肌目标不预测减重；要减脂请在目标里选「减脂」</div></div>'))
         +'</div>';
     }
   }
@@ -7248,7 +7249,7 @@ function obShowOnboard(){
   V('obWaist',pr.waist||'');V('obNeck',pr.neck||'');V('obHip',pr.hip||'');
   _obSetSeg('obGender',pr.gender||'male');
   _obSetSeg('obBf',pr.bfMethod||'auto');
-  _obSetSeg('obAct',pr.activity||'low');
+  _obSetSeg('obAct',pr.activity||'default');
   updateActNotes();
   _obSetSeg('obGoal',pr.goal||'lose');
   var hf=document.getElementById('obHipField');if(hf)hf.style.display=(pr.gender==='female')?'block':'none';
